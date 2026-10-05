@@ -8,6 +8,14 @@
 
 **Input**: User description: "Crie a primeira specification do projeto NutriLabel para a funcionalidade de Base Nutricional com uso da TACO..."
 
+## Clarifications
+
+### Session 2026-10-05
+
+- Q: Quais componentes nutricionais da TACO devem compor o escopo inicial do sistema? (FR-009) → A: Todos os componentes descritos e disponíveis na tabela TACO completa. Serão preservados na base, sem implicar que todos serão utilizados pelo MVP (a definição de quais nutrientes entram nos cálculos virá nas próximas specifications).
+- Q: Como tratar ou representar internamente marcadores específicos da TACO (Tr, NA e ausente)? (FR-010) → A: Utilizar um campo numérico para o valor quando existir e um campo separado para identificar o estado do dado (EXATO, TRACO, NA, AUSENTE). Esta spec foca na preservação dos estados; sua interpretação matemática virá na spec de cálculo.
+- Q: Como deve funcionar a pesquisa de alimentos e em quais campos ela ocorrerá? (FR-007) → A: Busca parcial focada apenas no nome/descrição, ignorando diferenças entre maiúsculas/minúsculas e acentuação. Buscas avançadas (Full-Text, categoria, ranqueamento) estão fora do escopo inicial.
+
 ## User Scenarios & Testing
 
 <!--
@@ -59,7 +67,7 @@ Como usuário, quero que os alimentos da base possam ser selecionados para uso p
 ### Edge Cases
 
 - O que acontece quando um alimento da TACO não possui valores disponíveis para determinados componentes nutricionais?  
-  O sistema deve preservar a distinção desse estado conforme a fonte e não inventar nem converter o valor para zero. A representação interna será definida posteriormente.
+  O sistema deve preservar a distinção desse estado conforme a fonte e não inventar nem converter o valor para zero. O dado deve ser identificado como AUSENTE, conforme definido no FR-010.
 
 - Como o sistema deve tratar futuramente valores classificados como `Tr` ou `NA` durante cálculos?  
   Esta specification não define comportamento de cálculo. Essa regra será definida em specification posterior do motor de cálculo.
@@ -74,13 +82,10 @@ Como usuário, quero que os alimentos da base possam ser selecionados para uso p
 - **FR-004**: O sistema MUST armazenar e representar os valores nutricionais com base na proporção de 100 gramas de parte comestível.
 - **FR-005**: O sistema MUST distinguir valores numéricos de valores classificados como traço (`Tr`), não aplicáveis (`NA`) ou dados ausentes.
 - **FR-006**: O sistema MUST NÃO converter silenciosamente `Tr`, `NA` ou valores ausentes para zero em nenhuma hipótese.
-- **FR-007**: O sistema MUST permitir a pesquisa/consulta de alimentos pelo nome.  
-  `[NEEDS CLARIFICATION: Como deve funcionar a pesquisa de alimentos? Ex.: busca exata, aproximada, parcial por nome? Em quais campos a busca deve ocorrer?]`
+- **FR-007**: O sistema MUST permitir a pesquisa de alimentos através de busca parcial restrita ao campo de nome/descrição, ignorando obrigatoriamente diferenças de maiúsculas/minúsculas e acentuação (buscas avançadas ou por categoria estão descartadas deste escopo inicial).
 - **FR-008**: O sistema MUST permitir que alimentos da base sejam utilizados como ingredientes em receitas futuras.
-- **FR-009**: O sistema MUST definir o conjunto inicial de componentes nutricionais.  
-  `[NEEDS CLARIFICATION: Quais componentes nutricionais da TACO devem compor o escopo inicial do sistema? Ex.: macronutrientes, micronutrientes específicos ou todos os componentes necessários ao projeto?]`
-- **FR-010**: O sistema MUST garantir uma forma consistente de distinguir os estados dos valores provenientes da TACO.  
-  `[NEEDS CLARIFICATION: Como tratar ou representar internamente marcadores específicos da TACO como Tr, NA e ausente, mantendo sua distinção sem perda de informação?]`
+- **FR-009**: O sistema MUST armazenar a totalidade dos componentes nutricionais descritos e disponíveis na tabela TACO completa, garantindo a preservação integral da base (os componentes efetivamente utilizados no MVP e rotulagem serão definidos em specifications posteriores).
+- **FR-010**: O sistema MUST representar a informação nutricional usando campos separados: um numérico puro para armazenar o valor exato (quando aplicável) e um campo descritivo/estado para identificar inequivocamente se o registro é EXATO, TRACO (`Tr`), NÃO APLICÁVEL (`NA`) ou AUSENTE, adiando a interpretação matemática para futuras especificações de cálculo.
 
 ### Key Entities
 
