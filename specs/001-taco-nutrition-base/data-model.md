@@ -12,6 +12,11 @@ A estrutura permite armazenar todos os componentes nutricionais
 disponíveis na TACO sem criar uma coluna fixa no banco para cada
 componente.
 
+A fonte autoritativa desta feature é o arquivo
+`resources/data/taco/source/taco_4_edicao_ampliada_e_revisada.pdf`, correspondente à Tabela
+Brasileira de Composição de Alimentos — TACO, 4ª edição revisada e
+ampliada, NEPA/UNICAMP, 2011.
+
 Relação conceitual:
 
 Food
@@ -69,6 +74,15 @@ Representa um alimento proveniente da base nutricional.
 - `source_code` não deve ser inventado quando não existir na fonte.
 - Esta feature não adiciona descrição, observação ou metadado criado pelo
   sistema que não tenha sido definido na specification.
+- Para alimentos provenientes da TACO, a identidade lógica de importação e
+  reimportação é `source + source_code`, sendo `source = TACO` e
+  `source_code` o número/código original fornecido pela TACO.
+- Quando já existir um `Food` com o mesmo `source + source_code`, a
+  reimportação deve atualizar esse registro, sem criar duplicata e
+  preservando o mesmo `foods.id`.
+- Para um registro da TACO que deveria representar um alimento, a ausência
+  de `source_code` é um problema de importação. O nome não deve ser usado
+  como fallback silencioso.
 
 ---
 
@@ -101,6 +115,10 @@ Representa um componente nutricional disponível na fonte.
 - O modelo não cria símbolos ou siglas próprias sem origem documentada.
 - Todos os componentes nutricionais definidos para importação da TACO
   devem poder ser representados nessa estrutura.
+- A identidade lógica de um `Nutrient` nesta feature é `name + unit`.
+- Durante a reimportação, o `Nutrient` existente deve ser reutilizado
+  quando `name + unit` coincidirem, sem criação de duplicata para o mesmo
+  par.
 
 ---
 
@@ -252,6 +270,10 @@ deve ser única.
 Isso impede múltiplos valores para o mesmo componente do mesmo alimento
 dentro desta base.
 
+Durante a reimportação, a associação correspondente deve ser atualizada ou
+criada com base em `food_id + nutrient_id`, sem criação de duplicatas para
+a mesma combinação.
+
 ### Integridade referencial
 
 `food_nutrients.food_id`
@@ -309,6 +331,16 @@ PostgreSQL e Laravel conforme documentado no `research.md`.
 
 Durante a importação:
 
+- `resources/data/taco/processed/foods.csv` fornece os alimentos e os dados
+  aprovados para `Food`;
+- `resources/data/taco/processed/nutrients.csv` fornece os componentes
+  nutricionais e suas unidades;
+- `resources/data/taco/processed/food_nutrients.csv` fornece a relação entre
+  alimento e nutriente, preservando `amount_value` e `status`.
+
+Os três arquivos devem ser derivados exclusivamente de
+`resources/data/taco/source/taco_4_edicao_ampliada_e_revisada.pdf`.
+
 ### Valor numérico
 
 Quando a fonte contiver um número:
@@ -316,3 +348,40 @@ Quando a fonte contiver um número:
 ```text
 status = EXACT
 amount_value = valor da fonte
+```
+
+Zero numérico permanece um valor numérico com `status = EXACT` e é
+diferente de `TRACE`.
+
+### Traço
+
+Quando a fonte contiver `Tr`:
+
+```text
+status = TRACE
+amount_value = null
+```
+
+### Não aplicável
+
+Quando a fonte contiver `NA`:
+
+```text
+status = NA
+amount_value = null
+```
+
+### Ausente
+
+Quando existir explicitamente uma célula na estrutura da fonte para o
+componente do alimento e essa célula estiver sem valor:
+
+```text
+status = ABSENT
+amount_value = null
+```
+
+`TRACE`, `NA` e `ABSENT` são estados distintos. A importação não deve criar
+registros `ABSENT` por produto cartesiano entre alimentos e nutrientes, e a
+ausência de uma relação `FoodNutrient` não significa automaticamente
+`ABSENT`.

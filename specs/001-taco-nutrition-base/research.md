@@ -101,18 +101,18 @@ Para esta feature, a fonte será:
 
 `TACO`
 
+A fonte autoritativa é o arquivo
+`resources/data/taco/source/taco_4_edicao_ampliada_e_revisada.pdf`, correspondente à Tabela
+Brasileira de Composição de Alimentos — TACO, 4ª edição revisada e
+ampliada, NEPA/UNICAMP, 2011.
+
 ### Rationale
 
 A TACO é a fonte inicial da base nutricional, mas não representa o
 conceito de alimento em si.
 
-Utilizar nomes como:
-
-- `TacoFood`
-- `TacoNutrient`
-- `TacoFoodNutrient`
-
-acoplaria as entidades do domínio diretamente à fonte.
+Utilizar o nome da fonte como prefixo nas entidades acoplaria os conceitos
+do domínio diretamente à TACO.
 
 O planejamento técnico já determina que a origem dos dados deve permanecer
 rastreável.
@@ -134,6 +134,22 @@ Cada alimento deve preservar:
 - categoria/grupo quando disponível;
 - fonte;
 - código ou identificação original da fonte quando disponível.
+
+Para os alimentos provenientes da TACO nesta feature, a identidade lógica
+utilizada durante importação e reimportação será:
+
+`source + source_code`
+
+Nesta feature, `source = TACO`, e `source_code` deve preservar o
+número/código original do alimento fornecido pela TACO.
+
+Durante a reimportação, quando existir um `Food` com o mesmo
+`source + source_code`, esse registro deve ser atualizado sem criação de
+duplicata e com preservação do mesmo `foods.id`.
+
+Para registros da TACO que deveriam representar alimentos, a ausência de
+`source_code` deve ser tratada como problema de importação. O nome não deve
+ser utilizado como fallback silencioso.
 
 O nome utilizado na aplicação deve preservar a descrição do alimento
 proveniente da TACO.
@@ -167,6 +183,13 @@ NutriLabel.
 Caso a fonte possua um identificador oficial necessário à importação,
 sua utilização deverá preservar exatamente a identificação existente na
 fonte, sem criação de siglas pelo sistema.
+
+A identidade lógica de um `Nutrient` nesta feature será:
+
+`name + unit`
+
+Durante a reimportação, um `Nutrient` existente deve ser reutilizado quando
+`name + unit` coincidirem, sem criação de duplicata para o mesmo par.
 
 ### Rationale
 
@@ -293,6 +316,10 @@ A combinação:
 
 deve ser única em `food_nutrients`.
 
+Durante a reimportação, a associação correspondente deve ser atualizada ou
+criada utilizando `food_id + nutrient_id`, sem criação de duplicatas para a
+mesma combinação.
+
 ### Rationale
 
 O registro representa a informação daquele componente nutricional para
@@ -317,7 +344,13 @@ O comportamento definido pela specification é:
 - ignorar diferenças entre maiúsculas e minúsculas;
 - ignorar diferenças de acentuação.
 
-No PostgreSQL, a implementação poderá utilizar:
+O parâmetro `q` deve ter os espaços externos removidos antes da validação
+e antes de ser entregue ao serviço de busca. Por exemplo, `" maca "` será
+normalizado para `"maca"`. Após a normalização, um valor com conteúdo será
+pesquisado; um valor vazio falhará por validação e nenhuma pesquisa será
+executada.
+
+No PostgreSQL, a implementação utilizará:
 
 - `ILIKE` para comparação sem diferenciação entre maiúsculas/minúsculas;
 - extensão `unaccent` para normalização de acentuação.
@@ -337,8 +370,8 @@ Não fazem parte desta feature:
 
 ### Technical Requirement
 
-Caso `unaccent` seja adotado na implementação, a extensão correspondente
-do PostgreSQL deverá ser habilitada e validada no ambiente do projeto.
+A extensão `unaccent` do PostgreSQL deverá ser habilitada e validada no
+ambiente do projeto.
 
 Essa utilização não altera o comportamento funcional definido na
 specification.
@@ -351,6 +384,29 @@ specification.
 
 A feature deve possuir um processo controlado para transformar os dados da
 TACO em registros da base nutricional.
+
+A fonte autoritativa desse processo é o arquivo
+`resources/data/taco/source/taco_4_edicao_ampliada_e_revisada.pdf`, Tabela Brasileira de Composição de
+Alimentos — TACO, 4ª edição revisada e ampliada, NEPA/UNICAMP, 2011.
+
+Os artefatos estruturados derivados exclusivamente dessa fonte serão:
+
+- `resources/data/taco/processed/foods.csv`, contendo os alimentos e os
+  dados aprovados para `Food`;
+- `resources/data/taco/processed/nutrients.csv`, contendo os componentes
+  nutricionais e suas unidades;
+- `resources/data/taco/processed/food_nutrients.csv`, contendo as relações
+  entre alimentos e nutrientes, com valor e estado `EXACT`, `TRACE`, `NA`
+  ou `ABSENT` conforme as regras aprovadas.
+
+A importação será executada pelo Laravel Artisan Command:
+
+`php artisan nutrition:import-taco`
+
+O Command consumirá os três arquivos em `resources/data/taco/processed/`
+e delegará a persistência e as regras aprovadas ao
+`NutritionBaseService`. O Command não conterá cálculos nutricionais nem
+novas regras de domínio.
 
 A implementação deverá preservar:
 

@@ -48,6 +48,12 @@ minúsculas e acentuação.
 
 **Storage**: PostgreSQL
 
+**Search**: `ILIKE` para ignorar diferenças entre maiúsculas/minúsculas e extensão PostgreSQL `unaccent` para ignorar diferenças de acentuação
+
+**Search Input**: `q` terá espaços externos removidos antes da validação e antes de ser entregue ao `NutritionBaseService`
+
+**Import**: Laravel Artisan Command `php artisan nutrition:import-taco`, consumindo os CSVs em `resources/data/taco/processed/` e delegando a persistência ao `NutritionBaseService`
+
 **Testing**: PHPUnit / Laravel Testing
 
 **Target Platform**: Aplicação Web
@@ -75,6 +81,11 @@ minúsculas e acentuação.
 
 A feature contempla os alimentos e todos os componentes nutricionais
 descritos e disponíveis na TACO fornecida ao projeto.
+
+A fonte autoritativa é
+`resources/data/taco/source/taco_4_edicao_ampliada_e_revisada.pdf`, Tabela
+Brasileira de Composição de Alimentos — TACO, 4ª edição revisada e
+ampliada, NEPA/UNICAMP, 2011.
 
 Todos esses componentes serão preservados na base, mesmo que parte deles
 não seja utilizada pelo MVP.
@@ -130,3 +141,39 @@ specs/001-taco-nutrition-base/
 ├── quickstart.md
 ├── contracts/
 └── tasks.md
+```
+
+### Application Code
+
+```text
+app/
+├── Console/
+│   └── Commands/
+├── Http/
+│   ├── Controllers/
+│   │   └── FoodController.php
+│   └── Requests/
+│       └── FoodSearchRequest.php
+├── Models/
+│   ├── Food.php
+│   ├── Nutrient.php
+│   └── FoodNutrient.php
+└── Services/
+    └── NutritionBaseService.php
+
+database/
+└── migrations/
+
+resources/
+└── data/
+    └── taco/
+        ├── source/
+        │   └── taco_4_edicao_ampliada_e_revisada.pdf
+        └── processed/
+            ├── foods.csv
+            ├── nutrients.csv
+            └── food_nutrients.csv
+
+tests/
+└── Feature/
+```

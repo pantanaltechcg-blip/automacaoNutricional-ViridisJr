@@ -60,8 +60,27 @@ banco de desenvolvimento já existente.
 
 ## 2. Preparar a Base Nutricional
 
-Execute o mecanismo de importação definido durante a implementação desta
-feature para carregar os dados da TACO.
+Execute o Laravel Artisan Command aprovado para carregar os dados da TACO:
+
+```bash
+php artisan nutrition:import-taco
+```
+
+O Command consome:
+
+- `resources/data/taco/processed/foods.csv`;
+- `resources/data/taco/processed/nutrients.csv`;
+- `resources/data/taco/processed/food_nutrients.csv`;
+
+e delega a persistência e as regras aprovadas ao
+`NutritionBaseService`, sem realizar cálculos nutricionais ou introduzir
+novas regras de domínio.
+
+A fonte autoritativa é o arquivo
+`resources/data/taco/source/taco_4_edicao_ampliada_e_revisada.pdf`, Tabela Brasileira de Composição de
+Alimentos — TACO, 4ª edição revisada e ampliada, NEPA/UNICAMP, 2011.
+
+Os três CSVs devem ser derivados exclusivamente dessa fonte.
 
 O mecanismo concreto de importação deve seguir as decisões documentadas
 em:
@@ -92,8 +111,14 @@ marcadores qualitativos para zero.
 
 ## 3. Validar os Dados Importados
 
-Após a importação, selecione registros de referência e compare os dados
-armazenados com a fonte TACO utilizada pelo projeto.
+Após a importação, execute a validação automatizada completa comparando os
+registros processados com a fonte estruturada usada na importação. A
+validação deve confirmar todos os componentes esperados e preservar, em
+100% dos registros processados, a distinção entre zero numérico, `TRACE`,
+`NA` e `ABSENT`.
+
+Uma inspeção manual por amostra pode ser realizada como verificação
+adicional, mas não substitui a validação automatizada completa.
 
 Verifique especificamente:
 
@@ -147,9 +172,25 @@ feature.
 A pesquisa deve:
 
 - utilizar o nome/descrição do alimento;
+- remover os espaços externos de `q` antes da validação e antes de entregar
+  o termo ao serviço de busca, de modo que `" maca "` seja normalizado para
+  `"maca"`;
+- exigir que `q` tenha conteúdo após essa normalização;
 - aceitar correspondência parcial;
 - ignorar diferenças entre maiúsculas e minúsculas;
 - ignorar diferenças de acentuação.
+
+Valide manualmente os casos aprovados:
+
+- `q` válido, depois da remoção de espaços externos, retorna resultados
+  correspondentes;
+- busca sem resultados retorna lista vazia;
+- `q` ausente falha por validação e nenhuma pesquisa é executada;
+- `q` vazio falha por validação e nenhuma pesquisa é executada;
+- `q` somente com espaços falha por validação e nenhuma pesquisa é
+  executada;
+- diferenças entre maiúsculas/minúsculas não alteram os resultados;
+- diferenças de acentuação não alteram os resultados.
 
 Exemplo conceitual:
 
@@ -186,6 +227,10 @@ A resposta da consulta deve preservar, no mínimo:
 - unidade de cada componente;
 - valor numérico quando disponível;
 - estado do valor.
+
+Os valores nutricionais retornados representam composição por `100 g de
+parte comestível`, conforme a fonte TACO, sem conversão ou cálculo nesta
+feature.
 
 Exemplo de estrutura:
 
@@ -237,10 +282,19 @@ Os testes referentes a esta feature devem validar, no mínimo:
 - `NA` diferente de zero;
 - `ABSENT` diferente de zero;
 - distinção entre `TRACE`, `NA` e `ABSENT`;
+- validação completa de que todos os componentes e estados esperados da
+  fonte estruturada foram preservados em todos os registros processados;
 - unicidade da combinação alimento + nutriente;
+- reimportação de alimentos por `source + source_code` sem duplicata e com
+  preservação de `foods.id`;
+- reutilização de nutrientes por `name + unit` sem duplicata;
 - busca parcial por nome;
+- busca sem resultados retorna lista vazia;
+- `q` ausente, vazio ou somente com espaços falha por validação sem executar
+  pesquisa;
 - busca sem diferenciação entre maiúsculas/minúsculas;
-- busca sem diferenciação de acentuação.
+- busca sem diferenciação de acentuação;
+- valores nutricionais representam `100 g de parte comestível`.
 
 ---
 
@@ -248,7 +302,8 @@ Os testes referentes a esta feature devem validar, no mínimo:
 
 A feature poderá ser considerada validada quando:
 
-1. os dados de referência importados corresponderem à fonte;
+1. todos os registros processados corresponderem à fonte estruturada usada
+   na importação, preservando todos os componentes esperados;
 2. nenhum marcador `TRACE`, `NA` ou `ABSENT` tiver sido convertido
    silenciosamente para zero;
 3. os componentes nutricionais preservarem suas unidades;
