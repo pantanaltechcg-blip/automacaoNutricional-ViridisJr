@@ -14,9 +14,9 @@
 
 **Purpose**: Preparação do banco de dados e habilitação dos recursos necessários.
 
-- [ ] T001 Habilitar a extensão `unaccent` do PostgreSQL via migration em `database/migrations/[timestamp]_enable_unaccent_extension.php`
+- [X] T001 Habilitar a extensão `unaccent` do PostgreSQL via migration em `database/migrations/[timestamp]_enable_unaccent_extension.php`
 
-- [ ] T002 Verificar que o arquivo `.env` contém a conexão PostgreSQL configurada para o ambiente de desenvolvimento
+- [X] T002 Verificar que o arquivo `.env` contém a conexão PostgreSQL configurada para o ambiente de desenvolvimento
 
 **Checkpoint**: Infraestrutura do banco pronta. As migrations de schema podem ser aplicadas.
 
@@ -26,21 +26,21 @@
 
 **Purpose**: Definição da precisão necessária, criação do schema relacional e dos Models base dos quais todas as User Stories dependem.
 
-- [ ] T003 Analisar os valores numéricos presentes na fonte autoritativa `resources/data/taco/source/taco_4_edicao_ampliada_e_revisada.pdf` e determinar a representação `NUMERIC`/`DECIMAL` necessária para preservar os valores originais sem arredondamento ou perda de precisão
+- [X] T003 Analisar os valores numéricos presentes na fonte autoritativa `resources/data/taco/source/taco_4_edicao_ampliada_e_revisada.pdf` e determinar a representação `NUMERIC`/`DECIMAL` necessária para preservar os valores originais sem arredondamento ou perda de precisão
 
-- [ ] T004 Criar migration `database/migrations/[timestamp]_create_foods_table.php` com os campos: `id` (PK padrão Laravel), `name` (string, not null), `category` (string, nullable), `source` (string, not null), `source_code` (string, nullable), `timestamps`
+- [X] T004 Criar migration `database/migrations/[timestamp]_create_foods_table.php` com os campos: `id` (PK padrão Laravel), `name` (string, not null), `category` (string, nullable), `source` (string, not null), `source_code` (string, nullable), `timestamps`
 
-- [ ] T005 Criar migration `database/migrations/[timestamp]_create_nutrients_table.php` com os campos: `id` (PK padrão Laravel), `name` (string, not null), `unit` (string, not null), `timestamps`
+- [X] T005 Criar migration `database/migrations/[timestamp]_create_nutrients_table.php` com os campos: `id` (PK padrão Laravel), `name` (string, not null), `unit` (string, not null), `timestamps`
 
-- [ ] T006 Criar migration `database/migrations/[timestamp]_create_food_nutrients_table.php` com os campos: `id` (PK padrão Laravel), `food_id` (FK -> `foods.id`, cascade delete), `nutrient_id` (FK -> `nutrients.id`, cascade delete), `amount_value` (numérico nullable utilizando a precisão definida em T003), `status` (string, not null, valores permitidos: `EXACT`, `TRACE`, `NA`, `ABSENT`), `timestamps`; com unique constraint em `(food_id, nutrient_id)`
+- [X] T006 Criar migration `database/migrations/[timestamp]_create_food_nutrients_table.php` com os campos: `id` (PK padrão Laravel), `food_id` (FK -> `foods.id`, cascade delete), `nutrient_id` (FK -> `nutrients.id`, cascade delete), `amount_value` (numérico nullable utilizando a precisão definida em T003), `status` (string, not null, valores permitidos: `EXACT`, `TRACE`, `NA`, `ABSENT`), `timestamps`; com unique constraint em `(food_id, nutrient_id)`
 
-- [ ] T007 [P] Criar Eloquent Model `app/Models/Food.php` com `$fillable` contendo `name`, `category`, `source`, `source_code`; relacionamento `hasMany(FoodNutrient::class)`
+- [X] T007 [P] Criar Eloquent Model `app/Models/Food.php` com `$fillable` contendo `name`, `category`, `source`, `source_code`; relacionamento `hasMany(FoodNutrient::class)`
 
-- [ ] T008 [P] Criar Eloquent Model `app/Models/Nutrient.php` com `$fillable` contendo `name`, `unit`; relacionamento `hasMany(FoodNutrient::class)`
+- [X] T008 [P] Criar Eloquent Model `app/Models/Nutrient.php` com `$fillable` contendo `name`, `unit`; relacionamento `hasMany(FoodNutrient::class)`
 
-- [ ] T009 Criar Eloquent Model `app/Models/FoodNutrient.php` com `$fillable` contendo `food_id`, `nutrient_id`, `amount_value`, `status`; relacionamentos `belongsTo(Food::class)` e `belongsTo(Nutrient::class)`; constante ou enum para os estados `EXACT`, `TRACE`, `NA`, `ABSENT`
+- [X] T009 Criar Eloquent Model `app/Models/FoodNutrient.php` com `$fillable` contendo `food_id`, `nutrient_id`, `amount_value`, `status`; relacionamentos `belongsTo(Food::class)` e `belongsTo(Nutrient::class)`; constante ou enum para os estados `EXACT`, `TRACE`, `NA`, `ABSENT`
 
-- [ ] T010 Executar `php artisan migrate` e confirmar que as três tabelas foram criadas com o schema correto
+- [X] T010 Executar `php artisan migrate` e confirmar que as três tabelas foram criadas com o schema correto
 
 **Checkpoint**: Schema e Models criados. Nenhum dado nutricional precisa estar populado ainda. As User Stories podem começar.
 
