@@ -1,0 +1,598 @@
+source,source_code,name,category
+TACO,1,"Arroz, integral, cozido",Cereais e derivados
+TACO,2,"Arroz, integral, cru",Cereais e derivados
+TACO,3,"Arroz, tipo 1, cozido",Cereais e derivados
+TACO,4,"Arroz, tipo 1, cru",Cereais e derivados
+TACO,5,"Arroz, tipo 2, cozido",Cereais e derivados
+TACO,6,"Arroz, tipo 2, cru",Cereais e derivados
+TACO,7,"Aveia, flocos, crua",Cereais e derivados
+TACO,8,"Biscoito, doce, maisena",Cereais e derivados
+TACO,9,"Biscoito, doce, recheado com chocolate",Cereais e derivados
+TACO,10,"Biscoito, doce, recheado com morango",Cereais e derivados
+TACO,11,"Biscoito, doce, wafer, recheado de chocolate",Cereais e derivados
+TACO,12,"Biscoito, doce, wafer, recheado de morango",Cereais e derivados
+TACO,13,"Biscoito, salgado, cream cracker",Cereais e derivados
+TACO,14,"Bolo, mistura para",Cereais e derivados
+TACO,15,"Bolo, pronto, aipim",Cereais e derivados
+TACO,16,"Bolo, pronto, chocolate",Cereais e derivados
+TACO,17,"Bolo, pronto, coco",Cereais e derivados
+TACO,18,"Bolo, pronto, milho",Cereais e derivados
+TACO,19,"Canjica, branca, crua",Cereais e derivados
+TACO,20,"Canjica, com leite integral",Cereais e derivados
+TACO,21,"Cereais, milho, flocos, com sal",Cereais e derivados
+TACO,22,"Cereais, milho, flocos, sem sal",Cereais e derivados
+TACO,23,"Cereais, mingau, milho, infantil",Cereais e derivados
+TACO,24,"Cereais, mistura para vitamina, trigo, cevada e aveia",Cereais e derivados
+TACO,25,"Cereal matinal, milho",Cereais e derivados
+TACO,26,"Cereal matinal, milho, açúcar",Cereais e derivados
+TACO,27,"Creme de arroz, pó",Cereais e derivados
+TACO,28,"Creme de milho, pó",Cereais e derivados
+TACO,29,"Curau, milho verde",Cereais e derivados
+TACO,30,"Curau, milho verde, mistura para",Cereais e derivados
+TACO,31,"Farinha, de arroz, enriquecida",Cereais e derivados
+TACO,32,"Farinha, de centeio, integral",Cereais e derivados
+TACO,33,"Farinha, de milho, amarela",Cereais e derivados
+TACO,34,"Farinha, de rosca",Cereais e derivados
+TACO,35,"Farinha, de trigo",Cereais e derivados
+TACO,36,"Farinha, láctea, de cereais",Cereais e derivados
+TACO,37,"Lasanha, massa fresca, cozida",Cereais e derivados
+TACO,38,"Lasanha, massa fresca, crua",Cereais e derivados
+TACO,39,"Macarrão, instantâneo",Cereais e derivados
+TACO,40,"Macarrão, trigo, cru",Cereais e derivados
+TACO,41,"Macarrão, trigo, cru, com ovos",Cereais e derivados
+TACO,42,"Milho, amido, cru",Cereais e derivados
+TACO,43,"Milho, fubá, cru",Cereais e derivados
+TACO,44,"Milho, verde, cru",Cereais e derivados
+TACO,45,"Milho, verde, enlatado, drenado",Cereais e derivados
+TACO,46,"Mingau tradicional, pó",Cereais e derivados
+TACO,47,"Pamonha, barra para cozimento, pré-cozida",Cereais e derivados
+TACO,48,"Pão, aveia, forma",Cereais e derivados
+TACO,49,"Pão, de soja",Cereais e derivados
+TACO,50,"Pão, glúten, forma",Cereais e derivados
+TACO,51,"Pão, milho, forma",Cereais e derivados
+TACO,52,"Pão, trigo, forma, integral",Cereais e derivados
+TACO,53,"Pão, trigo, francês",Cereais e derivados
+TACO,54,"Pão, trigo, sovado",Cereais e derivados
+TACO,55,"Pastel, de carne, cru",Cereais e derivados
+TACO,56,"Pastel, de carne, frito",Cereais e derivados
+TACO,57,"Pastel, de queijo, cru",Cereais e derivados
+TACO,58,"Pastel, de queijo, frito",Cereais e derivados
+TACO,59,"Pastel, massa, crua",Cereais e derivados
+TACO,60,"Pastel, massa, frita",Cereais e derivados
+TACO,61,"Pipoca, com óleo de soja, sem sal",Cereais e derivados
+TACO,62,"Polenta, pré-cozida",Cereais e derivados
+TACO,63,"Torrada, pão francês",Cereais e derivados
+TACO,64,"Abóbora, cabotian, cozida","Verduras, hortaliças e derivados"
+TACO,65,"Abóbora, cabotian, crua","Verduras, hortaliças e derivados"
+TACO,66,"Abóbora, menina brasileira, crua","Verduras, hortaliças e derivados"
+TACO,67,"Abóbora, moranga, crua","Verduras, hortaliças e derivados"
+TACO,68,"Abóbora, moranga, refogada","Verduras, hortaliças e derivados"
+TACO,69,"Abobora, pescoço, crua","Verduras, hortaliças e derivados"
+TACO,70,"Abobrinha, italiana, cozida","Verduras, hortaliças e derivados"
+TACO,71,"Abobrinha, italiana, crua","Verduras, hortaliças e derivados"
+TACO,72,"Abobrinha, italiana, refogada","Verduras, hortaliças e derivados"
+TACO,73,"Abobrinha, paulista, crua","Verduras, hortaliças e derivados"
+TACO,74,"Acelga, crua","Verduras, hortaliças e derivados"
+TACO,75,"Agrião, cru","Verduras, hortaliças e derivados"
+TACO,76,"Aipo, cru","Verduras, hortaliças e derivados"
+TACO,77,"Alface, americana, crua","Verduras, hortaliças e derivados"
+TACO,78,"Alface, crespa, crua","Verduras, hortaliças e derivados"
+TACO,79,"Alface, lisa, crua","Verduras, hortaliças e derivados"
+TACO,80,"Alface, roxa, crua","Verduras, hortaliças e derivados"
+TACO,81,"Alfavaca, crua","Verduras, hortaliças e derivados"
+TACO,82,"Alho, cru","Verduras, hortaliças e derivados"
+TACO,83,"Alho-poró, cru","Verduras, hortaliças e derivados"
+TACO,84,"Almeirão, cru","Verduras, hortaliças e derivados"
+TACO,85,"Almeirão, refogado","Verduras, hortaliças e derivados"
+TACO,86,"Batata, baroa, cozida","Verduras, hortaliças e derivados"
+TACO,87,"Batata, baroa, crua","Verduras, hortaliças e derivados"
+TACO,88,"Batata, doce, cozida","Verduras, hortaliças e derivados"
+TACO,89,"Batata, doce, crua","Verduras, hortaliças e derivados"
+TACO,90,"Batata, frita, tipo chips, industrializada","Verduras, hortaliças e derivados"
+TACO,91,"Batata, inglesa, cozida","Verduras, hortaliças e derivados"
+TACO,92,"Batata, inglesa, crua","Verduras, hortaliças e derivados"
+TACO,93,"Batata, inglesa, frita","Verduras, hortaliças e derivados"
+TACO,94,"Batata, inglesa, sauté","Verduras, hortaliças e derivados"
+TACO,95,"Berinjela, cozida","Verduras, hortaliças e derivados"
+TACO,96,"Berinjela, crua","Verduras, hortaliças e derivados"
+TACO,97,"Beterraba, cozida","Verduras, hortaliças e derivados"
+TACO,98,"Beterraba, crua","Verduras, hortaliças e derivados"
+TACO,99,"Biscoito, polvilho doce","Verduras, hortaliças e derivados"
+TACO,100,"Brócolis, cozido","Verduras, hortaliças e derivados"
+TACO,101,"Brócolis, cru","Verduras, hortaliças e derivados"
+TACO,102,"Cará, cozido","Verduras, hortaliças e derivados"
+TACO,103,"Cará, cru","Verduras, hortaliças e derivados"
+TACO,104,"Caruru, cru","Verduras, hortaliças e derivados"
+TACO,105,"Catalonha, crua","Verduras, hortaliças e derivados"
+TACO,106,"Catalonha, refogada","Verduras, hortaliças e derivados"
+TACO,107,"Cebola, crua","Verduras, hortaliças e derivados"
+TACO,108,"Cebolinha, crua","Verduras, hortaliças e derivados"
+TACO,109,"Cenoura, cozida","Verduras, hortaliças e derivados"
+TACO,110,"Cenoura, crua","Verduras, hortaliças e derivados"
+TACO,111,"Chicória, crua","Verduras, hortaliças e derivados"
+TACO,112,"Chuchu, cozido","Verduras, hortaliças e derivados"
+TACO,113,"Chuchu, cru","Verduras, hortaliças e derivados"
+TACO,114,"Coentro, folhas desidratadas","Verduras, hortaliças e derivados"
+TACO,115,"Couve, manteiga, crua","Verduras, hortaliças e derivados"
+TACO,116,"Couve, manteiga, refogada","Verduras, hortaliças e derivados"
+TACO,117,"Couve-flor, crua","Verduras, hortaliças e derivados"
+TACO,118,"Couve-flor, cozida","Verduras, hortaliças e derivados"
+TACO,119,"Espinafre, Nova Zelândia, cru","Verduras, hortaliças e derivados"
+TACO,120,"Espinafre, Nova Zelândia, refogado","Verduras, hortaliças e derivados"
+TACO,121,"Farinha, de mandioca, crua","Verduras, hortaliças e derivados"
+TACO,122,"Farinha, de mandioca, torrada","Verduras, hortaliças e derivados"
+TACO,123,"Farinha, de puba","Verduras, hortaliças e derivados"
+TACO,124,"Fécula, de mandioca","Verduras, hortaliças e derivados"
+TACO,125,"Feijão, broto, cru","Verduras, hortaliças e derivados"
+TACO,126,"Inhame, cru","Verduras, hortaliças e derivados"
+TACO,127,"Jiló, cru","Verduras, hortaliças e derivados"
+TACO,128,"Jurubeba, crua","Verduras, hortaliças e derivados"
+TACO,129,"Mandioca, cozida","Verduras, hortaliças e derivados"
+TACO,130,"Mandioca, crua","Verduras, hortaliças e derivados"
+TACO,131,"Mandioca, farofa, temperada","Verduras, hortaliças e derivados"
+TACO,132,"Mandioca, frita","Verduras, hortaliças e derivados"
+TACO,133,"Manjericão, cru","Verduras, hortaliças e derivados"
+TACO,134,"Maxixe, cru","Verduras, hortaliças e derivados"
+TACO,135,"Mostarda, folha, crua","Verduras, hortaliças e derivados"
+TACO,136,"Nhoque, batata, cozido","Verduras, hortaliças e derivados"
+TACO,137,"Nabo, cru","Verduras, hortaliças e derivados"
+TACO,138,"Palmito, juçara, em conserva","Verduras, hortaliças e derivados"
+TACO,139,"Palmito, pupunha, em conserva","Verduras, hortaliças e derivados"
+TACO,140,"Pão, de queijo, assado","Verduras, hortaliças e derivados"
+TACO,141,"Pão, de queijo, cru","Verduras, hortaliças e derivados"
+TACO,142,"Pepino, cru","Verduras, hortaliças e derivados"
+TACO,143,"Pimentão, amarelo, cru","Verduras, hortaliças e derivados"
+TACO,144,"Pimentão, verde, cru","Verduras, hortaliças e derivados"
+TACO,145,"Pimentão, vermelho, cru","Verduras, hortaliças e derivados"
+TACO,146,"Polvilho, doce","Verduras, hortaliças e derivados"
+TACO,147,"Quiabo, cru","Verduras, hortaliças e derivados"
+TACO,148,"Rabanete, cru","Verduras, hortaliças e derivados"
+TACO,149,"Repolho, branco, cru","Verduras, hortaliças e derivados"
+TACO,150,"Repolho, roxo, cru","Verduras, hortaliças e derivados"
+TACO,151,"Repolho, roxo, refogado","Verduras, hortaliças e derivados"
+TACO,152,"Rúcula, crua","Verduras, hortaliças e derivados"
+TACO,153,"Salsa, crua","Verduras, hortaliças e derivados"
+TACO,154,"Seleta de legumes, enlatada","Verduras, hortaliças e derivados"
+TACO,155,"Serralha, crua","Verduras, hortaliças e derivados"
+TACO,156,"Taioba, crua","Verduras, hortaliças e derivados"
+TACO,157,"Tomate, com semente, cru","Verduras, hortaliças e derivados"
+TACO,158,"Tomate, extrato","Verduras, hortaliças e derivados"
+TACO,159,"Tomate, molho industrializado","Verduras, hortaliças e derivados"
+TACO,160,"Tomate, purê","Verduras, hortaliças e derivados"
+TACO,161,"Tomate, salada","Verduras, hortaliças e derivados"
+TACO,162,"Vagem, crua","Verduras, hortaliças e derivados"
+TACO,163,"Abacate, cru",Frutas e derivados
+TACO,164,"Abacaxi, cru",Frutas e derivados
+TACO,165,"Abacaxi, polpa, congelada",Frutas e derivados
+TACO,166,"Abiu, cru",Frutas e derivados
+TACO,167,"Açaí, polpa, com xarope de guaraná e glucose",Frutas e derivados
+TACO,168,"Açaí, polpa, congelada",Frutas e derivados
+TACO,169,"Acerola, crua",Frutas e derivados
+TACO,170,"Acerola, polpa, congelada",Frutas e derivados
+TACO,171,"Ameixa, calda, enlatada",Frutas e derivados
+TACO,172,"Ameixa, crua",Frutas e derivados
+TACO,173,"Ameixa, em calda, enlatada, drenada",Frutas e derivados
+TACO,174,"Atemóia, crua",Frutas e derivados
+TACO,175,"Banana, da terra, crua",Frutas e derivados
+TACO,176,"Banana, doce em barra",Frutas e derivados
+TACO,177,"Banana, figo, crua",Frutas e derivados
+TACO,178,"Banana, maçã, crua",Frutas e derivados
+TACO,179,"Banana, nanica, crua",Frutas e derivados
+TACO,180,"Banana, ouro, crua",Frutas e derivados
+TACO,181,"Banana, pacova, crua",Frutas e derivados
+TACO,182,"Banana, prata, crua",Frutas e derivados
+TACO,183,"Cacau, cru",Frutas e derivados
+TACO,184,"Cajá-Manga, cru",Frutas e derivados
+TACO,185,"Cajá, polpa, congelada",Frutas e derivados
+TACO,186,"Caju, cru",Frutas e derivados
+TACO,187,"Caju, polpa, congelada",Frutas e derivados
+TACO,188,"Caju, suco concentrado, envasado",Frutas e derivados
+TACO,189,"Caqui, chocolate, cru",Frutas e derivados
+TACO,190,"Carambola, crua",Frutas e derivados
+TACO,191,"Ciriguela, crua",Frutas e derivados
+TACO,192,"Cupuaçu, cru",Frutas e derivados
+TACO,193,"Cupuaçu, polpa, congelada",Frutas e derivados
+TACO,194,"Figo, cru",Frutas e derivados
+TACO,195,"Figo, enlatado, em calda",Frutas e derivados
+TACO,196,"Fruta-pão, crua",Frutas e derivados
+TACO,197,"Goiaba, branca, com casca, crua",Frutas e derivados
+TACO,198,"Goiaba, doce em pasta",Frutas e derivados
+TACO,199,"Goiaba, doce, cascão",Frutas e derivados
+TACO,200,"Goiaba, vermelha, com casca, crua",Frutas e derivados
+TACO,201,"Graviola, crua",Frutas e derivados
+TACO,202,"Graviola, polpa, congelada",Frutas e derivados
+TACO,203,"Jabuticaba, crua",Frutas e derivados
+TACO,204,"Jaca, crua",Frutas e derivados
+TACO,205,"Jambo, cru",Frutas e derivados
+TACO,206,"Jamelão, cru",Frutas e derivados
+TACO,207,"Kiwi, cru",Frutas e derivados
+TACO,208,"Laranja, baía, crua",Frutas e derivados
+TACO,209,"Laranja, baía, suco",Frutas e derivados
+TACO,210,"Laranja, da terra, crua",Frutas e derivados
+TACO,211,"Laranja, da terra, suco",Frutas e derivados
+TACO,212,"Laranja, lima, crua",Frutas e derivados
+TACO,213,"Laranja, lima, suco",Frutas e derivados
+TACO,214,"Laranja, pêra, crua",Frutas e derivados
+TACO,215,"Laranja, pêra, suco",Frutas e derivados
+TACO,216,"Laranja, valência, crua",Frutas e derivados
+TACO,217,"Laranja, valência, suco",Frutas e derivados
+TACO,218,"Limão, cravo, suco",Frutas e derivados
+TACO,219,"Limão, galego, suco",Frutas e derivados
+TACO,220,"Limão, tahiti, cru",Frutas e derivados
+TACO,221,"Maçã, Argentina, com casca, crua",Frutas e derivados
+TACO,222,"Maçã, Fuji, com casca, crua",Frutas e derivados
+TACO,223,"Macaúba, crua",Frutas e derivados
+TACO,224,"Mamão, doce em calda, drenado",Frutas e derivados
+TACO,225,"Mamão, Formosa, cru",Frutas e derivados
+TACO,226,"Mamão, Papaia, cru",Frutas e derivados
+TACO,227,"Mamão verde, doce em calda, drenado",Frutas e derivados
+TACO,228,"Manga, Haden, crua",Frutas e derivados
+TACO,229,"Manga, Palmer, crua",Frutas e derivados
+TACO,230,"Manga, polpa, congelada",Frutas e derivados
+TACO,231,"Manga, Tommy Atkins, crua",Frutas e derivados
+TACO,232,"Maracujá, cru",Frutas e derivados
+TACO,233,"Maracujá, polpa, congelada",Frutas e derivados
+TACO,234,"Maracujá, suco concentrado, envasado",Frutas e derivados
+TACO,235,"Melancia, crua",Frutas e derivados
+TACO,236,"Melão, cru",Frutas e derivados
+TACO,237,"Mexerica, Murcote, crua",Frutas e derivados
+TACO,238,"Mexerica, Rio, crua",Frutas e derivados
+TACO,239,"Morango, cru",Frutas e derivados
+TACO,240,"Nêspera, crua",Frutas e derivados
+TACO,241,"Pequi, cru",Frutas e derivados
+TACO,242,"Pêra, Park, crua",Frutas e derivados
+TACO,243,"Pêra, Williams, crua",Frutas e derivados
+TACO,244,"Pêssego, Aurora, cru",Frutas e derivados
+TACO,245,"Pêssego, enlatado, em calda",Frutas e derivados
+TACO,246,"Pinha, crua",Frutas e derivados
+TACO,247,"Pitanga, crua",Frutas e derivados
+TACO,248,"Pitanga, polpa, congelada",Frutas e derivados
+TACO,249,"Romã, crua",Frutas e derivados
+TACO,250,"Tamarindo, cru",Frutas e derivados
+TACO,251,"Tangerina, Poncã, crua",Frutas e derivados
+TACO,252,"Tangerina, Poncã, suco",Frutas e derivados
+TACO,253,"Tucumã, cru",Frutas e derivados
+TACO,254,"Umbu, cru",Frutas e derivados
+TACO,255,"Umbu, polpa, congelada",Frutas e derivados
+TACO,256,"Uva, Itália, crua",Frutas e derivados
+TACO,257,"Uva, Rubi, crua",Frutas e derivados
+TACO,258,"Uva, suco concentrado, envasado",Frutas e derivados
+TACO,259,"Azeite, de dendê",Gorduras e óleos
+TACO,260,"Azeite, de oliva, extra virgem",Gorduras e óleos
+TACO,261,"Manteiga, com sal",Gorduras e óleos
+TACO,262,"Manteiga, sem sal",Gorduras e óleos
+TACO,263,"Margarina, com óleo hidrogenado, com sal (65% de lipídeos)",Gorduras e óleos
+TACO,264,"Margarina, com óleo hidrogenado, sem sal (80% de lipídeos)",Gorduras e óleos
+TACO,265,"Margarina, com óleo interesterificado, com sal (65%de lipídeos)",Gorduras e óleos
+TACO,266,"Margarina, com óleo interesterificado, sem sal (65% de lipídeos)",Gorduras e óleos
+TACO,267,"Óleo, de babaçu",Gorduras e óleos
+TACO,268,"Óleo, de canola",Gorduras e óleos
+TACO,269,"Óleo, de girassol",Gorduras e óleos
+TACO,270,"Óleo, de milho",Gorduras e óleos
+TACO,271,"Óleo, de pequi",Gorduras e óleos
+TACO,272,"Óleo, de soja",Gorduras e óleos
+TACO,273,"Abadejo, filé, congelado, assado",Pescados e frutos do mar
+TACO,274,"Abadejo, filé, congelado,cozido",Pescados e frutos do mar
+TACO,275,"Abadejo, filé, congelado, cru",Pescados e frutos do mar
+TACO,276,"Abadejo, filé, congelado, grelhado",Pescados e frutos do mar
+TACO,277,"Atum, conserva em óleo",Pescados e frutos do mar
+TACO,278,"Atum, fresco, cru",Pescados e frutos do mar
+TACO,279,"Bacalhau, salgado, cru",Pescados e frutos do mar
+TACO,280,"Bacalhau, salgado, refogado",Pescados e frutos do mar
+TACO,281,"Cação, posta, com farinha de trigo, frita",Pescados e frutos do mar
+TACO,282,"Cação, posta, cozida",Pescados e frutos do mar
+TACO,283,"Cação, posta, crua",Pescados e frutos do mar
+TACO,284,"Camarão, Rio Grande, grande, cozido",Pescados e frutos do mar
+TACO,285,"Camarão, Rio Grande, grande, cru",Pescados e frutos do mar
+TACO,286,"Camarão, Sete Barbas, sem cabeça, com casca, frito",Pescados e frutos do mar
+TACO,287,"Caranguejo, cozido",Pescados e frutos do mar
+TACO,288,"Corimba, cru",Pescados e frutos do mar
+TACO,289,"Corimbatá, assado",Pescados e frutos do mar
+TACO,290,"Corimbatá, cozido",Pescados e frutos do mar
+TACO,291,"Corvina de água doce, crua",Pescados e frutos do mar
+TACO,292,"Corvina do mar, crua",Pescados e frutos do mar
+TACO,293,"Corvina grande, assada",Pescados e frutos do mar
+TACO,294,"Corvina grande, cozida",Pescados e frutos do mar
+TACO,295,"Dourada de água doce, fresca",Pescados e frutos do mar
+TACO,296,"Lambari, congelado, cru",Pescados e frutos do mar
+TACO,297,"Lambari, congelado, frito",Pescados e frutos do mar
+TACO,298,"Lambari, fresco, cru",Pescados e frutos do mar
+TACO,299,"Manjuba, com farinha de trigo, frita",Pescados e frutos do mar
+TACO,300,"Manjuba, frita",Pescados e frutos do mar
+TACO,301,"Merluza, filé, assado",Pescados e frutos do mar
+TACO,302,"Merluza, filé, cru",Pescados e frutos do mar
+TACO,303,"Merluza, filé, frito",Pescados e frutos do mar
+TACO,304,"Pescada, branca, crua",Pescados e frutos do mar
+TACO,305,"Pescada, branca, frita",Pescados e frutos do mar
+TACO,306,"Pescada, filé, com farinha de trigo, frito",Pescados e frutos do mar
+TACO,307,"Pescada, filé, cru",Pescados e frutos do mar
+TACO,308,"Pescada, filé, frito",Pescados e frutos do mar
+TACO,309,"Pescada, filé, molho escabeche",Pescados e frutos do mar
+TACO,310,"Pescadinha, crua",Pescados e frutos do mar
+TACO,311,"Pintado, assado",Pescados e frutos do mar
+TACO,312,"Pintado, cru",Pescados e frutos do mar
+TACO,313,"Pintado, grelhado",Pescados e frutos do mar
+TACO,314,"Porquinho, cru",Pescados e frutos do mar
+TACO,315,"Salmão, filé, com pele, fresco, grelhado",Pescados e frutos do mar
+TACO,316,"Salmão, sem pele, fresco, cru",Pescados e frutos do mar
+TACO,317,"Salmão, sem pele, fresco, grelhado",Pescados e frutos do mar
+TACO,318,"Sardinha, assada",Pescados e frutos do mar
+TACO,319,"Sardinha, conserva em óleo",Pescados e frutos do mar
+TACO,320,"Sardinha, frita",Pescados e frutos do mar
+TACO,321,"Sardinha, inteira, crua",Pescados e frutos do mar
+TACO,322,"Tucunaré, filé, congelado, cru",Pescados e frutos do mar
+TACO,323,Apresuntado,Carnes e derivados
+TACO,324,"Caldo de carne, tablete",Carnes e derivados
+TACO,325,"Caldo de galinha, tablete",Carnes e derivados
+TACO,326,"Carne, bovina, acém, moído, cozido",Carnes e derivados
+TACO,327,"Carne, bovina, acém, moído, cru",Carnes e derivados
+TACO,328,"Carne, bovina, acém, sem gordura, cozido",Carnes e derivados
+TACO,329,"Carne, bovina, acém, sem gordura, cru",Carnes e derivados
+TACO,330,"Carne, bovina, almôndegas, cruas",Carnes e derivados
+TACO,331,"Carne, bovina, almôndegas, fritas",Carnes e derivados
+TACO,332,"Carne, bovina, bucho, cozido",Carnes e derivados
+TACO,333,"Carne, bovina, bucho, cru",Carnes e derivados
+TACO,334,"Carne, bovina, capa de contra-filé, com gordura, crua",Carnes e derivados
+TACO,335,"Carne, bovina, capa de contra-filé, com gordura, grelhada",Carnes e derivados
+TACO,336,"Carne, bovina, capa de contra-filé, sem gordura, crua",Carnes e derivados
+TACO,337,"Carne, bovina, capa de contra-filé, sem gordura, grelhada",Carnes e derivados
+TACO,338,"Carne, bovina, charque, cozido",Carnes e derivados
+TACO,339,"Carne, bovina, charque, cru",Carnes e derivados
+TACO,340,"Carne, bovina, contra-filé, à milanesa",Carnes e derivados
+TACO,341,"Carne, bovina, contra-filé de costela, cru",Carnes e derivados
+TACO,342,"Carne, bovina, contra-filé de costela, grelhado",Carnes e derivados
+TACO,343,"Carne, bovina, contra-filé, com gordura, cru",Carnes e derivados
+TACO,344,"Carne, bovina, contra-filé, com gordura, grelhado",Carnes e derivados
+TACO,345,"Carne, bovina, contra-filé, sem gordura, cru",Carnes e derivados
+TACO,346,"Carne, bovina, contra-filé, sem gordura, grelhado",Carnes e derivados
+TACO,347,"Carne, bovina, costela, assada",Carnes e derivados
+TACO,348,"Carne, bovina, costela, crua",Carnes e derivados
+TACO,349,"Carne, bovina, coxão duro, sem gordura, cozido",Carnes e derivados
+TACO,350,"Carne, bovina, coxão duro, sem gordura, cru",Carnes e derivados
+TACO,351,"Carne, bovina, coxão mole, sem gordura, cozido",Carnes e derivados
+TACO,352,"Carne, bovina, coxão mole, sem gordura, cru",Carnes e derivados
+TACO,353,"Carne, bovina, cupim, assado",Carnes e derivados
+TACO,354,"Carne, bovina, cupim, cru",Carnes e derivados
+TACO,355,"Carne, bovina, fígado, cru",Carnes e derivados
+TACO,356,"Carne, bovina, fígado, grelhado",Carnes e derivados
+TACO,357,"Carne, bovina, filé mingnon, sem gordura, cru",Carnes e derivados
+TACO,358,"Carne, bovina, filé mingnon, sem gordura, grelhado",Carnes e derivados
+TACO,359,"Carne, bovina, flanco, sem gordura, cozido",Carnes e derivados
+TACO,360,"Carne, bovina, flanco, sem gordura, cru",Carnes e derivados
+TACO,361,"Carne, bovina, fraldinha, com gordura, cozida",Carnes e derivados
+TACO,362,"Carne, bovina, fraldinha, com gordura, crua",Carnes e derivados
+TACO,363,"Carne, bovina, lagarto, cozido",Carnes e derivados
+TACO,364,"Carne, bovina, lagarto, cru",Carnes e derivados
+TACO,365,"Carne, bovina, língua, cozida",Carnes e derivados
+TACO,366,"Carne, bovina, língua, crua",Carnes e derivados
+TACO,367,"Carne, bovina, maminha, crua",Carnes e derivados
+TACO,368,"Carne, bovina, maminha, grelhada",Carnes e derivados
+TACO,369,"Carne, bovina, miolo de alcatra, sem gordura, cru",Carnes e derivados
+TACO,370,"Carne, bovina, miolo de alcatra, sem gordura, grelhado",Carnes e derivados
+TACO,371,"Carne, bovina, músculo, sem gordura, cozido",Carnes e derivados
+TACO,372,"Carne, bovina, músculo, sem gordura, cru",Carnes e derivados
+TACO,373,"Carne, bovina, paleta, com gordura, crua",Carnes e derivados
+TACO,374,"Carne, bovina, paleta, sem gordura, cozida",Carnes e derivados
+TACO,375,"Carne, bovina, paleta, sem gordura, crua",Carnes e derivados
+TACO,376,"Carne, bovina, patinho, sem gordura, cru",Carnes e derivados
+TACO,377,"Carne, bovina, patinho, sem gordura, grelhado",Carnes e derivados
+TACO,378,"Carne, bovina, peito, sem gordura, cozido",Carnes e derivados
+TACO,379,"Carne, bovina, peito, sem gordura, cru",Carnes e derivados
+TACO,380,"Carne, bovina, picanha, com gordura, crua",Carnes e derivados
+TACO,381,"Carne, bovina, picanha, com gordura, grelhada",Carnes e derivados
+TACO,382,"Carne, bovina, picanha, sem gordura, crua",Carnes e derivados
+TACO,383,"Carne, bovina, picanha, sem gordura, grelhada",Carnes e derivados
+TACO,384,"Carne, bovina, seca, cozida",Carnes e derivados
+TACO,385,"Carne, bovina, seca, crua",Carnes e derivados
+TACO,386,"Coxinha de frango, frita",Carnes e derivados
+TACO,387,"Croquete, de carne, cru",Carnes e derivados
+TACO,388,"Croquete, de carne, frito",Carnes e derivados
+TACO,389,"Empada de frango, pré-cozida, assada",Carnes e derivados
+TACO,390,"Empada, de frango, pré-cozida",Carnes e derivados
+TACO,391,"Frango, asa, com pele, crua",Carnes e derivados
+TACO,392,"Frango, caipira, inteiro, com pele, cozido",Carnes e derivados
+TACO,393,"Frango, caipira, inteiro, sem pele, cozido",Carnes e derivados
+TACO,394,"Frango, coração, cru",Carnes e derivados
+TACO,395,"Frango, coração, grelhado",Carnes e derivados
+TACO,396,"Frango, coxa, com pele, assada",Carnes e derivados
+TACO,397,"Frango, coxa, com pele, crua",Carnes e derivados
+TACO,398,"Frango, coxa, sem pele, cozida",Carnes e derivados
+TACO,399,"Frango, coxa, sem pele, crua",Carnes e derivados
+TACO,400,"Frango, fígado, cru",Carnes e derivados
+TACO,401,"Frango, filé, à milanesa",Carnes e derivados
+TACO,402,"Frango, inteiro, com pele, cru",Carnes e derivados
+TACO,403,"Frango, inteiro, sem pele, assado",Carnes e derivados
+TACO,404,"Frango, inteiro, sem pele, cozido",Carnes e derivados
+TACO,405,"Frango, inteiro, sem pele, cru",Carnes e derivados
+TACO,406,"Frango, peito, com pele, assado",Carnes e derivados
+TACO,407,"Frango, peito, com pele, cru",Carnes e derivados
+TACO,408,"Frango, peito, sem pele, cozido",Carnes e derivados
+TACO,409,"Frango, peito, sem pele, cru",Carnes e derivados
+TACO,410,"Frango, peito, sem pele, grelhado",Carnes e derivados
+TACO,411,"Frango, sobrecoxa, com pele, assada",Carnes e derivados
+TACO,412,"Frango, sobrecoxa, com pele, crua",Carnes e derivados
+TACO,413,"Frango, sobrecoxa, sem pele, assada",Carnes e derivados
+TACO,414,"Frango, sobrecoxa, sem pele, crua",Carnes e derivados
+TACO,415,"Hambúrguer, bovino, cru",Carnes e derivados
+TACO,416,"Hambúrguer, bovino, frito",Carnes e derivados
+TACO,417,"Hambúrguer, bovino, grelhado",Carnes e derivados
+TACO,418,"Lingüiça, frango, crua",Carnes e derivados
+TACO,419,"Lingüiça, frango, frita",Carnes e derivados
+TACO,420,"Lingüiça, frango, grelhada",Carnes e derivados
+TACO,421,"Lingüiça, porco, crua",Carnes e derivados
+TACO,422,"Lingüiça, porco, frita",Carnes e derivados
+TACO,423,"Lingüiça, porco, grelhada",Carnes e derivados
+TACO,424,Mortadela,Carnes e derivados
+TACO,425,"Peru, congelado, assado",Carnes e derivados
+TACO,426,"Peru, congelado, cru",Carnes e derivados
+TACO,427,"Porco, bisteca, crua",Carnes e derivados
+TACO,428,"Porco, bisteca, frita",Carnes e derivados
+TACO,429,"Porco, bisteca, grelhada",Carnes e derivados
+TACO,430,"Porco, costela, assada",Carnes e derivados
+TACO,431,"Porco, costela, crua",Carnes e derivados
+TACO,432,"Porco, lombo, assado",Carnes e derivados
+TACO,433,"Porco, lombo, cru",Carnes e derivados
+TACO,434,"Porco, orelha, salgada, crua",Carnes e derivados
+TACO,435,"Porco, pernil, assado",Carnes e derivados
+TACO,436,"Porco, pernil, cru",Carnes e derivados
+TACO,437,"Porco, rabo, salgado, cru",Carnes e derivados
+TACO,438,"Presunto, com capa de gordura",Carnes e derivados
+TACO,439,"Presunto, sem capa de gordura",Carnes e derivados
+TACO,440,"Quibe, assado",Carnes e derivados
+TACO,441,"Quibe, cru",Carnes e derivados
+TACO,442,"Quibe, frito",Carnes e derivados
+TACO,443,Salame,Carnes e derivados
+TACO,444,"Toucinho, cru",Carnes e derivados
+TACO,445,"Toucinho, frito",Carnes e derivados
+TACO,446,"Bebida láctea, pêssego",Leite e derivados
+TACO,447,Creme de Leite,Leite e derivados
+TACO,448,"Iogurte, natural",Leite e derivados
+TACO,449,"Iogurte, natural, desnatado",Leite e derivados
+TACO,450,"Iogurte, sabor abacaxi",Leite e derivados
+TACO,451,"Iogurte, sabor morango",Leite e derivados
+TACO,452,"Iogurte, sabor pêssego",Leite e derivados
+TACO,453,"Leite, condensado",Leite e derivados
+TACO,454,"Leite, de cabra",Leite e derivados
+TACO,455,"Leite, de vaca, achocolatado",Leite e derivados
+TACO,456,"Leite, de vaca, desnatado, pó",Leite e derivados
+TACO,457,"Leite, de vaca, desnatado, UHT",Leite e derivados
+TACO,458,"Leite, de vaca, integral",Leite e derivados
+TACO,459,"Leite, de vaca, integral, pó",Leite e derivados
+TACO,460,"Leite, fermentado",Leite e derivados
+TACO,461,"Queijo, minas, frescal",Leite e derivados
+TACO,462,"Queijo, minas, meia cura",Leite e derivados
+TACO,463,"Queijo, mozarela",Leite e derivados
+TACO,464,"Queijo, parmesão",Leite e derivados
+TACO,465,"Queijo, pasteurizado",Leite e derivados
+TACO,466,"Queijo, petit suisse, morango",Leite e derivados
+TACO,467,"Queijo, prato",Leite e derivados
+TACO,468,"Queijo, requeijão, cremoso",Leite e derivados
+TACO,469,"Queijo, ricota",Leite e derivados
+TACO,470,"Bebida isotônica, sabores variados",Bebidas (alcoólicas e não alcoólicas)
+TACO,471,"Café, infusão 10%",Bebidas (alcoólicas e não alcoólicas)
+TACO,472,"Cana, aguardente",Bebidas (alcoólicas e não alcoólicas)
+TACO,473,"Cana, caldo de",Bebidas (alcoólicas e não alcoólicas)
+TACO,474,"Cerveja, pilsen",Bebidas (alcoólicas e não alcoólicas)
+TACO,475,"Chá, erva-doce, infusão 5%",Bebidas (alcoólicas e não alcoólicas)
+TACO,476,"Chá, mate, infusão 5%",Bebidas (alcoólicas e não alcoólicas)
+TACO,477,"Chá, preto, infusão 5%",Bebidas (alcoólicas e não alcoólicas)
+TACO,478,"Coco, água de",Bebidas (alcoólicas e não alcoólicas)
+TACO,479,"Refrigerante, tipo água tônica",Bebidas (alcoólicas e não alcoólicas)
+TACO,480,"Refrigerante, tipo cola",Bebidas (alcoólicas e não alcoólicas)
+TACO,481,"Refrigerante, tipo guaraná",Bebidas (alcoólicas e não alcoólicas)
+TACO,482,"Refrigerante, tipo laranja",Bebidas (alcoólicas e não alcoólicas)
+TACO,483,"Refrigerante, tipo limão",Bebidas (alcoólicas e não alcoólicas)
+TACO,484,"Omelete, de queijo",Ovos e derivados
+TACO,485,"Ovo, de codorna, inteiro, cru",Ovos e derivados
+TACO,486,"Ovo, de galinha, clara, cozida/10minutos",Ovos e derivados
+TACO,487,"Ovo, de galinha, gema, cozida/10minutos",Ovos e derivados
+TACO,488,"Ovo, de galinha, inteiro, cozido/10minutos",Ovos e derivados
+TACO,489,"Ovo, de galinha, inteiro, cru",Ovos e derivados
+TACO,490,"Ovo, de galinha, inteiro, frito",Ovos e derivados
+TACO,491,"Achocolatado, pó",Produtos açucarados
+TACO,492,"Açúcar, cristal",Produtos açucarados
+TACO,493,"Açúcar, mascavo",Produtos açucarados
+TACO,494,"Açúcar, refinado",Produtos açucarados
+TACO,495,"Chocolate, ao leite",Produtos açucarados
+TACO,496,"Chocolate, ao leite, com castanha do Pará",Produtos açucarados
+TACO,497,"Chocolate, ao leite, dietético",Produtos açucarados
+TACO,498,"Chocolate, meio amargo",Produtos açucarados
+TACO,499,Cocada branca,Produtos açucarados
+TACO,500,"Doce, de abóbora, cremoso",Produtos açucarados
+TACO,501,"Doce, de leite, cremoso",Produtos açucarados
+TACO,502,"Geléia, mocotó, natural",Produtos açucarados
+TACO,503,Glicose de milho,Produtos açucarados
+TACO,504,Maria mole,Produtos açucarados
+TACO,505,"Maria mole, coco queimado",Produtos açucarados
+TACO,506,Marmelada,Produtos açucarados
+TACO,507,"Mel, de abelha",Produtos açucarados
+TACO,508,Melado,Produtos açucarados
+TACO,509,Quindim,Produtos açucarados
+TACO,510,Rapadura,Produtos açucarados
+TACO,511,"Café, pó, torrado",Miscelâneas
+TACO,512,"Capuccino, pó",Miscelâneas
+TACO,513,"Fermento em pó, químico",Miscelâneas
+TACO,514,"Fermento, biológico, levedura, tablete",Miscelâneas
+TACO,515,"Gelatina, sabores variados, pó",Miscelâneas
+TACO,516,"Sal, dietético",Miscelâneas
+TACO,517,"Sal, grosso",Miscelâneas
+TACO,518,Shoyu,Miscelâneas
+TACO,519,Tempero a base de sal,Miscelâneas
+TACO,520,"Azeitona, preta, conserva",Outros alimentos industrializados
+TACO,521,"Azeitona, verde, conserva",Outros alimentos industrializados
+TACO,522,"Chantilly, spray, com gordura vegetal",Outros alimentos industrializados
+TACO,523,"Leite, de coco",Outros alimentos industrializados
+TACO,524,"Maionese, tradicional com ovos",Outros alimentos industrializados
+TACO,525,Acarajé,Alimentos preparados
+TACO,526,Arroz carreteiro,Alimentos preparados
+TACO,527,"Baião de dois, arroz e feijão-de-corda",Alimentos preparados
+TACO,528,Barreado,Alimentos preparados
+TACO,529,"Bife à cavalo, com contra filé",Alimentos preparados
+TACO,530,Bolinho de arroz,Alimentos preparados
+TACO,531,Camarão à baiana,Alimentos preparados
+TACO,532,"Charuto, de repolho",Alimentos preparados
+TACO,533,"Cuscuz, de milho, cozido com sal",Alimentos preparados
+TACO,534,"Cuscuz, paulista",Alimentos preparados
+TACO,535,"Cuxá, molho",Alimentos preparados
+TACO,536,Dobradinha,Alimentos preparados
+TACO,537,Estrogonofe de carne,Alimentos preparados
+TACO,538,Estrogonofe de frango,Alimentos preparados
+TACO,539,Feijão tropeiro mineiro,Alimentos preparados
+TACO,540,Feijoada,Alimentos preparados
+TACO,541,"Frango, com açafrão",Alimentos preparados
+TACO,542,"Macarrão, molho bolognesa",Alimentos preparados
+TACO,543,Maniçoba,Alimentos preparados
+TACO,544,Quibebe,Alimentos preparados
+TACO,545,"Salada, de legumes, com maionese",Alimentos preparados
+TACO,546,"Salada, de legumes, cozida no vapor",Alimentos preparados
+TACO,547,"Salpicão, de frango",Alimentos preparados
+TACO,548,Sarapatel,Alimentos preparados
+TACO,549,Tabule,Alimentos preparados
+TACO,550,Tacacá,Alimentos preparados
+TACO,551,"Tapioca, com manteiga",Alimentos preparados
+TACO,552,"Tucupi, com pimenta-de-cheiro",Alimentos preparados
+TACO,553,Vaca atolada,Alimentos preparados
+TACO,554,Vatapá,Alimentos preparados
+TACO,555,Virado à paulista,Alimentos preparados
+TACO,556,Yakisoba,Alimentos preparados
+TACO,557,"Amendoim, grão, cru",Leguminosas e derivados
+TACO,558,"Amendoim, torrado, salgado",Leguminosas e derivados
+TACO,559,"Ervilha, em vagem",Leguminosas e derivados
+TACO,560,"Ervilha, enlatada, drenada",Leguminosas e derivados
+TACO,561,"Feijão, carioca, cozido",Leguminosas e derivados
+TACO,562,"Feijão, carioca, cru",Leguminosas e derivados
+TACO,563,"Feijão, fradinho, cozido",Leguminosas e derivados
+TACO,564,"Feijão, fradinho, cru",Leguminosas e derivados
+TACO,565,"Feijão, jalo, cozido",Leguminosas e derivados
+TACO,566,"Feijão, jalo, cru",Leguminosas e derivados
+TACO,567,"Feijão, preto, cozido",Leguminosas e derivados
+TACO,568,"Feijão, preto, cru",Leguminosas e derivados
+TACO,569,"Feijão, rajado, cozido",Leguminosas e derivados
+TACO,570,"Feijão, rajado, cru",Leguminosas e derivados
+TACO,571,"Feijão, rosinha, cozido",Leguminosas e derivados
+TACO,572,"Feijão, rosinha, cru",Leguminosas e derivados
+TACO,573,"Feijão, roxo, cozido",Leguminosas e derivados
+TACO,574,"Feijão, roxo, cru",Leguminosas e derivados
+TACO,575,"Grão-de-bico, cru",Leguminosas e derivados
+TACO,576,"Guandu, cru",Leguminosas e derivados
+TACO,577,"Lentilha, cozida",Leguminosas e derivados
+TACO,578,"Lentilha, crua",Leguminosas e derivados
+TACO,579,"Paçoca, amendoim",Leguminosas e derivados
+TACO,580,"Pé-de-moleque, amendoim",Leguminosas e derivados
+TACO,581,"Soja, farinha",Leguminosas e derivados
+TACO,582,"Soja, extrato solúvel, natural, fluido",Leguminosas e derivados
+TACO,583,"Soja, extrato solúvel, pó",Leguminosas e derivados
+TACO,584,"Soja, queijo (tofu)",Leguminosas e derivados
+TACO,585,"Tremoço, cru",Leguminosas e derivados
+TACO,586,"Tremoço, em conserva",Leguminosas e derivados
+TACO,587,"Amêndoa, torrada, salgada",Nozes e sementes
+TACO,588,"Castanha-de-caju, torrada, salgada",Nozes e sementes
+TACO,589,"Castanha-do-Brasil, crua",Nozes e sementes
+TACO,590,"Coco, cru",Nozes e sementes
+TACO,591,"Coco, verde, cru",Nozes e sementes
+TACO,592,"Farinha, de mesocarpo de babaçu, crua",Nozes e sementes
+TACO,593,"Gergelim, semente",Nozes e sementes
+TACO,594,"Linhaça, semente",Nozes e sementes
+TACO,595,"Pinhão, cozido",Nozes e sementes
+TACO,596,"Pupunha, cozida",Nozes e sementes
+TACO,597,"Noz, crua",Nozes e sementes

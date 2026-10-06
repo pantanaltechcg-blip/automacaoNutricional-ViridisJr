@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable(['name', 'category', 'source', 'source_code'])]
 class Food extends Model
 {
+    protected $table = 'foods';
+
     public function foodNutrients(): HasMany
     {
         return $this->hasMany(FoodNutrient::class);

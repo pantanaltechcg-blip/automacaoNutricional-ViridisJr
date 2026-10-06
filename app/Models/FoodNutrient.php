@@ -17,6 +17,8 @@ class FoodNutrient extends Model
 
     public const string STATUS_ABSENT = 'ABSENT';
 
+    public const string STATUS_REEVALUATION = 'REEVALUATION';
+
     public function food(): BelongsTo
     {
         return $this->belongsTo(Food::class);
