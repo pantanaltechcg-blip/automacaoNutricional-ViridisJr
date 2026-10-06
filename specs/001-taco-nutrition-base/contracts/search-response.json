@@ -1,0 +1,27 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Maçã, crua, com casca",
+      "category": "Frutas e derivados",
+      "source": "TACO",
+      "source_code": "P001",
+      "nutrients": [
+        {
+          "id": 1,
+          "name": "Valor Energético",
+          "unit": "kcal",
+          "amount_value": 52.0,
+          "status": "EXACT"
+        },
+        {
+          "id": 2,
+          "name": "Vitamina C",
+          "unit": "mg",
+          "amount_value": null,
+          "status": "TRACE"
+        }
+      ]
+    }
+  ]
+}
