@@ -10,7 +10,7 @@ A validação deve confirmar:
 - preservação dos alimentos provenientes da TACO;
 - preservação dos componentes nutricionais;
 - preservação das unidades;
-- distinção entre `EXACT`, `TRACE`, `NA` e `ABSENT`;
+- distinção entre `EXACT`, `TRACE`, `NA`, `ABSENT` e `REEVALUATION`;
 - rastreabilidade da fonte;
 - pesquisa parcial pelo nome/descrição;
 - pesquisa independente de maiúsculas/minúsculas e acentuação.
@@ -102,7 +102,8 @@ A importação deve preservar:
 - `TRACE`;
 - `NA`;
 - `ABSENT` somente quando aplicável segundo as regras definidas no
-  `research.md`.
+  `research.md`;
+- `REEVALUATION` para o marcador `*`, com valor numérico nulo.
 
 A importação não deve realizar cálculos nutricionais ou converter
 marcadores qualitativos para zero.
@@ -115,7 +116,7 @@ Após a importação, execute a validação automatizada completa comparando os
 registros processados com a fonte estruturada usada na importação. A
 validação deve confirmar todos os componentes esperados e preservar, em
 100% dos registros processados, a distinção entre zero numérico, `TRACE`,
-`NA` e `ABSENT`.
+`NA`, `ABSENT` e `REEVALUATION`.
 
 Uma inspeção manual por amostra pode ser realizada como verificação
 adicional, mas não substitui a validação automatizada completa.
@@ -137,7 +138,7 @@ Quando a fonte apresentar `Tr`:
 
 ```text
 status = TRACE
-amount_value = sem valor numérico
+amount_value = null
 ```
 
 ### Não aplicável
@@ -146,7 +147,7 @@ Quando a fonte apresentar `NA`:
 
 ```text
 status = NA
-amount_value = sem valor numérico
+amount_value = null
 ```
 
 ### Ausente
@@ -156,11 +157,23 @@ valor:
 
 ```text
 status = ABSENT
-amount_value = sem valor numérico
+amount_value = null
 ```
 
 A ausência de uma relação entre alimento e nutriente não deve ser
 automaticamente interpretada como `ABSENT`.
+
+### Em reavaliação
+
+Quando a fonte apresentar `*`:
+
+```text
+status = REEVALUATION
+amount_value = null
+```
+
+`REEVALUATION` deve permanecer distinto de `EXACT`, `TRACE`, `NA`,
+`ABSENT` e zero e não recebe interpretação matemática nesta feature.
 
 ---
 
@@ -281,7 +294,13 @@ Os testes referentes a esta feature devem validar, no mínimo:
 - `TRACE` diferente de zero;
 - `NA` diferente de zero;
 - `ABSENT` diferente de zero;
-- distinção entre `TRACE`, `NA` e `ABSENT`;
+- `*` armazenado como `REEVALUATION`, com `amount_value` nulo;
+- `REEVALUATION` diferente de `EXACT`;
+- `REEVALUATION` diferente de `TRACE`;
+- `REEVALUATION` diferente de `NA`;
+- `REEVALUATION` diferente de `ABSENT`;
+- `REEVALUATION` nunca convertido para zero;
+- distinção entre `EXACT`, `TRACE`, `NA`, `ABSENT` e `REEVALUATION`;
 - validação completa de que todos os componentes e estados esperados da
   fonte estruturada foram preservados em todos os registros processados;
 - unicidade da combinação alimento + nutriente;
@@ -304,8 +323,8 @@ A feature poderá ser considerada validada quando:
 
 1. todos os registros processados corresponderem à fonte estruturada usada
    na importação, preservando todos os componentes esperados;
-2. nenhum marcador `TRACE`, `NA` ou `ABSENT` tiver sido convertido
-   silenciosamente para zero;
+2. nenhum marcador `TRACE`, `NA`, `ABSENT` ou `REEVALUATION` tiver sido
+   convertido silenciosamente para zero;
 3. os componentes nutricionais preservarem suas unidades;
 4. a origem TACO permanecer rastreável;
 5. a pesquisa pelo nome funcionar conforme definido na specification;

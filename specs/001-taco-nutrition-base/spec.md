@@ -13,7 +13,7 @@
 ### Session 2026-10-05
 
 - Q: Quais componentes nutricionais da TACO devem compor o escopo inicial do sistema? (FR-009) → A: Todos os componentes descritos e disponíveis na tabela TACO completa. Serão preservados na base, sem implicar que todos serão utilizados pelo MVP (a definição de quais nutrientes entram nos cálculos virá nas próximas specifications).
-- Q: Como tratar ou representar internamente marcadores específicos da TACO (Tr, NA e ausente)? (FR-010) → A: Utilizar um campo numérico para o valor quando existir e um campo separado para identificar o estado do dado (EXATO, TRACO, NA, AUSENTE). Esta spec foca na preservação dos estados; sua interpretação matemática virá na spec de cálculo.
+- Q: Como tratar ou representar internamente marcadores específicos da TACO (`Tr`, `NA`, ausente e `*`)? (FR-010) → A: Utilizar um campo numérico para o valor quando existir e um campo separado para identificar o estado do dado (EXATO, TRACO, NA, AUSENTE, REAVALIAÇÃO). `*` significa "as análises estão sendo reavaliadas" e será representado como `REEVALUATION`, com valor numérico nulo, distinto dos demais estados e de zero. Esta spec foca na preservação dos estados; sua interpretação matemática virá na spec de cálculo.
 - Q: Como deve funcionar a pesquisa de alimentos e em quais campos ela ocorrerá? (FR-007) → A: Busca parcial focada apenas no nome/descrição, ignorando diferenças entre maiúsculas/minúsculas e acentuação. Buscas avançadas (Full-Text, categoria, ranqueamento) estão fora do escopo inicial.
 - Q: Qual é a regra aprovada para o parâmetro de pesquisa `q`? (FR-007) → A: `q` é obrigatório e deve ser normalizado pela remoção de espaços externos antes da validação e antes de ser entregue ao serviço de busca. Após a normalização, quando possuir conteúdo a busca deve ser executada; quando ficar vazio, a requisição deve falhar por validação e nenhuma pesquisa deve ser executada.
 - Q: Qual é a fonte autoritativa da TACO para esta feature? (FR-009) → A: O arquivo `resources/data/taco/source/taco_4_edicao_ampliada_e_revisada.pdf`, correspondente à Tabela Brasileira de Composição de Alimentos — TACO, 4ª edição revisada e ampliada, NEPA/UNICAMP, 2011.
@@ -36,7 +36,7 @@ O sistema deve possuir uma base nutricional formada a partir dos dados dos alime
 **Acceptance Scenarios**:
 
 1. **Given** os dados de um alimento da TACO com valores numéricos, **When** armazenado no sistema, **Then** o sistema preserva os valores originais, categorias e unidades, referenciando a TACO como fonte.
-2. **Given** um alimento que possui "Tr" (traço) ou "NA" em determinados nutrientes, **When** armazenado, **Then** o sistema preserva esses marcadores e não os converte para zero.
+2. **Given** um alimento que possui "Tr" (traço), "NA" ou `*` em determinados nutrientes, **When** armazenado, **Then** o sistema preserva esses marcadores como estados distintos e não os converte para zero.
 
 ---
 
@@ -74,6 +74,11 @@ Como usuário, quero que os alimentos da base possam ser selecionados para uso p
 - Como o sistema deve tratar futuramente valores classificados como `Tr` ou `NA` durante cálculos?  
   Esta specification não define comportamento de cálculo. Essa regra será definida em specification posterior do motor de cálculo.
 
+- Como o sistema deve tratar o marcador `*` da TACO?
+  O sistema deve preservá-lo como `REEVALUATION`, com valor numérico nulo,
+  sem equipará-lo a AUSENTE, TRACO, NA ou zero e sem atribuir interpretação
+  matemática nesta feature.
+
 ## Requirements
 
 ### Functional Requirements
@@ -82,12 +87,12 @@ Como usuário, quero que os alimentos da base possam ser selecionados para uso p
 - **FR-002**: O sistema MUST preservar a categoria/grupo do alimento e a origem dos dados nutricionais (TACO).
 - **FR-003**: O sistema MUST preservar as unidades associadas a cada componente nutricional.
 - **FR-004**: O sistema MUST armazenar e representar os valores nutricionais com base na proporção de 100 gramas de parte comestível.
-- **FR-005**: O sistema MUST distinguir valores numéricos de valores classificados como traço (`Tr`), não aplicáveis (`NA`) ou dados ausentes.
-- **FR-006**: O sistema MUST NÃO converter silenciosamente `Tr`, `NA` ou valores ausentes para zero em nenhuma hipótese.
+- **FR-005**: O sistema MUST distinguir valores numéricos de valores classificados como traço (`Tr`), não aplicáveis (`NA`), dados ausentes ou análises em reavaliação (`*`).
+- **FR-006**: O sistema MUST NÃO converter silenciosamente `Tr`, `NA`, valores ausentes ou `*` (`REEVALUATION`) para zero em nenhuma hipótese.
 - **FR-007**: O sistema MUST permitir a pesquisa de alimentos através de busca parcial restrita ao campo de nome/descrição, ignorando obrigatoriamente diferenças de maiúsculas/minúsculas e acentuação. O parâmetro `q` é obrigatório e deve ter os espaços externos removidos antes da validação e antes de ser entregue ao serviço de busca; após essa normalização, quando possuir conteúdo a busca deve ser executada e, quando ficar vazio, a requisição deve falhar por validação e nenhuma pesquisa deve ser executada. Buscas avançadas ou por categoria estão descartadas deste escopo inicial.
 - **FR-008**: O sistema MUST permitir que alimentos da base sejam utilizados como ingredientes em receitas futuras.
 - **FR-009**: O sistema MUST armazenar a totalidade dos componentes nutricionais descritos e disponíveis na tabela TACO completa, garantindo a preservação integral da base (os componentes efetivamente utilizados no MVP e rotulagem serão definidos em specifications posteriores).
-- **FR-010**: O sistema MUST representar a informação nutricional usando campos separados: um numérico puro para armazenar o valor exato (quando aplicável) e um campo descritivo/estado para identificar inequivocamente se o registro é EXATO, TRACO (`Tr`), NÃO APLICÁVEL (`NA`) ou AUSENTE, adiando a interpretação matemática para futuras especificações de cálculo.
+- **FR-010**: O sistema MUST representar a informação nutricional usando campos separados: um numérico puro para armazenar o valor exato (quando aplicável) e um campo descritivo/estado para identificar inequivocamente se o registro é EXATO, TRACO (`Tr`), NÃO APLICÁVEL (`NA`), AUSENTE ou REAVALIAÇÃO (`REEVALUATION`, correspondente a `*` na TACO), adiando a interpretação matemática para futuras especificações de cálculo. Para `REEVALUATION`, o valor numérico MUST permanecer nulo.
 
 ### Key Entities
 
@@ -98,7 +103,7 @@ Como usuário, quero que os alimentos da base possam ser selecionados para uso p
 
 ### Measurable Outcomes
 
-- **SC-001**: 100% dos registros importados/armazenados da TACO devem manter a distinção entre valor numérico zero, `Tr`, `NA` e dado ausente, verificável por comparação com a fonte.
+- **SC-001**: 100% dos registros importados/armazenados da TACO devem manter a distinção entre valor numérico zero, `Tr`, `NA`, dado ausente e `*` (`REEVALUATION`), verificável por comparação com a fonte.
 - **SC-002**: Pesquisas por nome de alimento devem retornar resultados consistentes com a descrição da fonte original.
 - **SC-003**: O módulo de base nutricional deve funcionar de forma independente das funcionalidades futuras de cálculo e receitas.
 

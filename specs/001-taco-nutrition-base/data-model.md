@@ -158,6 +158,7 @@ Valores permitidos:
 - `TRACE`
 - `NA`
 - `ABSENT`
+- `REEVALUATION`
 
 - `created_at`
   - timestamp padrão do Laravel.
@@ -204,6 +205,17 @@ cartesiano entre todos os alimentos e todos os nutrientes.
 
 A inexistência de um registro `food_nutrients` não deve ser
 automaticamente interpretada como `ABSENT`.
+
+#### `REEVALUATION`
+
+Utilizado quando a fonte TACO apresenta `*`, cujo significado é "as
+análises estão sendo reavaliadas".
+
+Nesse estado:
+
+- `amount_value` permanece `null`;
+- o marcador permanece distinto de `EXACT`, `TRACE`, `NA`, `ABSENT` e zero;
+- nenhuma interpretação matemática será realizada nesta feature.
 
 ---
 
@@ -295,6 +307,7 @@ A modelagem não deve permitir que:
 - `TRACE`;
 - `NA`;
 - `ABSENT`;
+- `REEVALUATION`;
 
 sejam convertidos automaticamente para zero.
 
@@ -381,7 +394,19 @@ status = ABSENT
 amount_value = null
 ```
 
-`TRACE`, `NA` e `ABSENT` são estados distintos. A importação não deve criar
-registros `ABSENT` por produto cartesiano entre alimentos e nutrientes, e a
-ausência de uma relação `FoodNutrient` não significa automaticamente
-`ABSENT`.
+### Em reavaliação
+
+Quando a fonte contiver `*`:
+
+```text
+status = REEVALUATION
+amount_value = null
+```
+
+`REEVALUATION` representa que as análises estão sendo reavaliadas e não
+possui interpretação matemática nesta feature.
+
+`EXACT`, `TRACE`, `NA`, `ABSENT` e `REEVALUATION` são estados distintos. A
+importação não deve criar registros `ABSENT` por produto cartesiano entre
+alimentos e nutrientes, e a ausência de uma relação `FoodNutrient` não
+significa automaticamente `ABSENT`.

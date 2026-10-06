@@ -60,7 +60,11 @@ Os estados permitidos são:
 - `EXACT`;
 - `TRACE`;
 - `NA`;
-- `ABSENT`.
+- `ABSENT`;
+- `REEVALUATION`.
+
+`REEVALUATION` representa o marcador `*` da TACO e mantém
+`amount_value` igual a `null`.
 
 Os valores nutricionais representam a composição por `100 g de parte
 comestível`, conforme a fonte TACO utilizada. Esta feature não realiza

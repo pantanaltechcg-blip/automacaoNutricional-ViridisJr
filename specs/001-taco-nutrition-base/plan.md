@@ -27,6 +27,7 @@ numérico, quando disponível, e seu estado, distinguindo:
 - `TRACO`
 - `NA`
 - `AUSENTE`
+- `REEVALUATION`
 
 Esta feature não define a interpretação matemática desses estados e
 não implementa cálculos nutricionais.
@@ -65,7 +66,7 @@ minúsculas e acentuação.
 **Constraints**:
 
 - Esta feature não implementa cálculos nutricionais.
-- Esta feature não interpreta matematicamente `TRACO`, `NA` ou `AUSENTE`.
+- Esta feature não interpreta matematicamente `TRACO`, `NA`, `AUSENTE` ou `REEVALUATION`.
 - Esta feature não implementa receitas.
 - Esta feature não implementa cálculo por porção.
 - Esta feature não implementa cálculo de %VD.
@@ -75,6 +76,8 @@ minúsculas e acentuação.
 - Esta feature não implementa autenticação.
 - Nenhuma biblioteca ou framework externo deve ser introduzido sem aprovação explícita da equipe.
 - Valores provenientes da TACO não podem ser convertidos silenciosamente para zero.
+- O marcador `*` da TACO deve ser preservado como `REEVALUATION`, com valor numérico nulo e sem equivalência com os demais estados.
+- A restrição já aplicada aos estados de `food_nutrients` deve ser ampliada por migration adicional não destrutiva, sem reescrever migrations aplicadas.
 - A origem e o estado dos dados nutricionais devem permanecer rastreáveis.
 
 **Scale/Scope**:
@@ -109,7 +112,8 @@ e implementação.**
   componentes apropriados da arquitetura Laravel.
 
 - [x] **Preservação dos Dados Nutricionais**  
-  Valores numéricos e estados `EXATO`, `TRACO`, `NA` e `AUSENTE`
+  Valores numéricos e estados `EXATO`, `TRACO`, `NA`, `AUSENTE` e
+  `REEVALUATION`
   permanecerão distintos.
 
 - [x] **Preservação da Fonte**  

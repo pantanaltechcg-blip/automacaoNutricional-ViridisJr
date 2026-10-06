@@ -48,31 +48,43 @@
 
 ## Phase 3: User Story 1 — Armazenamento de Dados da TACO (Priority: P1)
 
-**Goal**: O sistema deve possuir uma base nutricional formada a partir dos dados da TACO, preservando todos os componentes nutricionais disponíveis na fonte, incluindo os estados `EXACT`, `TRACE`, `NA` e `ABSENT`, sem conversão silenciosa para zero.
+**Goal**: O sistema deve possuir uma base nutricional formada a partir dos dados da TACO, preservando todos os componentes nutricionais disponíveis na fonte, incluindo os estados `EXACT`, `TRACE`, `NA`, `ABSENT` e `REEVALUATION`, sem conversão silenciosa para zero.
 
 **Independent Test**: Verificar que os dados armazenados correspondem à fonte TACO, que `status` distingue corretamente os diferentes estados, que valores numéricos são preservados e que `source` identifica a origem TACO.
 
+### Adequação do Estado
+
+- [ ] T011 [US1] Criar migration adicional não destrutiva em `database/migrations/[timestamp]_add_reevaluation_status_to_food_nutrients_table.php` para permitir `REEVALUATION` em `food_nutrients.status`, preservando os estados `EXACT`, `TRACE`, `NA` e `ABSENT`, sem reescrever migrations já aplicadas nem alterar dados existentes
+
+- [ ] T012 [US1] Atualizar `app/Models/FoodNutrient.php` para incluir `REEVALUATION` entre os estados permitidos, preservando as constantes ou enumerações já implementadas para `EXACT`, `TRACE`, `NA` e `ABSENT`
+
 ### Preparação da Fonte
 
-- [ ] T011 [US1] Preparar e validar, exclusivamente a partir da fonte autoritativa `resources/data/taco/source/taco_4_edicao_ampliada_e_revisada.pdf` — Tabela Brasileira de Composição de Alimentos — TACO, 4ª edição revisada e ampliada, NEPA/UNICAMP, 2011 — os artefatos `resources/data/taco/processed/foods.csv` com os alimentos e dados aprovados para `Food`, `resources/data/taco/processed/nutrients.csv` com os componentes nutricionais e suas unidades, e `resources/data/taco/processed/food_nutrients.csv` com as relações entre alimento e nutriente, preservando valores e estados `EXACT`, `TRACE`, `NA` e `ABSENT`
+- [ ] T013 [US1] Preparar e validar, exclusivamente a partir da fonte autoritativa `resources/data/taco/source/taco_4_edicao_ampliada_e_revisada.pdf` — Tabela Brasileira de Composição de Alimentos — TACO, 4ª edição revisada e ampliada, NEPA/UNICAMP, 2011 — os artefatos `resources/data/taco/processed/foods.csv` com os alimentos e dados aprovados para `Food`, `resources/data/taco/processed/nutrients.csv` com os componentes nutricionais e suas unidades, e `resources/data/taco/processed/food_nutrients.csv` com as relações entre alimento e nutriente, preservando valores e estados `EXACT`, `TRACE`, `NA`, `ABSENT` e `REEVALUATION`
 
 ### Implementação — User Story 1
 
-- [ ] T012 [US1] Criar `app/Services/NutritionBaseService.php` com a responsabilidade de persistir os dados da base nutricional, recebendo os dados estruturados de um alimento e seus componentes nutricionais; criar ou atualizar `Food` pela identidade `source + source_code`, preservando `foods.id` na reimportação e tratando `source_code` ausente como problema de importação sem fallback pelo nome; reutilizar `Nutrient` pela identidade `name + unit`; e criar ou atualizar `FoodNutrient` pela combinação única `food_id + nutrient_id`, sem duplicatas e sem converter estados qualitativos para zero
+- [ ] T014 [US1] Criar `app/Services/NutritionBaseService.php` com a responsabilidade de persistir os dados da base nutricional, recebendo os dados estruturados de um alimento e seus componentes nutricionais; criar ou atualizar `Food` pela identidade `source + source_code`, preservando `foods.id` na reimportação e tratando `source_code` ausente como problema de importação sem fallback pelo nome; reutilizar `Nutrient` pela identidade `name + unit`; e criar ou atualizar `FoodNutrient` pela combinação única `food_id + nutrient_id`, sem duplicatas e sem converter estados qualitativos para zero
 
-- [ ] T013 [US1] Implementar no `NutritionBaseService` a lógica de mapeamento definida no `data-model.md`: valor numérico → `status=EXACT` e `amount_value=<valor>`; `Tr` → `status=TRACE` e ausência de valor numérico; `NA` → `status=NA` e ausência de valor numérico; célula explicitamente existente na estrutura da fonte e sem valor → `status=ABSENT` e ausência de valor numérico; nunca criar registros `ABSENT` via produto cartesiano entre alimentos e nutrientes
+- [ ] T015 [US1] Implementar no `NutritionBaseService` a lógica de mapeamento definida no `data-model.md`: valor numérico → `status=EXACT` e `amount_value=<valor>`; `Tr` → `status=TRACE` e ausência de valor numérico; `NA` → `status=NA` e ausência de valor numérico; célula explicitamente existente na estrutura da fonte e sem valor → `status=ABSENT` e ausência de valor numérico; `*` → `status=REEVALUATION` e ausência de valor numérico; nunca converter `REEVALUATION` para zero nem criar registros `ABSENT` via produto cartesiano entre alimentos e nutrientes
 
-- [ ] T014 [US1] Implementar o Laravel Artisan Command `nutrition:import-taco`, executado por `php artisan nutrition:import-taco`, para consumir `resources/data/taco/processed/foods.csv`, `resources/data/taco/processed/nutrients.csv` e `resources/data/taco/processed/food_nutrients.csv` e delegar ao `NutritionBaseService` a persistência e as regras de importação, reimportação e upsert já aprovadas, sem conter cálculos nutricionais nem novas regras de domínio
+- [ ] T016 [US1] Implementar o Laravel Artisan Command `nutrition:import-taco`, executado por `php artisan nutrition:import-taco`, para consumir `resources/data/taco/processed/foods.csv`, `resources/data/taco/processed/nutrients.csv` e `resources/data/taco/processed/food_nutrients.csv` e delegar ao `NutritionBaseService` a persistência e as regras de importação, reimportação e upsert já aprovadas, sem conter cálculos nutricionais nem novas regras de domínio
 
-- [ ] T015 [US1] Executar `php artisan nutrition:import-taco` em ambiente de desenvolvimento e realizar validação automatizada completa dos registros processados contra `resources/data/taco/processed/foods.csv`, `resources/data/taco/processed/nutrients.csv` e `resources/data/taco/processed/food_nutrients.csv`, verificando todos os componentes esperados, nome/descrição, categoria quando disponível, `source`, `source_code`, unidades, valores e estados; uma comparação manual por amostra pode ser feita apenas como verificação adicional
+- [ ] T017 [US1] Executar `php artisan nutrition:import-taco` em ambiente de desenvolvimento e realizar validação automatizada completa dos registros processados contra `resources/data/taco/processed/foods.csv`, `resources/data/taco/processed/nutrients.csv` e `resources/data/taco/processed/food_nutrients.csv`, verificando todos os componentes esperados, nome/descrição, categoria quando disponível, `source`, `source_code`, unidades, valores e estados, incluindo `REEVALUATION`; uma comparação manual por amostra pode ser feita apenas como verificação adicional
 
-- [ ] T016 [US1] Criar teste em `tests/Feature/NutritionBaseStorageTest.php` que verifica:
+- [ ] T018 [US1] Criar teste em `tests/Feature/NutritionBaseStorageTest.php` que verifica:
   - valor numérico armazenado com `status=EXACT` e `amount_value` preservado;
   - valor numérico zero continua sendo zero e é diferente de `TRACE`;
   - `Tr` armazenado como `TRACE` sem conversão para zero;
   - `NA` armazenado como `NA` sem conversão para zero;
   - ausência explícita na fonte armazenada como `ABSENT` somente quando aplicável;
-  - `TRACE`, `NA` e `ABSENT` permanecem estados distintos;
+  - `*` armazenado como `REEVALUATION` com `amount_value` nulo;
+  - `REEVALUATION` permanece diferente de `EXACT`;
+  - `REEVALUATION` permanece diferente de `TRACE`;
+  - `REEVALUATION` permanece diferente de `NA`;
+  - `REEVALUATION` permanece diferente de `ABSENT`;
+  - `REEVALUATION` nunca é convertido para zero;
+  - `EXACT`, `TRACE`, `NA`, `ABSENT` e `REEVALUATION` permanecem estados distintos;
   - nenhum registro `ABSENT` é criado apenas pela inexistência de uma relação alimento × nutriente;
   - unidade do componente nutricional é preservada;
   - `source` identifica a TACO;
@@ -95,31 +107,31 @@
 
 ### Contrato — User Story 2
 
-- [ ] T017 [US2] Confirmar que `specs/001-taco-nutrition-base/contracts/search-foods.md` documenta o endpoint `GET /api/foods`, o parâmetro obrigatório `q` e a referência ao formato de resposta definido em `search-response.json`.
+- [ ] T019 [US2] Confirmar que `specs/001-taco-nutrition-base/contracts/search-foods.md` documenta o endpoint `GET /api/foods`, o parâmetro obrigatório `q` e a referência ao formato de resposta definido em `search-response.json`.
 
-- [ ] T018 [US2] Confirmar que o contrato documenta que os espaços externos de `q` são removidos antes da validação e antes de o valor ser entregue ao serviço de busca e que, após essa normalização, um valor com conteúdo executa a busca, enquanto um valor ausente ou vazio falha por validação sem executar pesquisa.
+- [ ] T020 [US2] Confirmar que o contrato documenta que os espaços externos de `q` são removidos antes da validação e antes de o valor ser entregue ao serviço de busca e que, após essa normalização, um valor com conteúdo executa a busca, enquanto um valor ausente ou vazio falha por validação sem executar pesquisa.
 
 ### Implementação — User Story 2
 
-- [ ] T019 [US2] Adicionar método de busca em `app/Services/NutritionBaseService.php` que executa pesquisa parcial em `foods.name`, utilizando recursos do PostgreSQL compatíveis com a decisão documentada no `research.md` para ignorar diferenças entre maiúsculas/minúsculas e acentuação, incluindo no resultado os registros de `food_nutrients` e seus respectivos `nutrients`
+- [ ] T021 [US2] Adicionar método de busca em `app/Services/NutritionBaseService.php` que executa pesquisa parcial em `foods.name`, utilizando recursos do PostgreSQL compatíveis com a decisão documentada no `research.md` para ignorar diferenças entre maiúsculas/minúsculas e acentuação, incluindo no resultado os registros de `food_nutrients` e seus respectivos `nutrients`
 
-- [ ] T020 [US2] Criar `app/Http/Requests/FoodSearchRequest.php` para remover os espaços externos de `q` antes da validação e antes de entregar o valor ao serviço de busca, normalizando por exemplo `" maca "` para `"maca"`, e aplicar somente as regras de validação aprovadas e documentadas em T018; quando o valor normalizado ficar vazio, a requisição deve falhar por validação e nenhuma pesquisa deve ser executada
+- [ ] T022 [US2] Criar `app/Http/Requests/FoodSearchRequest.php` para remover os espaços externos de `q` antes da validação e antes de entregar o valor ao serviço de busca, normalizando por exemplo `" maca "` para `"maca"`, e aplicar somente as regras de validação aprovadas e documentadas em T020; quando o valor normalizado ficar vazio, a requisição deve falhar por validação e nenhuma pesquisa deve ser executada
 
-- [ ] T021 [US2] Criar `app/Http/Controllers/FoodController.php` com método `search(FoodSearchRequest $request)` responsável apenas por receber a requisição validada, delegar a busca ao `NutritionBaseService` e retornar resposta JSON conforme o contrato em `specs/001-taco-nutrition-base/contracts/search-response.json`
+- [ ] T023 [US2] Criar `app/Http/Controllers/FoodController.php` com método `search(FoodSearchRequest $request)` responsável apenas por receber a requisição validada, delegar a busca ao `NutritionBaseService` e retornar resposta JSON conforme o contrato em `specs/001-taco-nutrition-base/contracts/search-response.json`
 
-- [ ] T022 [US2] Registrar rota em `routes/api.php`: `GET /api/foods` com parâmetro `q`, apontando para o método de busca do `FoodController`
+- [ ] T024 [US2] Registrar rota em `routes/api.php`: `GET /api/foods` com parâmetro `q`, apontando para o método de busca do `FoodController`
 
-- [ ] T023 [US2] Criar teste em `tests/Feature/FoodSearchTest.php` que verifica:
+- [ ] T025 [US2] Criar teste em `tests/Feature/FoodSearchTest.php` que verifica:
   - busca por termo parcial retorna alimentos correspondentes;
   - busca ignora diferenças entre maiúsculas e minúsculas;
   - busca ignora diferenças de acentuação;
   - busca sem resultados retorna lista vazia;
   - `" maca "` é normalizado para `"maca"` antes da validação e o serviço de busca recebe o valor normalizado;
-  - comportamento de `q` ausente, vazio ou composto por espaços corresponde exatamente ao definido no contrato em T018;
+  - comportamento de `q` ausente, vazio ou composto por espaços corresponde exatamente ao definido no contrato em T020;
   - resposta JSON segue o contrato;
   - `source` e `source_code` são preservados;
   - componentes nutricionais retornam `name`, `unit`, `amount_value` e `status`;
-  - estados `EXACT`, `TRACE`, `NA` e `ABSENT` não são convertidos silenciosamente para zero;
+  - estados `EXACT`, `TRACE`, `NA`, `ABSENT` e `REEVALUATION` não são convertidos silenciosamente para zero;
   - valores nutricionais retornados representam `100 g de parte comestível`
 
 **Checkpoint**: User Story 2 completamente funcional. A pesquisa retorna dados corretos de acordo com o contrato aprovado.
@@ -134,7 +146,7 @@
 
 ### Validação — User Story 3
 
-- [ ] T024 [US3] Criar teste garantindo que cada alimento retornado pela consulta possua identificação não ambígua e estável, preservando `source`, `source_code` e sua associação com os dados nutricionais, permitindo seu uso posterior como referência por outras funcionalidades sem implementar nesta feature endpoints adicionais, receitas ou relacionamentos de receita
+- [ ] T026 [US3] Criar teste garantindo que cada alimento retornado pela consulta possua identificação não ambígua e estável, preservando `source`, `source_code` e sua associação com os dados nutricionais, permitindo seu uso posterior como referência por outras funcionalidades sem implementar nesta feature endpoints adicionais, receitas ou relacionamentos de receita
 
 **Checkpoint**: User Story 3 validada sem introdução de funcionalidades adicionais fora da specification.
 
@@ -144,13 +156,13 @@
 
 **Purpose**: Validação end-to-end e encerramento da feature.
 
-- [ ] T025 [P] Executar `php artisan test` e confirmar que todos os testes relacionados à feature passam sem falhas
+- [ ] T027 [P] Executar `php artisan test` e confirmar que todos os testes relacionados à feature passam sem falhas
 
-- [ ] T026 Executar o roteiro de validação descrito em `specs/001-taco-nutrition-base/quickstart.md` e confirmar os critérios definidos
+- [ ] T028 Executar o roteiro de validação descrito em `specs/001-taco-nutrition-base/quickstart.md` e confirmar os critérios definidos
 
-- [ ] T027 Revisar que nenhum código desta feature:
+- [ ] T029 Revisar que nenhum código desta feature:
   - realiza cálculos nutricionais;
-  - interpreta matematicamente `TRACE`, `NA` ou `ABSENT`;
+  - interpreta matematicamente `TRACE`, `NA`, `ABSENT` ou `REEVALUATION`;
   - converte esses estados para zero;
   - implementa receitas;
   - implementa porções;
@@ -185,17 +197,30 @@
 #### User Story 1
 
 ```text
-Fonte estruturada
+Fonte oficial TACO (PDF)
     ↓
-NutritionBaseService
+T011/T012
+Migration e atualização necessárias para suportar REEVALUATION
     ↓
-Mapeamento dos estados
+T013
+Preparação e validação da fonte estruturada
     ↓
-Mecanismo de importação
+foods.csv
+nutrients.csv
+food_nutrients.csv
     ↓
-Execução e comparação
+T014/T015
+NutritionBaseService + mapeamento dos estados
+EXACT / TRACE / NA / ABSENT / REEVALUATION
     ↓
-Testes
+T016
+Artisan Command nutrition:import-taco
+    ↓
+T017
+Execução e validação integral da importação
+    ↓
+T018
+Testes automatizados
 ```
 
 #### User Story 2
@@ -230,9 +255,9 @@ Validação da identificação estável
 
 - T007 e T008 (`Food` e `Nutrient`) podem ser desenvolvidos em paralelo após as migrations correspondentes estarem definidas.
 
-- Partes dos testes de T016 podem ser preparadas enquanto o mecanismo de importação é implementado, desde que utilizem apenas o comportamento já aprovado.
+- Partes dos testes de T018 podem ser preparadas enquanto o mecanismo de importação é implementado, desde que utilizem apenas o comportamento já aprovado.
 
-- T025 e a preparação para T026 podem ocorrer em paralelo após todas as User Stories estarem concluídas.
+- T027 e a preparação para T028 podem ocorrer em paralelo após todas as User Stories estarem concluídas.
 
 ---
 
@@ -263,7 +288,7 @@ Task: "Criar app/Models/Nutrient.php"
    - fonte preservada;
    - componentes preservados;
    - unidades preservadas;
-   - `EXACT`, `TRACE`, `NA` e `ABSENT` corretamente distintos;
+   - `EXACT`, `TRACE`, `NA`, `ABSENT` e `REEVALUATION` corretamente distintos;
    - ausência de conversão silenciosa para zero
 
 5. Seguir para US2 somente após a validação da US1
@@ -292,7 +317,7 @@ Task: "Criar app/Models/Nutrient.php"
 
 - O campo `status` nunca deve ser automaticamente convertido para representação numérica zero.
 
-- `EXACT`, `TRACE`, `NA` e `ABSENT` representam estados distintos.
+- `EXACT`, `TRACE`, `NA`, `ABSENT` e `REEVALUATION` representam estados distintos.
 
 - Registros `ABSENT` só devem ser criados quando a própria estrutura da fonte apresentar uma posição explícita sem valor — jamais via produto cartesiano entre todos os alimentos e nutrientes.
 

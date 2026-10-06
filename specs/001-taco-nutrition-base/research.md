@@ -216,6 +216,7 @@ Os estados definidos pela specification são:
 - `TRACE`
 - `NA`
 - `ABSENT`
+- `REEVALUATION`
 
 Correspondência conceitual:
 
@@ -223,6 +224,7 @@ Correspondência conceitual:
 - `TRACE` → TRACO
 - `NA` → NÃO APLICÁVEL
 - `ABSENT` → AUSENTE
+- `REEVALUATION` → ANÁLISES EM REAVALIAÇÃO
 
 Nenhum desses estados poderá ser convertido silenciosamente para zero.
 
@@ -234,6 +236,7 @@ A Constitution e a specification determinam que:
 - traço;
 - não aplicável;
 - ausência;
+- análises em reavaliação;
 
 são situações diferentes.
 
@@ -241,6 +244,14 @@ A separação entre valor e estado impede a perda dessa distinção.
 
 A interpretação matemática desses estados permanece explicitamente fora
 desta feature.
+
+### Marcador `*`
+
+Na TACO, `*` significa "as análises estão sendo reavaliadas".
+
+A decisão de domínio é mapear esse marcador para `REEVALUATION`, com
+`amount_value = null`. Ele não será mapeado para `ABSENT`, `TRACE`, `NA`
+ou zero e não receberá interpretação matemática nesta feature.
 
 ---
 
@@ -260,7 +271,7 @@ e todos os componentes nutricionais.
 
 ### Rationale
 
-A TACO diferencia valores numéricos, `Tr`, `NA` e células sem valor.
+A TACO diferencia valores numéricos, `Tr`, `NA`, `*` e células sem valor.
 
 A ausência de uma relação `FoodNutrient` não deve ser automaticamente
 interpretada como um valor nutricional ausente, pois isso poderia criar
@@ -396,8 +407,8 @@ Os artefatos estruturados derivados exclusivamente dessa fonte serão:
 - `resources/data/taco/processed/nutrients.csv`, contendo os componentes
   nutricionais e suas unidades;
 - `resources/data/taco/processed/food_nutrients.csv`, contendo as relações
-  entre alimentos e nutrientes, com valor e estado `EXACT`, `TRACE`, `NA`
-  ou `ABSENT` conforme as regras aprovadas.
+  entre alimentos e nutrientes, com valor e estado `EXACT`, `TRACE`, `NA`,
+  `ABSENT` ou `REEVALUATION` conforme as regras aprovadas.
 
 A importação será executada pelo Laravel Artisan Command:
 
@@ -418,7 +429,8 @@ A implementação deverá preservar:
 - valores numéricos;
 - `TRACE`;
 - `NA`;
-- `ABSENT` somente nas condições definidas neste research.
+- `ABSENT` somente nas condições definidas neste research;
+- `REEVALUATION` para o marcador `*`, com valor numérico nulo.
 
 O processo de importação não realizará cálculos nutricionais.
 
@@ -429,16 +441,19 @@ projeto de forma reproduzível e verificável.
 
 ### Constraint
 
-Este research não exige que a importação seja implementada
-especificamente como:
+O mecanismo definitivo de importação é o Laravel Artisan Command:
 
-- Seeder;
-- Controller;
-- endpoint HTTP.
+`php artisan nutrition:import-taco`
 
-A forma concreta deve permanecer compatível com a arquitetura Laravel e
-ser escolhida durante a implementação sem alterar os requisitos definidos
-neste documento.
+O Command consumirá exclusivamente os arquivos:
+
+- `resources/data/taco/processed/foods.csv`;
+- `resources/data/taco/processed/nutrients.csv`;
+- `resources/data/taco/processed/food_nutrients.csv`.
+
+A persistência e as regras de domínio serão delegadas ao
+`NutritionBaseService`. Seeder, endpoint HTTP ou outro mecanismo
+alternativo não fazem parte desta feature.
 
 ---
 
