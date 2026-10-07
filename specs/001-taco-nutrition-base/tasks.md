@@ -146,7 +146,7 @@
 
 ### Validação — User Story 3
 
-- [ ] T026 [US3] Criar teste garantindo que cada alimento retornado pela consulta possua identificação não ambígua e estável, preservando `source`, `source_code` e sua associação com os dados nutricionais, permitindo seu uso posterior como referência por outras funcionalidades sem implementar nesta feature endpoints adicionais, receitas ou relacionamentos de receita
+- [X] T026 [US3] Criar teste garantindo que cada alimento retornado pela consulta possua identificação não ambígua e estável, preservando `source`, `source_code` e sua associação com os dados nutricionais, permitindo seu uso posterior como referência por outras funcionalidades sem implementar nesta feature endpoints adicionais, receitas ou relacionamentos de receita
 
 **Checkpoint**: User Story 3 validada sem introdução de funcionalidades adicionais fora da specification.
 

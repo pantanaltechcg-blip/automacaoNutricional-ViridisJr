@@ -151,6 +151,68 @@ class FoodSearchTest extends TestCase
         );
     }
 
+    public function test_returned_food_keeps_its_internal_identity_and_nutrients_after_reimport(): void
+    {
+        $this->artisan('nutrition:import-taco')->assertSuccessful();
+
+        $initialResponse = $this->getJson('/api/foods?q=maca%2C%20fuji')
+            ->assertSuccessful();
+        $initialFood = collect($initialResponse->json('data'))->firstWhere('source_code', '222');
+
+        $this->assertIsArray($initialFood);
+        $this->assertIsInt($initialFood['id']);
+        $this->assertSame('TACO', $initialFood['source']);
+        $this->assertSame('222', $initialFood['source_code']);
+
+        $foodId = $initialFood['id'];
+        $storedFood = Food::query()->with('foodNutrients')->findOrFail($foodId);
+        $initialStoredNutrients = $this->storedNutrientSignature($storedFood);
+        $initialResponseNutrients = $this->responseNutrientSignature($initialFood['nutrients']);
+
+        $this->assertSame(1, Food::query()->whereKey($foodId)->count());
+        $this->assertSame(1, Food::query()
+            ->where('source', 'TACO')
+            ->where('source_code', '222')
+            ->count());
+        $this->assertSame('TACO', $storedFood->source);
+        $this->assertSame('222', $storedFood->source_code);
+        $this->assertNotEmpty($initialStoredNutrients);
+        $this->assertSame(
+            $storedFood->foodNutrients->pluck('nutrient_id')->sort()->values()->all(),
+            collect($initialFood['nutrients'])->pluck('id')->sort()->values()->all(),
+        );
+        $this->assertTrue(
+            $storedFood->foodNutrients->every(
+                fn (FoodNutrient $foodNutrient): bool => $foodNutrient->food_id === $foodId,
+            ),
+        );
+
+        $this->artisan('nutrition:import-taco')->assertSuccessful();
+
+        $reimportedResponse = $this->getJson('/api/foods?q=maca%2C%20fuji')
+            ->assertSuccessful();
+        $reimportedFood = collect($reimportedResponse->json('data'))->firstWhere('source_code', '222');
+
+        $this->assertIsArray($reimportedFood);
+        $this->assertSame($foodId, $reimportedFood['id']);
+        $this->assertSame('TACO', $reimportedFood['source']);
+        $this->assertSame('222', $reimportedFood['source_code']);
+        $this->assertSame(
+            $initialResponseNutrients,
+            $this->responseNutrientSignature($reimportedFood['nutrients']),
+        );
+
+        $reimportedStoredFood = Food::query()->with('foodNutrients')->findOrFail($foodId);
+
+        $this->assertSame($foodId, $reimportedStoredFood->id);
+        $this->assertSame('TACO', $reimportedStoredFood->source);
+        $this->assertSame('222', $reimportedStoredFood->source_code);
+        $this->assertSame(
+            $initialStoredNutrients,
+            $this->storedNutrientSignature($reimportedStoredFood),
+        );
+    }
+
     private function createFood(
         string $name,
         ?string $category = 'Categoria de teste',
@@ -182,6 +244,45 @@ class FoodSearchTest extends TestCase
             'amount_value' => $amountValue,
             'status' => $status,
         ]);
+    }
+
+    /**
+     * @param  list<array{id: int, name: string, unit: string, amount_value: float|null, status: string}>  $nutrients
+     * @return list<string>
+     */
+    private function responseNutrientSignature(array $nutrients): array
+    {
+        $signature = array_map(
+            fn (array $nutrient): string => implode('|', [
+                $nutrient['id'],
+                $nutrient['name'],
+                $nutrient['unit'],
+                $nutrient['amount_value'] ?? 'null',
+                $nutrient['status'],
+            ]),
+            $nutrients,
+        );
+        sort($signature);
+
+        return $signature;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function storedNutrientSignature(Food $food): array
+    {
+        return $food->foodNutrients
+            ->map(fn (FoodNutrient $foodNutrient): string => implode('|', [
+                $foodNutrient->id,
+                $foodNutrient->food_id,
+                $foodNutrient->nutrient_id,
+                $foodNutrient->amount_value ?? 'null',
+                $foodNutrient->status,
+            ]))
+            ->sort()
+            ->values()
+            ->all();
     }
 
     /**
