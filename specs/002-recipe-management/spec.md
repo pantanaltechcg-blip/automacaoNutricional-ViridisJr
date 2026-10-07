@@ -81,8 +81,16 @@ Como usuário, quero abrir uma receita já salva, consultar suas entradas e edit
 
 ### Functional Requirements
 
+Para validação e preservação das entradas, o valor considerado é aquele resultante
+da normalização de transporte HTTP: espaços externos são removidos das strings e
+strings vazias ou compostas apenas por espaços são tratadas como ausência de valor.
+Essa normalização não altera caixa, não converte unidades ou valores numéricos e não
+arredonda valores. Assim, por exemplo, `" Receita "`, `" 1.250 "` e `" g "` são
+considerados respectivamente como `"Receita"`, `"1.250"` e `"g"`, enquanto `""` e
+`"   "` são considerados ausência de valor.
+
 - **FR-001**: O sistema MUST permitir criar uma receita.
-- **FR-002**: O sistema MUST preservar o nome informado para a receita.
+- **FR-002**: O sistema MUST preservar para a receita o nome resultante da normalização de transporte HTTP descrita nesta specification.
 - **FR-003**: O sistema MUST NOT exigir ou persistir características adicionais de produto nesta feature; além dos ingredientes e das demais entradas especificadas, o único dado de identificação obrigatório da receita MUST ser o nome. Características futuras MUST exigir alteração formal e aprovada desta specification.
 - **FR-004**: O sistema MUST permitir que uma receita seja composta por múltiplos ingredientes.
 - **FR-005**: Cada ingrediente MUST referenciar um alimento já existente na Base Nutricional por sua identificação interna estável (`foods.id`).
@@ -92,8 +100,10 @@ Como usuário, quero abrir uma receita já salva, consultar suas entradas e edit
 - **FR-009**: O sistema MUST permitir reordenar ingredientes e preservar exatamente a ordem escolhida após salvar e reabrir a receita. A reordenação MUST NOT alterar alimento, quantidade em gramas, rendimento ou qualquer outro dado.
 - **FR-010**: O sistema MUST aceitar e preservar a quantidade de cada ingrediente exclusivamente em gramas (`g`) e MUST NOT realizar conversão de unidade. A quantidade MUST ser maior que zero, MUST permitir frações de grama e MUST rejeitar zero e valores negativos. Esta feature não estabelece precisão decimal máxima; qualquer limite futuro MUST exigir decisão explícita e alteração formal desta specification. Ingredientes sem referência a um alimento existente na Base Nutricional MUST ser rejeitados, sem criação ou substituição de alimento.
 - **FR-011**: Para uma receita completa, o sistema MUST exigir que o usuário informe explicitamente um rendimento total maior que zero, em gramas (`g`) ou mililitros (`ml`), e MUST permitir valores fracionários. O sistema MUST preservar o valor e a unidade informados, sem inferir o rendimento pela soma das quantidades dos ingredientes, converter entre `g` e `ml`, calcular densidade ou interpretar matematicamente o rendimento. Esta feature não estabelece precisão decimal máxima; qualquer limite futuro MUST exigir decisão explícita e alteração formal desta specification.
-- **FR-012**: O sistema MUST NOT persistir uma receita sem ao menos um ingrediente válido e MUST NOT introduzir estado de rascunho ou receita incompleta nesta feature.
-- **FR-013**: Toda receita persistida MUST possuir ao menos um ingrediente válido.
+- **FR-012**: Toda receita persistida MUST possuir ao menos um ingrediente válido; o sistema MUST rejeitar receita sem ingredientes e MUST NOT introduzir estado de rascunho ou receita incompleta nesta feature.
+
+*Nota documental: FR-013 foi consolidado em FR-012; os IDs posteriores permanecem inalterados.*
+
 - **FR-014**: O sistema MUST rejeitar dados obrigatórios ausentes.
 - **FR-015**: O sistema MUST permitir consultar uma receita salva.
 - **FR-016**: O sistema MUST permitir editar uma receita existente e salvar novamente suas entradas válidas.
@@ -137,7 +147,7 @@ Como usuário, quero abrir uma receita já salva, consultar suas entradas e edit
 - **SC-002**: Em 100% das receitas reabertas nos testes de aceitação, nome, ingredientes, alimentos selecionados, quantidades em gramas, ordem, valor e unidade do rendimento correspondem ao último salvamento.
 - **SC-003**: Em 100% dos ingredientes persistidos, a referência interna corresponde ao mesmo alimento selecionado na Base Nutricional.
 - **SC-004**: Após adicionar, editar, remover ou reordenar ingredientes, 100% das alterações válidas permanecem preservadas ao reabrir a receita.
-- **SC-005**: 100% das entradas classificadas como inválidas pelas regras aprovadas são rejeitadas sem correção, conversão ou preenchimento silencioso.
+- **SC-005**: Após a normalização de transporte HTTP descrita nesta specification, 100% das entradas classificadas como inválidas pelas regras aprovadas são rejeitadas sem normalização de caixa, conversão de unidade, conversão numérica silenciosa, arredondamento ou preenchimento silencioso.
 - **SC-006**: Nenhuma operação desta feature produz valores nutricionais calculados, resultados por rendimento, valores por 100 g ou 100 ml, valores por porção, %VD ou resultados de rotulagem.
 - **SC-007**: Um usuário consegue concluir o fluxo criar, salvar, consultar e editar uma receita sem recadastrar alimentos já existentes na Base Nutricional.
 
