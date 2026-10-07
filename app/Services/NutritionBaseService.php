@@ -11,6 +11,61 @@ use InvalidArgumentException;
 class NutritionBaseService
 {
     /**
+     * @return list<array{
+     *     id: int,
+     *     name: string,
+     *     category?: string,
+     *     source: string,
+     *     source_code?: string,
+     *     nutrients: list<array{
+     *         id: int,
+     *         name: string,
+     *         unit: string,
+     *         amount_value: ?float,
+     *         status: string
+     *     }>
+     * }>
+     */
+    public function search(string $query): array
+    {
+        return Food::query()
+            ->with('foodNutrients.nutrient')
+            ->whereRaw('unaccent(name) ILIKE unaccent(?)', ["%{$query}%"])
+            ->get()
+            ->map(function (Food $food): array {
+                $result = [
+                    'id' => (int) $food->getKey(),
+                    'name' => $food->name,
+                    'source' => $food->source,
+                    'nutrients' => $food->foodNutrients
+                        ->map(fn (FoodNutrient $foodNutrient): array => [
+                            'id' => (int) $foodNutrient->nutrient->getKey(),
+                            'name' => $foodNutrient->nutrient->name,
+                            'unit' => $foodNutrient->nutrient->unit,
+                            'amount_value' => $foodNutrient->amount_value === null
+                                ? null
+                                : (float) $foodNutrient->amount_value,
+                            'status' => $foodNutrient->status,
+                        ])
+                        ->values()
+                        ->all(),
+                ];
+
+                if ($food->category !== null) {
+                    $result['category'] = $food->category;
+                }
+
+                if ($food->source_code !== null) {
+                    $result['source_code'] = $food->source_code;
+                }
+
+                return $result;
+            })
+            ->values()
+            ->all();
+    }
+
+    /**
      * @param  list<array{source: string, source_code: string, name: string, category: ?string}>  $foods
      * @param  list<array{name: string, unit: string}>  $nutrients
      * @param  list<array{source: string, source_code: string, nutrient_name: string, nutrient_unit: string, amount_value: ?string, status: string}>  $foodNutrients

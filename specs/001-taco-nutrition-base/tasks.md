@@ -107,21 +107,21 @@
 
 ### Contrato — User Story 2
 
-- [ ] T019 [US2] Confirmar que `specs/001-taco-nutrition-base/contracts/search-foods.md` documenta o endpoint `GET /api/foods`, o parâmetro obrigatório `q` e a referência ao formato de resposta definido em `search-response.json`.
+- [X] T019 [US2] Confirmar que `specs/001-taco-nutrition-base/contracts/search-foods.md` documenta o endpoint `GET /api/foods`, o parâmetro obrigatório `q` e a referência ao formato de resposta definido em `search-response.json`.
 
-- [ ] T020 [US2] Confirmar que o contrato documenta que os espaços externos de `q` são removidos antes da validação e antes de o valor ser entregue ao serviço de busca e que, após essa normalização, um valor com conteúdo executa a busca, enquanto um valor ausente ou vazio falha por validação sem executar pesquisa.
+- [X] T020 [US2] Confirmar que o contrato documenta que os espaços externos de `q` são removidos antes da validação e antes de o valor ser entregue ao serviço de busca e que, após essa normalização, um valor com conteúdo executa a busca, enquanto um valor ausente ou vazio falha por validação sem executar pesquisa.
 
 ### Implementação — User Story 2
 
-- [ ] T021 [US2] Adicionar método de busca em `app/Services/NutritionBaseService.php` que executa pesquisa parcial em `foods.name`, utilizando recursos do PostgreSQL compatíveis com a decisão documentada no `research.md` para ignorar diferenças entre maiúsculas/minúsculas e acentuação, incluindo no resultado os registros de `food_nutrients` e seus respectivos `nutrients`
+- [X] T021 [US2] Adicionar método de busca em `app/Services/NutritionBaseService.php` que executa pesquisa parcial em `foods.name`, utilizando recursos do PostgreSQL compatíveis com a decisão documentada no `research.md` para ignorar diferenças entre maiúsculas/minúsculas e acentuação, incluindo no resultado os registros de `food_nutrients` e seus respectivos `nutrients`
 
-- [ ] T022 [US2] Criar `app/Http/Requests/FoodSearchRequest.php` para remover os espaços externos de `q` antes da validação e antes de entregar o valor ao serviço de busca, normalizando por exemplo `" maca "` para `"maca"`, e aplicar somente as regras de validação aprovadas e documentadas em T020; quando o valor normalizado ficar vazio, a requisição deve falhar por validação e nenhuma pesquisa deve ser executada
+- [X] T022 [US2] Criar `app/Http/Requests/FoodSearchRequest.php` para remover os espaços externos de `q` antes da validação e antes de entregar o valor ao serviço de busca, normalizando por exemplo `" maca "` para `"maca"`, e aplicar somente as regras de validação aprovadas e documentadas em T020; quando o valor normalizado ficar vazio, a requisição deve falhar por validação e nenhuma pesquisa deve ser executada
 
-- [ ] T023 [US2] Criar `app/Http/Controllers/FoodController.php` com método `search(FoodSearchRequest $request)` responsável apenas por receber a requisição validada, delegar a busca ao `NutritionBaseService` e retornar resposta JSON conforme o contrato em `specs/001-taco-nutrition-base/contracts/search-response.json`
+- [X] T023 [US2] Criar `app/Http/Controllers/FoodController.php` com método `search(FoodSearchRequest $request)` responsável apenas por receber a requisição validada, delegar a busca ao `NutritionBaseService` e retornar resposta JSON conforme o contrato em `specs/001-taco-nutrition-base/contracts/search-response.json`
 
-- [ ] T024 [US2] Registrar rota em `routes/api.php`: `GET /api/foods` com parâmetro `q`, apontando para o método de busca do `FoodController`
+- [X] T024 [US2] Registrar rota em `routes/api.php`: `GET /api/foods` com parâmetro `q`, apontando para o método de busca do `FoodController`
 
-- [ ] T025 [US2] Criar teste em `tests/Feature/FoodSearchTest.php` que verifica:
+- [X] T025 [US2] Criar teste em `tests/Feature/FoodSearchTest.php` que verifica:
   - busca por termo parcial retorna alimentos correspondentes;
   - busca ignora diferenças entre maiúsculas e minúsculas;
   - busca ignora diferenças de acentuação;
