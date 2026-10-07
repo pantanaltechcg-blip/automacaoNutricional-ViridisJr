@@ -156,11 +156,11 @@
 
 **Purpose**: Validação end-to-end e encerramento da feature.
 
-- [ ] T027 [P] Executar `php artisan test` e confirmar que todos os testes relacionados à feature passam sem falhas
+- [X] T027 [P] Executar `php artisan test` e confirmar que todos os testes relacionados à feature passam sem falhas
 
-- [ ] T028 Executar o roteiro de validação descrito em `specs/001-taco-nutrition-base/quickstart.md` e confirmar os critérios definidos
+- [X] T028 Executar o roteiro de validação descrito em `specs/001-taco-nutrition-base/quickstart.md` e confirmar os critérios definidos
 
-- [ ] T029 Revisar que nenhum código desta feature:
+- [X] T029 Revisar que nenhum código desta feature:
   - realiza cálculos nutricionais;
   - interpreta matematicamente `TRACE`, `NA`, `ABSENT` ou `REEVALUATION`;
   - converte esses estados para zero;
