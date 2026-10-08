@@ -140,9 +140,9 @@ o último estado válido persistido.
 **Purpose**: Validar migrations, suíte completa, qualidade e limites de escopo sem
 adicionar funcionalidades.
 
-- [ ] T027 Executar `php artisan migrate:status` e `php artisan test` com PostgreSQL conforme `phpunit.xml`, confirmando migrations aplicadas e compatibilidade de todos os testes existentes e novos
-- [ ] T028 Executar `vendor/bin/pint --test` e `git diff --check`, revisar `app/`, `database/migrations/`, `routes/api.php` e `tests/Feature/` e confirmar ausência de autenticação, draft, cálculos nutricionais, rotulagem, PDF/PNG, histórico, DELETE, PATCH, listagem, busca de receitas e endpoints separados de ingredientes
-- [ ] T029 Executar integralmente os cenários manuais de `specs/002-recipe-management/quickstart.md` e confirmar criação, GET, PUT integral, normalização HTTP, rejeições, precisão decimal, atomicidade, preservação da ordem e ausência de modificação na Base Nutricional
+- [X] T027 Executar `php artisan migrate:status` e `php artisan test` com PostgreSQL conforme `phpunit.xml`, confirmando migrations aplicadas e compatibilidade de todos os testes existentes e novos
+- [X] T028 Executar `vendor/bin/pint --test` e `git diff --check`, revisar `app/`, `database/migrations/`, `routes/api.php` e `tests/Feature/` e confirmar ausência de autenticação, draft, cálculos nutricionais, rotulagem, PDF/PNG, histórico, DELETE, PATCH, listagem, busca de receitas e endpoints separados de ingredientes
+- [X] T029 Executar integralmente os cenários manuais de `specs/002-recipe-management/quickstart.md` e confirmar criação, GET, PUT integral, normalização HTTP, rejeições, precisão decimal, atomicidade, preservação da ordem e ausência de modificação na Base Nutricional
 
 ---
 
