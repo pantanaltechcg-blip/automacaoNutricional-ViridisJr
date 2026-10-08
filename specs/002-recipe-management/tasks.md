@@ -120,15 +120,15 @@ PUT e que cada ingrediente continua associado ao Food explicitamente selecionado
 
 > Escrever estes testes primeiro e confirmar que falham antes da implementação.
 
-- [ ] T021 [P] [US3] Adicionar testes do contrato `GET /api/recipes/{recipe}` em `tests/Feature/RecipeManagementTest.php` cobrindo envelope `data`, receita inexistente sem criação ou alteração, ingredientes em ordem crescente de `position`, `food_id`, quantidade e rendimento como strings decimais, unidades e ausência de resultados nutricionais
-- [ ] T022 [P] [US3] Adicionar testes de reabertura em `tests/Feature/RecipePersistenceTest.php` criando, atualizando e consultando novamente a receita para confirmar preservação de nome, rendimento, unidade do rendimento, coleção final, Foods selecionados, quantidades, unidades e posições sem arredondamento, conversão ou alteração da Base Nutricional
+- [X] T021 [P] [US3] Adicionar testes do contrato `GET /api/recipes/{recipe}` em `tests/Feature/RecipeManagementTest.php` cobrindo envelope `data`, receita inexistente sem criação ou alteração, ingredientes em ordem crescente de `position`, `food_id`, quantidade e rendimento como strings decimais, unidades e ausência de resultados nutricionais
+- [X] T022 [P] [US3] Adicionar testes de reabertura em `tests/Feature/RecipePersistenceTest.php` criando, atualizando e consultando novamente a receita para confirmar preservação de nome, rendimento, unidade do rendimento, coleção final, Foods selecionados, quantidades, unidades e posições sem arredondamento, conversão ou alteração da Base Nutricional
 
 ### Implementation for User Story 3
 
-- [ ] T023 [US3] Implementar em `app/Services/RecipeService.php` a consulta da receita com RecipeIngredients e Foods existentes, carregando a coleção em ordem crescente de `position` e serializando `quantity` e `yield_value` como strings sem casts numéricos
-- [ ] T024 [US3] Adicionar o método de consulta em `app/Http/Controllers/RecipeController.php` para somente orquestrar route model binding e `RecipeService` e devolver o envelope `data` sem nutrientes calculados
-- [ ] T025 [US3] Registrar somente `GET /api/recipes/{recipe}` em `routes/api.php`, sem listagem ou busca de receitas
-- [ ] T026 [US3] Executar os testes da User Story 3 em `tests/Feature/RecipeManagementTest.php` e `tests/Feature/RecipePersistenceTest.php` com PostgreSQL e confirmar consulta e reprodução integral após criação e PUT
+- [X] T023 [US3] Implementar em `app/Services/RecipeService.php` a consulta da receita com RecipeIngredients e Foods existentes, carregando a coleção em ordem crescente de `position` e serializando `quantity` e `yield_value` como strings sem casts numéricos
+- [X] T024 [US3] Adicionar o método de consulta em `app/Http/Controllers/RecipeController.php` para somente orquestrar route model binding e `RecipeService` e devolver o envelope `data` sem nutrientes calculados
+- [X] T025 [US3] Registrar somente `GET /api/recipes/{recipe}` em `routes/api.php`, sem listagem ou busca de receitas
+- [X] T026 [US3] Executar os testes da User Story 3 em `tests/Feature/RecipeManagementTest.php` e `tests/Feature/RecipePersistenceTest.php` com PostgreSQL e confirmar consulta e reprodução integral após criação e PUT
 
 **Checkpoint**: Todas as User Stories estão funcionais e a receita reaberta reproduz
 o último estado válido persistido.

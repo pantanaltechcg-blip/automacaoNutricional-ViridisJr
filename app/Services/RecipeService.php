@@ -53,4 +53,9 @@ class RecipeService
             return $recipe->load('ingredients');
         });
     }
+
+    public function retrieve(Recipe $recipe): Recipe
+    {
+        return $recipe->load('ingredients');
+    }
 }

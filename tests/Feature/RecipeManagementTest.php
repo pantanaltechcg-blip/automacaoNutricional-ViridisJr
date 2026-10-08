@@ -247,6 +247,65 @@ class RecipeManagementTest extends TestCase
             ->assertJsonPath('data.ingredients.0.position', 7);
     }
 
+    public function test_get_returns_the_exact_recipe_contract_with_ingredients_ordered_by_position(): void
+    {
+        $firstFood = $this->createFood('RECIPE-GET-FIRST');
+        $secondFood = $this->createFood('RECIPE-GET-SECOND');
+        $recipe = $this->createRecipe([
+            ['food_id' => $firstFood->id, 'quantity' => '1000.0001', 'unit' => 'g', 'position' => 5],
+            ['food_id' => $secondFood->id, 'quantity' => '500.125', 'unit' => 'g', 'position' => 2],
+        ]);
+        $recipe->update([
+            'name' => 'Produto reaberto',
+            'yield_value' => '1680.5001',
+            'yield_unit' => 'ml',
+        ]);
+
+        $response = $this->getJson("/api/recipes/{$recipe->id}")
+            ->assertSuccessful();
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => $recipe->id,
+                'name' => 'Produto reaberto',
+                'yield_value' => '1680.5001',
+                'yield_unit' => 'ml',
+                'ingredients' => [
+                    ['food_id' => $secondFood->id, 'quantity' => '500.125', 'unit' => 'g', 'position' => 2],
+                    ['food_id' => $firstFood->id, 'quantity' => '1000.0001', 'unit' => 'g', 'position' => 5],
+                ],
+            ],
+        ]);
+        $this->assertIsString($response->json('data.yield_value'));
+        $this->assertContainsOnly('string', $response->json('data.ingredients.*.quantity'));
+    }
+
+    public function test_get_fails_for_an_unknown_recipe_without_changing_records(): void
+    {
+        $food = $this->createFood('RECIPE-GET-NOT-FOUND');
+        $recipe = $this->createRecipe([
+            ['food_id' => $food->id, 'quantity' => '10.25', 'unit' => 'g', 'position' => 3],
+        ]);
+        $recipeAttributes = $recipe->only(['id', 'name', 'yield_value', 'yield_unit']);
+        $ingredientAttributes = $recipe->ingredients()->firstOrFail()
+            ->only(['id', 'recipe_id', 'food_id', 'quantity', 'unit', 'position']);
+        $recipeCount = Recipe::query()->count();
+
+        $this->getJson('/api/recipes/'.PHP_INT_MAX)
+            ->assertClientError();
+
+        $this->assertSame($recipeCount, Recipe::query()->count());
+        $this->assertSame(
+            $recipeAttributes,
+            $recipe->fresh()->only(['id', 'name', 'yield_value', 'yield_unit']),
+        );
+        $this->assertSame(
+            $ingredientAttributes,
+            $recipe->ingredients()->firstOrFail()
+                ->only(['id', 'recipe_id', 'food_id', 'quantity', 'unit', 'position']),
+        );
+    }
+
     private function createFood(string $sourceCode): Food
     {
         return Food::query()->create([

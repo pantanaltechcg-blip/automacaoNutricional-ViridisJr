@@ -30,6 +30,11 @@ class RecipeController extends Controller
         return $this->recipeResponse($recipe);
     }
 
+    public function show(Recipe $recipe, RecipeService $recipeService): JsonResponse
+    {
+        return $this->recipeResponse($recipeService->retrieve($recipe));
+    }
+
     private function recipeResponse(Recipe $recipe): JsonResponse
     {
         return response()->json([

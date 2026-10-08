@@ -464,6 +464,57 @@ class RecipePersistenceTest extends TestCase
         $this->assertSame($recipe->ingredients->first()->quantity, $response->json('data.ingredients.0.quantity'));
     }
 
+    public function test_get_reopens_the_exact_latest_state_after_post_and_put(): void
+    {
+        $foodA = $this->createFood('RECIPE-REOPEN-A');
+        $foodB = $this->createFood('RECIPE-REOPEN-B');
+        $foodC = $this->createFood('RECIPE-REOPEN-C');
+        $foodCount = Food::query()->count();
+        $foodAttributes = collect([$foodA, $foodB, $foodC])
+            ->mapWithKeys(fn (Food $food): array => [$food->id => $food->getAttributes()]);
+
+        $created = $this->postJson('/api/recipes', [
+            'name' => 'Produto Teste',
+            'yield_value' => '1680.5001',
+            'yield_unit' => 'g',
+            'ingredients' => [
+                ['food_id' => $foodA->id, 'quantity' => '1000', 'unit' => 'g', 'position' => 1],
+                ['food_id' => $foodB->id, 'quantity' => '500.125', 'unit' => 'g', 'position' => 3],
+            ],
+        ])->assertSuccessful();
+        $recipeId = $created->json('data.id');
+
+        $this->putJson("/api/recipes/{$recipeId}", [
+            'name' => 'Produto Teste Atualizado',
+            'yield_value' => '1500.5001001',
+            'yield_unit' => 'ml',
+            'ingredients' => [
+                ['food_id' => $foodC->id, 'quantity' => '375.0000001', 'unit' => 'g', 'position' => 5],
+                ['food_id' => $foodB->id, 'quantity' => '625.1250001', 'unit' => 'g', 'position' => 2],
+            ],
+        ])->assertSuccessful();
+
+        $response = $this->getJson("/api/recipes/{$recipeId}")
+            ->assertSuccessful();
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => $recipeId,
+                'name' => 'Produto Teste Atualizado',
+                'yield_value' => '1500.5001001',
+                'yield_unit' => 'ml',
+                'ingredients' => [
+                    ['food_id' => $foodB->id, 'quantity' => '625.1250001', 'unit' => 'g', 'position' => 2],
+                    ['food_id' => $foodC->id, 'quantity' => '375.0000001', 'unit' => 'g', 'position' => 5],
+                ],
+            ],
+        ]);
+        $this->assertSame($foodCount, Food::query()->count());
+        foreach ([$foodA, $foodB, $foodC] as $food) {
+            $this->assertFoodUnchanged($food, $foodAttributes->get($food->id));
+        }
+    }
+
     private function createFood(string $sourceCode = 'RECIPE-PERSISTENCE'): Food
     {
         return Food::query()->create([
