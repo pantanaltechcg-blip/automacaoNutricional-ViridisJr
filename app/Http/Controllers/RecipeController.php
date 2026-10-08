@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRecipeRequest;
+use App\Http\Requests\UpdateRecipeRequest;
+use App\Models\Recipe;
 use App\Models\RecipeIngredient;
 use App\Services\RecipeService;
 use Illuminate\Http\JsonResponse;
@@ -15,6 +17,21 @@ class RecipeController extends Controller
     ): JsonResponse {
         $recipe = $recipeService->create($request->validated());
 
+        return $this->recipeResponse($recipe);
+    }
+
+    public function update(
+        UpdateRecipeRequest $request,
+        Recipe $recipe,
+        RecipeService $recipeService,
+    ): JsonResponse {
+        $recipe = $recipeService->update($recipe, $request->validated());
+
+        return $this->recipeResponse($recipe);
+    }
+
+    private function recipeResponse(Recipe $recipe): JsonResponse
+    {
         return response()->json([
             'data' => [
                 'id' => $recipe->id,

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Food;
 use App\Models\Recipe;
+use App\Models\RecipeIngredient;
 use App\Services\RecipeService;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -328,6 +329,141 @@ class RecipePersistenceTest extends TestCase
         }
     }
 
+    public function test_update_rolls_back_to_the_exact_previous_state_when_an_ingredient_fails(): void
+    {
+        $firstFood = $this->createFood('RECIPE-UPDATE-ROLLBACK-FIRST');
+        $secondFood = $this->createFood('RECIPE-UPDATE-ROLLBACK-SECOND');
+        $recipe = $this->createRecipe([
+            ['food_id' => $firstFood->id, 'quantity' => '10.25', 'unit' => 'g', 'position' => 1],
+            ['food_id' => $secondFood->id, 'quantity' => '20.5', 'unit' => 'g', 'position' => 3],
+        ]);
+        $previousRecipe = $recipe->only(['name', 'yield_value', 'yield_unit']);
+        $previousIngredients = $this->ingredientSignature($recipe);
+
+        try {
+            app(RecipeService::class)->update($recipe, [
+                'name' => 'Estado que deve ser revertido',
+                'yield_value' => '999.999',
+                'yield_unit' => 'ml',
+                'ingredients' => [
+                    ['food_id' => $firstFood->id, 'quantity' => '1', 'unit' => 'g', 'position' => 1],
+                    ['food_id' => $secondFood->id, 'quantity' => '2', 'unit' => 'g', 'position' => 1],
+                ],
+            ]);
+            $this->fail('A constraint de posição deveria impedir a substituição.');
+        } catch (QueryException) {
+            $recipe->refresh();
+            $this->assertSame($previousRecipe, $recipe->only(['name', 'yield_value', 'yield_unit']));
+            $this->assertSame($previousIngredients, $this->ingredientSignature($recipe));
+        }
+    }
+
+    public function test_reordering_changes_only_positions(): void
+    {
+        $firstFood = $this->createFood('RECIPE-UPDATE-ORDER-FIRST');
+        $secondFood = $this->createFood('RECIPE-UPDATE-ORDER-SECOND');
+        $recipe = $this->createRecipe([
+            ['food_id' => $firstFood->id, 'quantity' => '10.250', 'unit' => 'g', 'position' => 1],
+            ['food_id' => $secondFood->id, 'quantity' => '20.500', 'unit' => 'g', 'position' => 3],
+        ], '500.125', 'ml');
+
+        $this->putJson("/api/recipes/{$recipe->id}", [
+            'name' => 'Receita original',
+            'yield_value' => '500.125',
+            'yield_unit' => 'ml',
+            'ingredients' => [
+                ['food_id' => $firstFood->id, 'quantity' => '10.250', 'unit' => 'g', 'position' => 8],
+                ['food_id' => $secondFood->id, 'quantity' => '20.500', 'unit' => 'g', 'position' => 2],
+            ],
+        ])->assertSuccessful();
+
+        $recipe->refresh();
+        $this->assertSame('500.125', $recipe->yield_value);
+        $this->assertSame('ml', $recipe->yield_unit);
+        $this->assertSame([
+            "{$secondFood->id}|20.500|g|2",
+            "{$firstFood->id}|10.250|g|8",
+        ], $this->ingredientSignature($recipe));
+    }
+
+    public function test_omitted_ingredient_is_removed_without_changing_any_food(): void
+    {
+        $keptFood = $this->createFood('RECIPE-UPDATE-KEEP');
+        $omittedFood = $this->createFood('RECIPE-UPDATE-OMIT');
+        $recipe = $this->createRecipe([
+            ['food_id' => $keptFood->id, 'quantity' => '10', 'unit' => 'g', 'position' => 1],
+            ['food_id' => $omittedFood->id, 'quantity' => '20', 'unit' => 'g', 'position' => 2],
+        ]);
+        $foodCount = Food::query()->count();
+        $keptFoodAttributes = $keptFood->getAttributes();
+        $omittedFoodAttributes = $omittedFood->getAttributes();
+
+        $this->putJson("/api/recipes/{$recipe->id}", [
+            'name' => 'Receita sem ingrediente omitido',
+            'yield_value' => '30',
+            'yield_unit' => 'g',
+            'ingredients' => [[
+                'food_id' => $keptFood->id,
+                'quantity' => '10',
+                'unit' => 'g',
+                'position' => 1,
+            ]],
+        ])->assertSuccessful();
+
+        $this->assertSame(1, $recipe->ingredients()->count());
+        $this->assertFalse($recipe->ingredients()->where('food_id', $omittedFood->id)->exists());
+        $this->assertSame($foodCount, Food::query()->count());
+        $this->assertFoodUnchanged($keptFood, $keptFoodAttributes);
+        $this->assertFoodUnchanged($omittedFood, $omittedFoodAttributes);
+    }
+
+    public function test_update_allows_the_same_food_in_different_positions_without_upsert(): void
+    {
+        $food = $this->createFood('RECIPE-UPDATE-REPEATED-FOOD');
+        $recipe = $this->createRecipe([
+            ['food_id' => $food->id, 'quantity' => '1', 'unit' => 'g', 'position' => 1],
+        ]);
+
+        $this->putJson("/api/recipes/{$recipe->id}", [
+            'name' => 'Receita com alimento repetido',
+            'yield_value' => '3',
+            'yield_unit' => 'g',
+            'ingredients' => [
+                ['food_id' => $food->id, 'quantity' => '1', 'unit' => 'g', 'position' => 1],
+                ['food_id' => $food->id, 'quantity' => '2', 'unit' => 'g', 'position' => 4],
+            ],
+        ])->assertSuccessful();
+
+        $this->assertSame(2, $recipe->ingredients()->where('food_id', $food->id)->count());
+        $this->assertSame([1, 4], $recipe->ingredients()->pluck('position')->all());
+    }
+
+    public function test_update_preserves_decimal_strings_without_fixed_scale(): void
+    {
+        $food = $this->createFood('RECIPE-UPDATE-PRECISION');
+        $recipe = $this->createRecipe([
+            ['food_id' => $food->id, 'quantity' => '1', 'unit' => 'g', 'position' => 1],
+        ]);
+
+        $response = $this->putJson("/api/recipes/{$recipe->id}", [
+            'name' => 'Receita atualizada com precisão',
+            'yield_value' => '12345678901234567890.12345678901234567890',
+            'yield_unit' => 'g',
+            'ingredients' => [[
+                'food_id' => $food->id,
+                'quantity' => '0.12345678901234567890123456789',
+                'unit' => 'g',
+                'position' => 1,
+            ]],
+        ])->assertSuccessful();
+
+        $recipe->refresh();
+        $this->assertSame('12345678901234567890.12345678901234567890', $recipe->yield_value);
+        $this->assertSame('0.12345678901234567890123456789', $recipe->ingredients->first()->quantity);
+        $this->assertSame($recipe->yield_value, $response->json('data.yield_value'));
+        $this->assertSame($recipe->ingredients->first()->quantity, $response->json('data.ingredients.0.quantity'));
+    }
+
     private function createFood(string $sourceCode = 'RECIPE-PERSISTENCE'): Food
     {
         return Food::query()->create([
@@ -336,6 +472,50 @@ class RecipePersistenceTest extends TestCase
             'source' => 'TACO',
             'source_code' => $sourceCode,
         ]);
+    }
+
+    /**
+     * @param  list<array{food_id: int, quantity: string, unit: string, position: int}>  $ingredients
+     */
+    private function createRecipe(
+        array $ingredients,
+        string $yieldValue = '1000',
+        string $yieldUnit = 'g',
+    ): Recipe {
+        $recipe = Recipe::factory()->create([
+            'name' => 'Receita original',
+            'yield_value' => $yieldValue,
+            'yield_unit' => $yieldUnit,
+        ]);
+        $recipe->ingredients()->createMany($ingredients);
+
+        return $recipe;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function ingredientSignature(Recipe $recipe): array
+    {
+        return $recipe->ingredients()->get()
+            ->map(fn (RecipeIngredient $ingredient): string => implode('|', [
+                $ingredient->food_id,
+                $ingredient->quantity,
+                $ingredient->unit,
+                $ingredient->position,
+            ]))
+            ->all();
+    }
+
+    /**
+     * @param  array<string, mixed>  $expectedAttributes
+     */
+    private function assertFoodUnchanged(Food $food, array $expectedAttributes): void
+    {
+        $freshFood = $food->fresh();
+        foreach ($expectedAttributes as $attribute => $value) {
+            $this->assertSame($value, $freshFood->getRawOriginal($attribute));
+        }
     }
 
     /**

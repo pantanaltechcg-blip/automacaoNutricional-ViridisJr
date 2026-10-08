@@ -91,16 +91,16 @@ explicitamente mudaram.
 
 > Escrever estes testes primeiro e confirmar que falham antes da implementação.
 
-- [ ] T014 [P] [US2] Adicionar testes do contrato `PUT /api/recipes/{recipe}` em `tests/Feature/RecipeManagementTest.php` cobrindo adição, alteração de quantidade, troca explícita de `food_id`, remoção de ingrediente omitido, reordenação por `position`, coleção vazia rejeitada, payload completo obrigatório, trim e validação aninhada iguais ao POST e retorno da coleção final ordenada
-- [ ] T015 [P] [US2] Adicionar testes de integridade da substituição em `tests/Feature/RecipePersistenceTest.php` cobrindo rollback integral diante de falha em qualquer ingrediente, posição única por receita, preservação de strings decimais, reordenação sem alterar Food/quantidade/unidade/rendimento, remoção de RecipeIngredient sem remover Food e edição sem criar ou modificar registros da Base Nutricional
+- [X] T014 [P] [US2] Adicionar testes do contrato `PUT /api/recipes/{recipe}` em `tests/Feature/RecipeManagementTest.php` cobrindo adição, alteração de quantidade, troca explícita de `food_id`, remoção de ingrediente omitido, reordenação por `position`, coleção vazia rejeitada, payload completo obrigatório, trim e validação aninhada iguais ao POST e retorno da coleção final ordenada
+- [X] T015 [P] [US2] Adicionar testes de integridade da substituição em `tests/Feature/RecipePersistenceTest.php` cobrindo rollback integral diante de falha em qualquer ingrediente, posição única por receita, preservação de strings decimais, reordenação sem alterar Food/quantidade/unidade/rendimento, remoção de RecipeIngredient sem remover Food e edição sem criar ou modificar registros da Base Nutricional
 
 ### Implementation for User Story 2
 
-- [ ] T016 [US2] Criar `app/Http/Requests/UpdateRecipeRequest.php` com o mesmo contrato completo e as mesmas regras de `StoreRecipeRequest`, incluindo strings decimais positivas, unidade de ingrediente `g`, rendimento em `g`/`ml`, ao menos um ingrediente e posições positivas distintas após a normalização HTTP padrão
-- [ ] T017 [US2] Implementar em `app/Services/RecipeService.php` a substituição integral transacional: atualizar nome e rendimento, remover RecipeIngredients omitidos, recriar a coleção enviada com seus `food_id`, quantidades, unidades e posições e garantir que nenhuma falha deixe estado parcial ou modifique Food
-- [ ] T018 [US2] Adicionar o método de atualização em `app/Http/Controllers/RecipeController.php` para somente orquestrar `UpdateRecipeRequest`, route model binding e `RecipeService`, sem regras de negócio no Controller
-- [ ] T019 [US2] Registrar somente `PUT /api/recipes/{recipe}` em `routes/api.php`, sem PATCH, DELETE ou endpoints separados de ingredientes
-- [ ] T020 [US2] Executar os testes da User Story 2 em `tests/Feature/RecipeManagementTest.php` e `tests/Feature/RecipePersistenceTest.php` com PostgreSQL e confirmar substituição integral, rollback, remoção e reordenação
+- [X] T016 [US2] Criar `app/Http/Requests/UpdateRecipeRequest.php` com o mesmo contrato completo e as mesmas regras de `StoreRecipeRequest`, incluindo strings decimais positivas, unidade de ingrediente `g`, rendimento em `g`/`ml`, ao menos um ingrediente e posições positivas distintas após a normalização HTTP padrão
+- [X] T017 [US2] Implementar em `app/Services/RecipeService.php` a substituição integral transacional: atualizar nome e rendimento, remover RecipeIngredients omitidos, recriar a coleção enviada com seus `food_id`, quantidades, unidades e posições e garantir que nenhuma falha deixe estado parcial ou modifique Food
+- [X] T018 [US2] Adicionar o método de atualização em `app/Http/Controllers/RecipeController.php` para somente orquestrar `UpdateRecipeRequest`, route model binding e `RecipeService`, sem regras de negócio no Controller
+- [X] T019 [US2] Registrar somente `PUT /api/recipes/{recipe}` em `routes/api.php`, sem PATCH, DELETE ou endpoints separados de ingredientes
+- [X] T020 [US2] Executar os testes da User Story 2 em `tests/Feature/RecipeManagementTest.php` e `tests/Feature/RecipePersistenceTest.php` com PostgreSQL e confirmar substituição integral, rollback, remoção e reordenação
 
 **Checkpoint**: A composição pode ser gerenciada integralmente por PUT sem alterar
 Food nem produzir estados parciais.
