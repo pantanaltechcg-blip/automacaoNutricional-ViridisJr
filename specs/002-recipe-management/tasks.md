@@ -25,7 +25,7 @@ e validação incremental, respeitando as dependências técnicas compartilhadas
 **Purpose**: Confirmar que a infraestrutura de testes existente permanece alinhada
 ao PostgreSQL antes de criar a modelagem.
 
-- [ ] T001 Confirmar em `phpunit.xml` que a suíte usa `DB_CONNECTION=pgsql`, executar a suíte baseline com `php artisan test` e não adicionar credenciais ao arquivo
+- [X] T001 Confirmar em `phpunit.xml` que a suíte usa `DB_CONNECTION=pgsql`, executar a suíte baseline com `php artisan test` e não adicionar credenciais ao arquivo
 
 ---
 
@@ -36,11 +36,11 @@ todas as User Stories.
 
 **⚠️ CRITICAL**: Nenhuma User Story pode começar antes da conclusão desta fase.
 
-- [ ] T002 Criar `database/migrations/2026_10_07_000001_create_recipes_table.php` com `id BIGINT`, `name TEXT NOT NULL`, `yield_value NUMERIC` sem precisão/escala e obrigatório, `yield_unit VARCHAR(2) NOT NULL`, timestamps e constraints `yield_value > 0` com rejeição de `NaN`/`Infinity` e `yield_unit IN ('g', 'ml')`
-- [ ] T003 Criar `database/migrations/2026_10_07_000002_create_recipe_ingredients_table.php` com `id BIGINT`, `recipe_id` obrigatório e FK para `recipes.id` com cascade somente sobre os ingredientes, `food_id` obrigatório e FK para `foods.id` sem cascade para Food, `quantity NUMERIC` sem precisão/escala e obrigatório, `unit VARCHAR(1) NOT NULL`, `position BIGINT NOT NULL`, timestamps, índice em `food_id` e constraints `quantity > 0` com rejeição de `NaN`/`Infinity`, `unit = 'g'`, `position > 0` e `UNIQUE (recipe_id, position)`
-- [ ] T004 [P] Criar `app/Models/Recipe.php` com atributos persistíveis aprovados, valores decimais mantidos como strings sem casts `float`, `double` ou `decimal:N`, e relacionamento `hasMany` para `RecipeIngredient` ordenado por `position`
-- [ ] T005 [P] Criar `app/Models/RecipeIngredient.php` com atributos persistíveis aprovados, `quantity` mantida como string sem casts `float`, `double` ou `decimal:N`, relacionamento `belongsTo` com `Recipe` e relacionamento `belongsTo` com o `Food` existente, sem alterar `app/Models/Food.php`
-- [ ] T006 Criar factories de teste em `database/factories/RecipeFactory.php` e `database/factories/RecipeIngredientFactory.php` sem criar Food substituto, sem precisão decimal fixa e exigindo que os testes forneçam um `foods.id` existente
+- [X] T002 Criar `database/migrations/2026_10_07_000001_create_recipes_table.php` com `id BIGINT`, `name TEXT NOT NULL`, `yield_value NUMERIC` sem precisão/escala e obrigatório, `yield_unit VARCHAR(2) NOT NULL`, timestamps e constraints `yield_value > 0` com rejeição de `NaN`/`Infinity` e `yield_unit IN ('g', 'ml')`
+- [X] T003 Criar `database/migrations/2026_10_07_000002_create_recipe_ingredients_table.php` com `id BIGINT`, `recipe_id` obrigatório e FK para `recipes.id` com cascade somente sobre os ingredientes, `food_id` obrigatório e FK para `foods.id` sem cascade para Food, `quantity NUMERIC` sem precisão/escala e obrigatório, `unit VARCHAR(1) NOT NULL`, `position BIGINT NOT NULL`, timestamps, índice em `food_id` e constraints `quantity > 0` com rejeição de `NaN`/`Infinity`, `unit = 'g'`, `position > 0` e `UNIQUE (recipe_id, position)`
+- [X] T004 [P] Criar `app/Models/Recipe.php` com atributos persistíveis aprovados, valores decimais mantidos como strings sem casts `float`, `double` ou `decimal:N`, e relacionamento `hasMany` para `RecipeIngredient` ordenado por `position`
+- [X] T005 [P] Criar `app/Models/RecipeIngredient.php` com atributos persistíveis aprovados, `quantity` mantida como string sem casts `float`, `double` ou `decimal:N`, relacionamento `belongsTo` com `Recipe` e relacionamento `belongsTo` com o `Food` existente, sem alterar `app/Models/Food.php`
+- [X] T006 Criar factories de teste em `database/factories/RecipeFactory.php` e `database/factories/RecipeIngredientFactory.php` sem criar Food substituto, sem precisão decimal fixa e exigindo que os testes forneçam um `foods.id` existente
 
 **Checkpoint**: Schema e Models compartilhados prontos; a Base Nutricional permanece
 inalterada.
