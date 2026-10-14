@@ -170,17 +170,17 @@
 
 **Purpose**: Validar migrations, suíte, contrato, Quickstart, dependências e limites de escopo sem adicionar funcionalidade.
 
-- [ ] T037 Executar `php artisan migrate` e `php artisan migrate:status` em PostgreSQL e confirmar todas as migrations de `database/migrations/` desta feature aplicadas, constraints ativas e ausência de alterações nas migrations já aplicadas das features 001/002
+- [X] T037 Executar `php artisan migrate` e `php artisan migrate:status` em PostgreSQL e confirmar todas as migrations de `database/migrations/` desta feature aplicadas, constraints ativas e ausência de alterações nas migrations já aplicadas das features 001/002
 
-- [ ] T038 Executar a suíte completa de `tests/` com `php artisan test` e `vendor/bin/phpunit`, confirmando que todos os testes existentes e os novos testes da feature passam em PostgreSQL
+- [X] T038 Executar a suíte completa de `tests/` com `php artisan test` e `vendor/bin/phpunit`, confirmando que todos os testes existentes e os novos testes da feature passam em PostgreSQL
 
-- [ ] T039 Executar `vendor/bin/pint --test` sobre os arquivos PHP da feature e `git diff --check` na raiz `.` do repositório, corrigindo somente formatação da implementação da feature quando necessário e confirmando ausência de whitespace errors
+- [X] T039 Executar `vendor/bin/pint --test` sobre os arquivos PHP da feature e `git diff --check` na raiz `.` do repositório, corrigindo somente formatação da implementação da feature quando necessário e confirmando ausência de whitespace errors
 
-- [ ] T040 Executar integralmente `specs/003-nutrition-calculation/quickstart.md`, validando cálculo real de Recipe, POST/GET, snapshot, versão, estados, ausência, 100 g, 100 ml, precisão, alteração da Recipe sem mutação histórica e nova execução independente
+- [X] T040 Executar integralmente `specs/003-nutrition-calculation/quickstart.md`, validando cálculo real de Recipe, POST/GET, snapshot, versão, estados, ausência, 100 g, 100 ml, precisão, alteração da Recipe sem mutação histórica e nova execução independente
 
-- [ ] T041 Verificar o caso real “GELEIA DE AMORA” conforme `specs/003-nutrition-calculation/quickstart.md`: confirmar `Açúcar, cristal` `source_code=492` e procurar somente mapeamentos explicitamente aprovados para amora e suco de limão; executar/comparar aproximadamente 65,21 g/100 g apenas se os três Foods estiverem inequivocamente aprovados e, caso contrário, registrar o bloqueio sem marcar o resultado nutricional como PASS e sem criar Food sintético, aproximação textual, composição manual, escolha arbitrária ou ajuste forçado
+- [X] T041 Verificar o caso real “GELEIA DE AMORA” conforme `specs/003-nutrition-calculation/quickstart.md`: confirmar `Açúcar, cristal` `source_code=492` e procurar somente mapeamentos explicitamente aprovados para amora e suco de limão; executar/comparar aproximadamente 65,21 g/100 g apenas se os três Foods estiverem inequivocamente aprovados e, caso contrário, registrar o bloqueio sem marcar o resultado nutricional como PASS e sem criar Food sintético, aproximação textual, composição manual, escolha arbitrária ou ajuste forçado
 
-- [ ] T042 Revisar `composer.json`, `composer.lock`, `routes/api.php`, Models, Services e migrations para confirmar `brick/math` direto em 1.0.0, somente os dois endpoints aprovados, Service sem update/delete, proteção PostgreSQL ativa, ausência de N+1 e inexistência de porção, medida caseira, %VD, arredondamento, energia por fatores, açúcares adicionados, rotulagem, preview, PDF/PNG, autenticação, cache, jobs, filas, histórico editável ou alteração funcional das features 001/002
+- [X] T042 Revisar `composer.json`, `composer.lock`, `routes/api.php`, Models, Services e migrations para confirmar `brick/math` direto em 1.0.0, somente os dois endpoints aprovados, Service sem update/delete, proteção PostgreSQL ativa, ausência de N+1 e inexistência de porção, medida caseira, %VD, arredondamento, energia por fatores, açúcares adicionados, rotulagem, preview, PDF/PNG, autenticação, cache, jobs, filas, histórico editável ou alteração funcional das features 001/002
 
 ---
 
