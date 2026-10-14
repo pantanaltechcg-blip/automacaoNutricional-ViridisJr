@@ -72,17 +72,17 @@
 
 ### Tests for User Story 1
 
-- [ ] T014 [P] [US1] Criar testes unitários inicialmente falhos em `tests/Unit/NutritionCalculationArithmeticTest.php` para construção de decimais a partir de strings, multiplicação, divisão, soma, fração reduzida, decimal terminado, dízima periódica, zero canônico `0/1` e ausência de `float`, `double`, escala arbitrária ou arredondamento
+- [X] T014 [P] [US1] Criar testes unitários inicialmente falhos em `tests/Unit/NutritionCalculationArithmeticTest.php` para construção de decimais a partir de strings, multiplicação, divisão, soma, fração reduzida, decimal terminado, dízima periódica, zero canônico `0/1` e ausência de `float`, `double`, escala arbitrária ou arredondamento
 
-- [ ] T015 [P] [US1] Criar testes inicialmente falhos em `tests/Feature/NutritionCalculationTest.php` para contribuição `EXACT` positiva e zero, `TRACE`, `NA`, `ABSENT`, `REEVALUATION`, ausência explícita de `FoodNutrient`, múltiplos Nutrients, energia da fonte como Nutrient comum, mesmo Food em ocorrências diferentes, todos os Nutrients existentes e carregamento agrupado sem N+1 nem produto cartesiano persistido na Base Nutricional
+- [X] T015 [P] [US1] Criar testes inicialmente falhos em `tests/Feature/NutritionCalculationTest.php` para contribuição `EXACT` positiva e zero, `TRACE`, `NA`, `ABSENT`, `REEVALUATION`, ausência explícita de `FoodNutrient`, múltiplos Nutrients, energia da fonte como Nutrient comum, mesmo Food em ocorrências diferentes, todos os Nutrients existentes e carregamento agrupado sem N+1 nem produto cartesiano persistido na Base Nutricional
 
 ### Implementation for User Story 1
 
-- [ ] T016 [US1] Criar `app/Services/NutritionCalculationArithmetic.php` como helper técnico mínimo baseado em `Brick\Math\BigRational`, recebendo somente strings decimais e produzindo razões reduzidas com numerador inteiro, denominador inteiro positivo e zero `0/1`, sem `float`, `double`, escala fixa ou arredondamento
+- [X] T016 [US1] Criar `app/Services/NutritionCalculationArithmetic.php` como helper técnico mínimo baseado em `Brick\Math\BigRational`, recebendo somente strings decimais e produzindo razões reduzidas com numerador inteiro, denominador inteiro positivo e zero `0/1`, sem `float`, `double`, escala fixa ou arredondamento
 
-- [ ] T017 [US1] Criar `app/Services/NutritionCalculationService.php` e implementar a etapa de contribuições: carregar todos os `Nutrients` uma vez, carregar em consulta agrupada os `FoodNutrients` dos Foods distintos, indexar em memória, percorrer cada ocorrência de ingrediente × Nutrient e calcular `quantity × amount_value ÷ 100` somente para `EXACT`, preservando estados qualitativos ou `is_missing_relation` sem valor/status inventado
+- [X] T017 [US1] Criar `app/Services/NutritionCalculationService.php` e implementar a etapa de contribuições: carregar todos os `Nutrients` uma vez, carregar em consulta agrupada os `FoodNutrients` dos Foods distintos, indexar em memória, percorrer cada ocorrência de ingrediente × Nutrient e calcular `quantity × amount_value ÷ 100` somente para `EXACT`, preservando estados qualitativos ou `is_missing_relation` sem valor/status inventado
 
-- [ ] T018 [US1] Executar `php artisan test --compact tests/Unit/NutritionCalculationArithmeticTest.php tests/Feature/NutritionCalculationTest.php` e confirmar que a User Story 1 passa sem modificar dados atuais de Recipe ou Base Nutricional
+- [X] T018 [US1] Executar `php artisan test --compact tests/Unit/NutritionCalculationArithmeticTest.php tests/Feature/NutritionCalculationTest.php` e confirmar que a User Story 1 passa sem modificar dados atuais de Recipe ou Base Nutricional
 
 **Checkpoint**: Cada contribuição pode ser calculada e explicada de modo exato e independente, mas ainda não existe consolidação ou endpoint HTTP.
 
