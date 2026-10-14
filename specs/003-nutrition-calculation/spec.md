@@ -15,29 +15,29 @@
 - Q: Quando um `FoodNutrient` possui estado `TRACE`, qual deve ser o resultado da
   contribuição proporcional desse nutriente para o ingrediente? → A: Produzir uma
   contribuição qualitativa `TRACE`, sem valor numérico; `TRACE` não pode ser
-  convertido para zero. Sua interação com contribuições `EXACT` ou outros estados
-  durante a consolidação será definida separadamente.
+  convertido para zero. Sua consolidação segue as decisões posteriores registradas
+  nesta mesma sessão.
 - Q: Quando um `FoodNutrient` possui estado `NA`, qual deve ser o resultado da
   contribuição proporcional desse nutriente para o ingrediente? → A: Produzir uma
   contribuição qualitativa `NA`, sem valor numérico; `NA` não pode ser convertido
-  para zero. Sua interação com contribuições `EXACT` ou outros estados durante a
-  consolidação será definida separadamente.
+  para zero. Sua consolidação segue as decisões posteriores registradas nesta mesma
+  sessão.
 - Q: Quando um `FoodNutrient` possui estado `ABSENT`, qual deve ser o resultado da
   contribuição proporcional desse nutriente para o ingrediente? → A: Produzir uma
   contribuição qualitativa `ABSENT`, sem valor numérico, sem conversão para zero e
-  sem omissão silenciosa. Sua interação com contribuições `EXACT` ou outros estados
-  durante a consolidação será definida separadamente.
+  sem omissão silenciosa. Sua consolidação segue as decisões posteriores registradas
+  nesta mesma sessão.
 - Q: Quando um `FoodNutrient` possui estado `REEVALUATION`, qual deve ser o resultado
   da contribuição proporcional desse nutriente para o ingrediente? → A: Produzir uma
   contribuição qualitativa `REEVALUATION`, sem valor numérico, sem conversão para
-  zero e sem omissão silenciosa. Sua interação com contribuições `EXACT` ou outros
-  estados durante a consolidação será definida separadamente.
+  zero e sem omissão silenciosa. Sua consolidação segue as decisões posteriores
+  registradas nesta mesma sessão.
 - Q: Quando não existe qualquer relação `FoodNutrient` entre um alimento e
   determinado nutriente, qual deve ser o resultado para esse nutriente na
   contribuição do ingrediente? → A: Produzir uma indicação qualitativa explícita de
   dado nutricional não disponível por ausência de relação, sem valor numérico e
-  distinta de `ABSENT`, `TRACE`, `NA` e `REEVALUATION`. Sua participação na
-  consolidação será definida separadamente.
+  distinta de `ABSENT`, `TRACE`, `NA` e `REEVALUATION`. Sua consolidação segue as
+  decisões posteriores registradas nesta mesma sessão.
 - Q: Quando um mesmo nutriente possui contribuições `EXACT` e `TRACE` em ingredientes
   diferentes, qual deve ser o resultado consolidado da receita? → A: Somar somente
   as contribuições `EXACT` e preservar separadamente que o consolidado contém
@@ -92,8 +92,8 @@
   nutrientes devem integrar o cálculo desta feature? → A: Processar todos os
   `Nutrients` existentes na Base Nutricional, aplicando as regras aprovadas para
   `EXACT`, estados qualitativos e ausência de relação. Isso não determina quais
-  nutrientes serão exibidos em rótulo ou utilizados em `%VD`; energia permanece
-  sujeita a decisão separada.
+  nutrientes serão exibidos em rótulo ou utilizados em `%VD`; o tratamento da
+  energia é definido na resposta seguinte desta mesma sessão.
 - Q: Como a energia já armazenada na Base Nutricional deve participar do cálculo
   desta feature? → A: Tratar a energia existente na Base Nutricional como qualquer
   outro `Nutrient`, aplicando cálculo proporcional, consolidação e as regras aprovadas
@@ -105,6 +105,14 @@
   `yield_unit = ml` produz referência de 100 ml. O valor do rendimento é usado
   exatamente como persistido, as quantidades dos ingredientes permanecem em gramas
   e nenhuma conversão entre massa e volume ou densidade é inferida.
+- Q: Quando o consolidado contém ao menos uma contribuição `EXACT` e também estados
+  qualitativos e/ou ausência de relação `FoodNutrient`, como o subtotal incompleto
+  participa da normalização pelo rendimento? → A: Somar somente as contribuições
+  `EXACT`, preservar todos os estados qualitativos e, separadamente, a ausência de
+  relação, marcar o consolidado como incompleto e calcular a referência por
+  `subtotal × 100 ÷ rendimento persistido`. A referência numérica resultante também
+  permanece incompleta, preserva as mesmas indicações e nunca pode ser apresentada
+  como composição nutricional completa.
 - Q: Depois de produzido, o resultado do cálculo deve existir apenas durante a
   solicitação ou deve ser preservado para consulta e reprodução posteriores? → A:
   Preservar o resultado produzido para permitir consulta e servir de base à
@@ -121,7 +129,8 @@
   para cada nutriente processado, sua identificação, nome, unidade e o valor `EXACT`,
   estado qualitativo ou ausência de relação utilizado. O snapshot contém somente os
   dados que participaram do cálculo e independe dos valores atuais da receita ou da
-  Base Nutricional; a versão das regras será definida separadamente.
+  Base Nutricional; a exigência funcional e o formato técnico da versão das regras
+  são definidos, respectivamente, nas respostas posteriores e no Plan/Research.
 - Q: Cada resultado preservado deve identificar explicitamente a versão das regras ou
   do motor de cálculo que o produziu? → A: Sim. Todo resultado preservado possui um
   identificador explícito da versão utilizada, capaz de distinguir execuções produzidas
@@ -291,6 +300,12 @@ substituído pela soma dos ingredientes e que sua unidade determina a referênci
 4. **Given** rendimento registrado em `g`, **When** a normalização é realizada,
    **Then** a referência final corresponde a 100 g e utiliza o rendimento exatamente
    como persistido.
+5. **Given** um consolidado com subtotal numérico formado por contribuições `EXACT`
+   e também com estados qualitativos e/ou ausência de relação `FoodNutrient`,
+   **When** a normalização é realizada, **Then** o sistema calcula
+   `subtotal × 100 ÷ rendimento persistido`, marca o valor de referência como
+   incompleto, preserva os mesmos estados e a mesma indicação de ausência de relação
+   e não o apresenta como composição nutricional completa.
 
 ---
 
@@ -347,10 +362,15 @@ próprio snapshot e identificação da versão sem alterar execuções anteriore
 - Nenhum estado qualitativo pode ser convertido automaticamente para zero.
 - A combinação, no mesmo nutriente, de valores `EXACT` com estados qualitativos
   produz subtotal limitado aos valores `EXACT`, preserva explicitamente todos os
-  estados presentes e nunca representa composição completa.
+  estados presentes e nunca representa composição completa. Esse subtotal é
+  normalizado pelo rendimento e produz referência numérica igualmente incompleta,
+  com os mesmos estados preservados.
 - A combinação de valores `EXACT` com ausência de relação `FoodNutrient` produz
   subtotal limitado aos valores `EXACT` e preserva explicitamente a indisponibilidade
-  do dado; combinações sem contribuição `EXACT` ainda dependem de CQ-001.
+  do dado. Esse subtotal é normalizado pelo rendimento e produz referência numérica
+  igualmente incompleta, preservando a indicação de ausência de relação. Combinações
+  sem contribuição `EXACT` seguem as regras já aprovadas em CQ-001 e não produzem
+  valor numérico.
 - A presença de um mesmo alimento em diferentes posições da receita não elimina
   nenhuma ocorrência; cada quantidade persistida representa uma contribuição.
 - Um rendimento diferente da soma das quantidades deve ser utilizado como informado.
@@ -408,7 +428,14 @@ próprio snapshot e identificação da versão sem alterar execuções anteriore
   de referência pela fórmula
   `total do nutriente na receita × 100 ÷ rendimento total persistido`. Quando
   `yield_unit = g`, o resultado MUST possuir referência de 100 g; quando
-  `yield_unit = ml`, MUST possuir referência de 100 ml.
+  `yield_unit = ml`, MUST possuir referência de 100 ml. Quando o consolidado possuir
+  subtotal numérico incompleto por combinar ao menos uma contribuição `EXACT` com
+  `TRACE`, `NA`, `ABSENT`, `REEVALUATION` e/ou ausência de relação `FoodNutrient`, o
+  sistema MUST normalizar esse subtotal por
+  `subtotal × 100 ÷ rendimento total persistido`. O valor de referência resultante
+  MUST permanecer marcado como incompleto, MUST preservar todos os mesmos estados
+  qualitativos e, separadamente, a mesma indicação de ausência de relação, e MUST
+  NOT ser apresentado como composição nutricional completa.
 - **FR-008**: O sistema MUST utilizar o valor e a unidade de rendimento já
   persistidos e MUST NOT inferir ou recalcular o rendimento pela soma das
   quantidades dos ingredientes.
@@ -465,7 +492,10 @@ próprio snapshot e identificação da versão sem alterar execuções anteriore
   nutricionais inexistentes nem substituir referências a alimentos.
 - **FR-019**: O caso de referência “GELEIA DE AMORA” MUST ser utilizável para validar
   as etapas pertencentes a esta feature, usando 1.000 g de amora, 1.000 g de açúcar
-  cristal, 50 g de suco de limão e rendimento final de 1.680 g.
+  cristal, 50 g de suco de limão e rendimento final de 1.680 g, após a
+  Viridis/equipe responsável aprovar o mapeamento inequívoco dos Foods ainda não
+  identificados. Até essa aprovação, o teste real MUST permanecer bloqueado e MUST
+  NOT criar Food sintético nem escolher correspondência aproximada.
 - **FR-020**: Quando os nutrientes participantes e seus tratamentos estiverem
   aprovados, o resultado de carboidratos da geleia de amora MUST poder ser comparado
   com a referência técnica aproximada de 65,21 g por 100 g, sem incorporar porção,
@@ -476,7 +506,7 @@ próprio snapshot e identificação da versão sem alterar execuções anteriore
   cálculo por porção, percentual diário, regras de arredondamento, quantidades não
   significativas, açúcares adicionados, rotulagem, visualização ou exportação.
 
-### Clarifications Required
+### Clarifications Resolved
 
 - **CQ-001 — Estados e dados ausentes**: `TRACE`, `NA`, `ABSENT` e `REEVALUATION`
   produzem contribuições qualitativas correspondentes, sem valor numérico e sem
@@ -499,7 +529,9 @@ próprio snapshot e identificação da versão sem alterar execuções anteriore
   os ingredientes estão sem relação para o nutriente, o consolidado indica
   indisponibilidade por ausência de relação, sem valor numérico, explicitamente
   incompleto e distinto dos estados qualitativos. Nenhum estado qualitativo ou caso
-  de ausência de relação é convertido para zero.
+  de ausência de relação é convertido para zero. Quando existe subtotal `EXACT`
+  incompleto, ele é normalizado pelo rendimento; a referência numérica preserva os
+  mesmos estados e/ou ausência de relação e permanece explicitamente incompleta.
 - **CQ-002 — Escopo e referência do cálculo**: Todos os `Nutrients` existentes na Base
   Nutricional são processados conforme as regras aprovadas para valores `EXACT`,
   estados qualitativos e ausência de relação, sem determinar exibição em rótulo ou
@@ -543,9 +575,9 @@ próprio snapshot e identificação da versão sem alterar execuções anteriore
   ingrediente para um nutriente, antes da consolidação da receita.
 - **Total Nutricional da Receita**: Soma das contribuições de um mesmo nutriente em
   todos os ingredientes, conforme o tratamento aprovado dos estados.
-- **Valor Nutricional de Referência**: Total nutricional normalizado pelo rendimento
-  informado para 100 g quando `yield_unit = g` ou para 100 ml quando
-  `yield_unit = ml`.
+- **Valor Nutricional de Referência**: Total ou subtotal numérico normalizado pelo
+  rendimento informado para 100 g quando `yield_unit = g` ou para 100 ml quando
+  `yield_unit = ml`, preservando a incompletude quando aplicável.
 
 ## Scope Boundaries
 
@@ -555,8 +587,8 @@ próprio snapshot e identificação da versão sem alterar execuções anteriore
 - Consolidação das contribuições por nutriente.
 - Processamento de todos os nutrientes existentes na Base Nutricional, sem definir
   sua posterior exibição regulatória.
-- Normalização dos totais pelo rendimento informado para uma referência aprovada de
-  100 g ou 100 ml.
+- Normalização dos totais e subtotais numéricos pelo rendimento informado para uma
+  referência aprovada de 100 g ou 100 ml.
 - Preservação da precisão durante as etapas de cálculo.
 - Distinção entre zero numérico `EXACT` e estados qualitativos.
 - Validação pelo caso de referência da geleia de amora nas partes abrangidas pela
@@ -578,8 +610,7 @@ próprio snapshot e identificação da versão sem alterar execuções anteriore
 - Açúcares adicionados.
 - Rotulagem frontal, geração ou visualização de tabela nutricional.
 - Preview, PDF, PNG e templates de rótulo.
-- Qualquer mecanismo técnico de persistência, snapshot, versionamento, histórico,
-  cache ou execução assíncrona antes das decisões funcionais correspondentes.
+- Auditoria avançada, event sourcing, cache e execução assíncrona.
 
 ## Success Criteria *(mandatory)*
 
@@ -594,8 +625,11 @@ próprio snapshot e identificação da versão sem alterar execuções anteriore
 - **SC-003**: Em 100% dos casos de teste, o rendimento utilizado corresponde ao valor
   persistido na receita e nunca à soma inferida dos ingredientes.
 - **SC-004**: Em 100% dos casos de teste, cada valor de referência corresponde a
-  `total do nutriente × 100 ÷ rendimento total` e é identificado como referência de
-  100 g quando `yield_unit = g` ou 100 ml quando `yield_unit = ml`.
+  `total ou subtotal numérico do nutriente × 100 ÷ rendimento total` e é identificado
+  como referência de 100 g quando `yield_unit = g` ou 100 ml quando
+  `yield_unit = ml`. Quando a origem for um subtotal incompleto, a referência também
+  permanece explicitamente incompleta e preserva os mesmos estados qualitativos e a
+  mesma indicação de ausência de relação.
 - **SC-005**: Valores de teste com casas decimais além das necessárias à apresentação
   atravessam contribuição, consolidação e normalização sem arredondamento ou
   truncamento prematuro.
@@ -609,10 +643,13 @@ próprio snapshot e identificação da versão sem alterar execuções anteriore
   solicitação preserva uma execução independente sem alterar as anteriores.
 - **SC-008**: Em 100% dos cálculos, a receita, seus ingredientes e todos os registros
   da Base Nutricional permanecem inalterados.
-- **SC-009**: Após as clarificações aplicáveis, o caso “GELEIA DE AMORA” pode ser
-  executado com as entradas documentadas e seu resultado de carboidratos por 100 g
-  pode ser comparado à referência aproximada de 65,21 g, com qualquer diferença
-  explicada exclusivamente pelos dados e regras aprovados.
+- **SC-009**: Após a Viridis/equipe responsável aprovar o mapeamento inequívoco dos
+  Foods, o caso “GELEIA DE AMORA” pode ser executado com as entradas documentadas e
+  seu resultado de carboidratos por 100 g pode ser comparado à referência aproximada
+  de 65,21 g, com qualquer diferença explicada exclusivamente pelos dados e regras
+  aprovados. Até esse mapeamento existir, o teste real permanece bloqueado e não pode
+  ser marcado como PASS; os testes genéricos do motor com fixtures controladas não
+  são bloqueados.
 - **SC-010**: Nenhum resultado desta feature contém cálculo por porção, percentual
   diário, arredondamento de apresentação, valor energético por fatores não
   aprovados ou informação de rotulagem.
@@ -629,5 +666,5 @@ próprio snapshot e identificação da versão sem alterar execuções anteriore
   necessariamente à soma das quantidades dos ingredientes.
 - A referência aproximada de 65,21 g de carboidratos por 100 g para a geleia de amora
   é um caso técnico de comparação, não uma regra de arredondamento ou tolerância.
-- As decisões em CQ-001, CQ-002 e CQ-003 devem ser resolvidas pelo fluxo
-  `$speckit-clarify` antes do planejamento técnico.
+- As decisões de CQ-001, CQ-002 e CQ-003 foram resolvidas e incorporadas a esta
+  Specification antes do planejamento técnico.
