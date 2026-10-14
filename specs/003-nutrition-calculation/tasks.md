@@ -96,13 +96,13 @@
 
 ### Tests for User Story 2
 
-- [ ] T019 [US2] Estender `tests/Feature/NutritionCalculationTest.php` com testes inicialmente falhos para `EXACT + EXACT`, `EXACT` combinado separadamente com `TRACE`, `NA`, `ABSENT`, `REEVALUATION` e ausência de relação, estados homogêneos sem `EXACT`, estados diferentes sem `EXACT`, estados + ausência sem `EXACT` e todos sem relação; verificar subtotal apenas dos `EXACT`, total nulo sem `EXACT`, conjunto completo sem precedência, indicador de ausência separado e `is_complete` verdadeiro somente para todas as contribuições `EXACT`
+- [X] T019 [US2] Estender `tests/Feature/NutritionCalculationTest.php` com testes inicialmente falhos para `EXACT + EXACT`, `EXACT` combinado separadamente com `TRACE`, `NA`, `ABSENT`, `REEVALUATION` e ausência de relação, estados homogêneos sem `EXACT`, estados diferentes sem `EXACT`, estados + ausência sem `EXACT` e todos sem relação; verificar subtotal apenas dos `EXACT`, total nulo sem `EXACT`, conjunto completo sem precedência, indicador de ausência separado e `is_complete` verdadeiro somente para todas as contribuições `EXACT`
 
 ### Implementation for User Story 2
 
-- [ ] T020 [US2] Implementar em `app/Services/NutritionCalculationService.php` a consolidação racional por `nutrient_id`, somando somente contribuições `EXACT`, mantendo Nutrients separados, preservando todos os estados qualitativos sem precedência, mantendo `has_missing_relation` separado e não produzindo valor numérico quando não existir `EXACT`
+- [X] T020 [US2] Implementar em `app/Services/NutritionCalculationService.php` a consolidação racional por `nutrient_id`, somando somente contribuições `EXACT`, mantendo Nutrients separados, preservando todos os estados qualitativos sem precedência, mantendo `has_missing_relation` separado e não produzindo valor numérico quando não existir `EXACT`
 
-- [ ] T021 [US2] Executar `php artisan test --compact tests/Feature/NutritionCalculationTest.php` e confirmar integralmente a matriz de consolidação aprovada, incluindo zero numérico distinto de todos os estados e ausência de conversão/omissão silenciosa
+- [X] T021 [US2] Executar `php artisan test --compact tests/Feature/NutritionCalculationTest.php` e confirmar integralmente a matriz de consolidação aprovada, incluindo zero numérico distinto de todos os estados e ausência de conversão/omissão silenciosa
 
 **Checkpoint**: Os totais/subtotais e as indicações de incompletude estão corretos; normalização e API ainda não foram implementadas.
 

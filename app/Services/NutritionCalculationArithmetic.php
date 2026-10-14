@@ -28,6 +28,16 @@ class NutritionCalculationArithmetic
         return $this->fromDecimal($left)->plus($this->fromDecimal($right));
     }
 
+    public function fromRatio(string $numerator, string $denominator): BigRational
+    {
+        return BigRational::ofFraction($numerator, $denominator);
+    }
+
+    public function addRationals(BigRational $left, BigRational $right): BigRational
+    {
+        return $left->plus($right);
+    }
+
     public function multiplyAndDivide(string $left, string $right, string $divisor): BigRational
     {
         return $this->multiply($left, $right)->dividedBy($this->fromDecimal($divisor));

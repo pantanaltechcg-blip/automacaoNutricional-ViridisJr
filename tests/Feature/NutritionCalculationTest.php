@@ -181,6 +181,165 @@ class NutritionCalculationTest extends TestCase
         $this->assertDatabaseCount('nutrition_calculation_nutrient_states', 0);
     }
 
+    public function test_consolidates_exact_ratios_by_nutrient_without_rounding_and_keeps_zero_numeric(): void
+    {
+        $contributions = [
+            $this->consolidationContribution(101, 'EXACT', '1', '3'),
+            $this->consolidationContribution(101, 'EXACT', '1', '6'),
+            $this->consolidationContribution(101, 'EXACT', '0', '1'),
+            $this->consolidationContribution(202, 'EXACT', '5', '2'),
+        ];
+
+        $consolidations = app(NutritionCalculationService::class)->consolidateContributions($contributions);
+        $first = $this->consolidationFor($consolidations, 101);
+        $second = $this->consolidationFor($consolidations, 202);
+
+        $this->assertCount(2, $consolidations);
+        $this->assertSame('1', $first['total_numerator']);
+        $this->assertSame('2', $first['total_denominator']);
+        $this->assertTrue($first['is_complete']);
+        $this->assertFalse($first['has_missing_relation']);
+        $this->assertSame([], $first['qualitative_states']);
+        $this->assertSame('5', $second['total_numerator']);
+        $this->assertSame('2', $second['total_denominator']);
+        $this->assertTrue($second['is_complete']);
+    }
+
+    #[DataProvider('qualitativeStatusProvider')]
+    public function test_consolidates_exact_with_each_qualitative_status_as_an_incomplete_subtotal(string $status): void
+    {
+        $contributions = [
+            $this->consolidationContribution(101, 'EXACT', '5', '2'),
+            $this->consolidationContribution(101, $status),
+        ];
+
+        $consolidation = $this->consolidationFor(
+            app(NutritionCalculationService::class)->consolidateContributions($contributions),
+            101,
+        );
+
+        $this->assertSame('5', $consolidation['total_numerator']);
+        $this->assertSame('2', $consolidation['total_denominator']);
+        $this->assertFalse($consolidation['is_complete']);
+        $this->assertFalse($consolidation['has_missing_relation']);
+        $this->assertSame([$status], $consolidation['qualitative_states']);
+    }
+
+    public function test_consolidates_exact_with_missing_relation_separately_from_qualitative_states(): void
+    {
+        $onlyMissing = [
+            $this->consolidationContribution(101, 'EXACT', '7', '3'),
+            $this->consolidationContribution(101, null, missingRelation: true),
+        ];
+        $statesAndMissing = [
+            $this->consolidationContribution(202, 'EXACT', '7', '3'),
+            $this->consolidationContribution(202, 'NA'),
+            $this->consolidationContribution(202, 'TRACE'),
+            $this->consolidationContribution(202, 'NA'),
+            $this->consolidationContribution(202, null, missingRelation: true),
+        ];
+
+        $consolidations = app(NutritionCalculationService::class)->consolidateContributions([
+            ...$onlyMissing,
+            ...$statesAndMissing,
+        ]);
+        $missing = $this->consolidationFor($consolidations, 101);
+        $combined = $this->consolidationFor($consolidations, 202);
+
+        $this->assertSame('7', $missing['total_numerator']);
+        $this->assertSame('3', $missing['total_denominator']);
+        $this->assertFalse($missing['is_complete']);
+        $this->assertTrue($missing['has_missing_relation']);
+        $this->assertSame([], $missing['qualitative_states']);
+
+        $this->assertSame('7', $combined['total_numerator']);
+        $this->assertSame('3', $combined['total_denominator']);
+        $this->assertFalse($combined['is_complete']);
+        $this->assertTrue($combined['has_missing_relation']);
+        $this->assertSame(['TRACE', 'NA'], $combined['qualitative_states']);
+    }
+
+    #[DataProvider('qualitativeStatusProvider')]
+    public function test_consolidates_homogeneous_qualitative_states_without_a_numeric_total(string $status): void
+    {
+        $contributions = [
+            $this->consolidationContribution(101, $status),
+            $this->consolidationContribution(101, $status),
+        ];
+
+        $consolidation = $this->consolidationFor(
+            app(NutritionCalculationService::class)->consolidateContributions($contributions),
+            101,
+        );
+
+        $this->assertNull($consolidation['total_numerator']);
+        $this->assertNull($consolidation['total_denominator']);
+        $this->assertFalse($consolidation['is_complete']);
+        $this->assertFalse($consolidation['has_missing_relation']);
+        $this->assertSame([$status], $consolidation['qualitative_states']);
+    }
+
+    public function test_consolidates_different_qualitative_states_without_precedence_or_numeric_total(): void
+    {
+        $contributions = [
+            $this->consolidationContribution(101, 'REEVALUATION'),
+            $this->consolidationContribution(101, 'ABSENT'),
+            $this->consolidationContribution(101, 'TRACE'),
+            $this->consolidationContribution(101, 'NA'),
+            $this->consolidationContribution(101, 'TRACE'),
+        ];
+
+        $consolidation = $this->consolidationFor(
+            app(NutritionCalculationService::class)->consolidateContributions($contributions),
+            101,
+        );
+
+        $this->assertNull($consolidation['total_numerator']);
+        $this->assertNull($consolidation['total_denominator']);
+        $this->assertFalse($consolidation['is_complete']);
+        $this->assertFalse($consolidation['has_missing_relation']);
+        $this->assertSame(['TRACE', 'NA', 'ABSENT', 'REEVALUATION'], $consolidation['qualitative_states']);
+    }
+
+    public function test_consolidates_qualitative_states_and_missing_relations_without_a_numeric_total(): void
+    {
+        $contributions = [
+            $this->consolidationContribution(101, 'ABSENT'),
+            $this->consolidationContribution(101, 'TRACE'),
+            $this->consolidationContribution(101, null, missingRelation: true),
+        ];
+
+        $consolidation = $this->consolidationFor(
+            app(NutritionCalculationService::class)->consolidateContributions($contributions),
+            101,
+        );
+
+        $this->assertNull($consolidation['total_numerator']);
+        $this->assertNull($consolidation['total_denominator']);
+        $this->assertFalse($consolidation['is_complete']);
+        $this->assertTrue($consolidation['has_missing_relation']);
+        $this->assertSame(['TRACE', 'ABSENT'], $consolidation['qualitative_states']);
+    }
+
+    public function test_consolidates_all_missing_relations_without_a_state_or_numeric_total(): void
+    {
+        $contributions = [
+            $this->consolidationContribution(101, null, missingRelation: true),
+            $this->consolidationContribution(101, null, missingRelation: true),
+        ];
+
+        $consolidation = $this->consolidationFor(
+            app(NutritionCalculationService::class)->consolidateContributions($contributions),
+            101,
+        );
+
+        $this->assertNull($consolidation['total_numerator']);
+        $this->assertNull($consolidation['total_denominator']);
+        $this->assertFalse($consolidation['is_complete']);
+        $this->assertTrue($consolidation['has_missing_relation']);
+        $this->assertSame([], $consolidation['qualitative_states']);
+    }
+
     private function createFood(string $label): Food
     {
         $sourceCode = $label.'-'.str()->uuid()->toString();
@@ -264,5 +423,67 @@ class NutritionCalculationTest extends TestCase
         $this->assertNotNull($contribution);
 
         return $contribution;
+    }
+
+    /**
+     * @return array{
+     *     recipe_ingredient_id: int,
+     *     food_id: int,
+     *     nutrient_id: int,
+     *     food_nutrient_id: ?int,
+     *     input_status: ?string,
+     *     input_amount_value: ?string,
+     *     is_missing_relation: bool,
+     *     value_numerator: ?string,
+     *     value_denominator: ?string
+     * }
+     */
+    private function consolidationContribution(
+        int $nutrientId,
+        ?string $status,
+        ?string $numerator = null,
+        ?string $denominator = null,
+        bool $missingRelation = false,
+    ): array {
+        return [
+            'recipe_ingredient_id' => 1,
+            'food_id' => 1,
+            'nutrient_id' => $nutrientId,
+            'food_nutrient_id' => $missingRelation ? null : 1,
+            'input_status' => $status,
+            'input_amount_value' => $status === 'EXACT' ? '1.00' : null,
+            'is_missing_relation' => $missingRelation,
+            'value_numerator' => $numerator,
+            'value_denominator' => $denominator,
+        ];
+    }
+
+    /**
+     * @param  list<array{
+     *     nutrient_id: int,
+     *     total_numerator: ?string,
+     *     total_denominator: ?string,
+     *     is_complete: bool,
+     *     has_missing_relation: bool,
+     *     qualitative_states: list<string>
+     * }>  $consolidations
+     * @return array{
+     *     nutrient_id: int,
+     *     total_numerator: ?string,
+     *     total_denominator: ?string,
+     *     is_complete: bool,
+     *     has_missing_relation: bool,
+     *     qualitative_states: list<string>
+     * }
+     */
+    private function consolidationFor(array $consolidations, int $nutrientId): array
+    {
+        $consolidation = collect($consolidations)->first(
+            fn (array $item): bool => $item['nutrient_id'] === $nutrientId,
+        );
+
+        $this->assertNotNull($consolidation);
+
+        return $consolidation;
     }
 }

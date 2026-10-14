@@ -12,6 +12,14 @@ use UnexpectedValueException;
 
 class NutritionCalculationService
 {
+    /** @var list<string> */
+    private const QUALITATIVE_STATE_ORDER = [
+        FoodNutrient::STATUS_TRACE,
+        FoodNutrient::STATUS_NA,
+        FoodNutrient::STATUS_ABSENT,
+        FoodNutrient::STATUS_REEVALUATION,
+    ];
+
     public function __construct(private NutritionCalculationArithmetic $arithmetic) {}
 
     /**
@@ -57,6 +65,97 @@ class NutritionCalculationService
         }
 
         return $contributions;
+    }
+
+    /**
+     * @param  list<array{
+     *     recipe_ingredient_id: int,
+     *     food_id: int,
+     *     nutrient_id: int,
+     *     food_nutrient_id: ?int,
+     *     input_status: ?string,
+     *     input_amount_value: ?string,
+     *     is_missing_relation: bool,
+     *     value_numerator: ?string,
+     *     value_denominator: ?string
+     * }>  $contributions
+     * @return list<array{
+     *     nutrient_id: int,
+     *     total_numerator: ?string,
+     *     total_denominator: ?string,
+     *     is_complete: bool,
+     *     has_missing_relation: bool,
+     *     qualitative_states: list<string>
+     * }>
+     */
+    public function consolidateContributions(array $contributions): array
+    {
+        $contributionsByNutrient = [];
+
+        foreach ($contributions as $contribution) {
+            $contributionsByNutrient[$contribution['nutrient_id']][] = $contribution;
+        }
+
+        ksort($contributionsByNutrient, SORT_NUMERIC);
+        $consolidations = [];
+
+        foreach ($contributionsByNutrient as $nutrientId => $nutrientContributions) {
+            $total = null;
+            $isComplete = true;
+            $hasMissingRelation = false;
+            $stateSet = [];
+
+            foreach ($nutrientContributions as $contribution) {
+                if ($contribution['is_missing_relation']) {
+                    $hasMissingRelation = true;
+                    $isComplete = false;
+
+                    continue;
+                }
+
+                $status = $contribution['input_status'];
+
+                if ($status === FoodNutrient::STATUS_EXACT) {
+                    $numerator = $contribution['value_numerator'];
+                    $denominator = $contribution['value_denominator'];
+
+                    if (! is_string($numerator) || ! is_string($denominator)) {
+                        throw new UnexpectedValueException('Contribuições EXACT exigem uma razão numérica.');
+                    }
+
+                    $value = $this->arithmetic->fromRatio($numerator, $denominator);
+                    $total = $total === null
+                        ? $value
+                        : $this->arithmetic->addRationals($total, $value);
+
+                    continue;
+                }
+
+                if (! is_string($status) || ! in_array($status, self::QUALITATIVE_STATE_ORDER, true)) {
+                    throw new UnexpectedValueException('Contribuição sem relação ou estado nutricional reconhecido.');
+                }
+
+                $stateSet[$status] = true;
+                $isComplete = false;
+            }
+
+            $ratio = $total === null ? null : $this->arithmetic->ratio($total);
+            $qualitativeStates = array_values(array_filter(
+                self::QUALITATIVE_STATE_ORDER,
+                fn (string $state): bool => isset($stateSet[$state]),
+            ));
+
+            $consolidations[] = [
+                'nutrient_id' => (int) $nutrientId,
+                'total_numerator' => $ratio['numerator'] ?? null,
+                'total_denominator' => $ratio['denominator'] ?? null,
+                'is_complete' => $isComplete,
+                'has_missing_relation' => $hasMissingRelation,
+                'qualitative_states' => $qualitativeStates,
+            ];
+        }
+
+        return $consolidations;
     }
 
     /**
