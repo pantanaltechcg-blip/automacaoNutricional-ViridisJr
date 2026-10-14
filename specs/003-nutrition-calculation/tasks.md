@@ -146,21 +146,21 @@
 
 ### Tests for User Story 4
 
-- [ ] T030 [US4] Estender `tests/Feature/NutritionCalculationPersistenceTest.php` com testes inicialmente falhos que criam uma execução, registram sua resposta histórica, alteram depois Recipe, RecipeIngredient, FoodNutrient, os campos relevantes de rastreabilidade do Food original e `Nutrient.name` e/ou `Nutrient.unit` sem alterar IDs primários, consultam novamente a execução antiga e confirmam resposta histórica idêntica baseada nos dados copiados no snapshot, não nos valores atuais; cobrir também nova execução com novo ID sem substituir a anterior, `rules_version` preservada, rollback integral, restauração automática das fontes pela transação de teste, Base Nutricional/Recipe inalteradas ao fim do teste e bloqueio PostgreSQL de UPDATE/DELETE em todas as cinco tabelas históricas
+- [X] T030 [US4] Estender `tests/Feature/NutritionCalculationPersistenceTest.php` com testes inicialmente falhos que criam uma execução, registram sua resposta histórica, alteram depois Recipe, RecipeIngredient, FoodNutrient, os campos relevantes de rastreabilidade do Food original e `Nutrient.name` e/ou `Nutrient.unit` sem alterar IDs primários, consultam novamente a execução antiga e confirmam resposta histórica idêntica baseada nos dados copiados no snapshot, não nos valores atuais; cobrir também nova execução com novo ID sem substituir a anterior, `rules_version` preservada, rollback integral, restauração automática das fontes pela transação de teste, Base Nutricional/Recipe inalteradas ao fim do teste e bloqueio PostgreSQL de UPDATE/DELETE em todas as cinco tabelas históricas
 
 ### Implementation for User Story 4
 
-- [ ] T031 [US4] Criar migration não destrutiva `database/migrations/[timestamp]_protect_nutrition_calculation_history_from_mutation.php` com proteção PostgreSQL contra `UPDATE` e `DELETE` nas cinco tabelas históricas, incluindo reversão segura no `down`, sem auditoria avançada, event sourcing ou operação funcional de exclusão
+- [X] T031 [US4] Criar migration não destrutiva `database/migrations/[timestamp]_protect_nutrition_calculation_history_from_mutation.php` com proteção PostgreSQL contra `UPDATE` e `DELETE` nas cinco tabelas históricas, incluindo reversão segura no `down`, sem auditoria avançada, event sourcing ou operação funcional de exclusão
 
-- [ ] T032 [US4] Implementar em `app/Services/NutritionCalculationService.php` a consulta read-only de uma execução com todo o agregado snapshot, sem métodos de update/delete e sem reconstruir qualquer campo a partir de Recipe, RecipeIngredient, Food, Nutrient ou FoodNutrient atuais
+- [X] T032 [US4] Implementar em `app/Services/NutritionCalculationService.php` a consulta read-only de uma execução com todo o agregado snapshot, sem métodos de update/delete e sem reconstruir qualquer campo a partir de Recipe, RecipeIngredient, Food, Nutrient ou FoodNutrient atuais
 
-- [ ] T033 [US4] Completar `app/Http/Resources/NutritionCalculationResource.php` para que criação e consulta histórica compartilhem exatamente a representação aprovada e dependam somente das relações internas carregadas do agregado preservado
+- [X] T033 [US4] Completar `app/Http/Resources/NutritionCalculationResource.php` para que criação e consulta histórica compartilhem exatamente a representação aprovada e dependam somente das relações internas carregadas do agregado preservado
 
-- [ ] T034 [US4] Adicionar ao `app/Http/Controllers/NutritionCalculationController.php` a ação de consulta que apenas delega a leitura histórica ao Service e retorna o Resource, sem cálculo ou acesso direto às fontes atuais
+- [X] T034 [US4] Adicionar ao `app/Http/Controllers/NutritionCalculationController.php` a ação de consulta que apenas delega a leitura histórica ao Service e retorna o Resource, sem cálculo ou acesso direto às fontes atuais
 
-- [ ] T035 [US4] Registrar somente a rota de consulta `GET /api/nutrition-calculations/{calculation}` em `routes/api.php`, sem adicionar qualquer outra operação sobre resultados
+- [X] T035 [US4] Registrar somente a rota de consulta `GET /api/nutrition-calculations/{calculation}` em `routes/api.php`, sem adicionar qualquer outra operação sobre resultados
 
-- [ ] T036 [US4] Executar `php artisan test --compact tests/Feature/NutritionCalculationPersistenceTest.php tests/Feature/NutritionCalculationTest.php` e confirmar imutabilidade, consulta histórica, novas execuções independentes e atomicidade integral
+- [X] T036 [US4] Executar `php artisan test --compact tests/Feature/NutritionCalculationPersistenceTest.php tests/Feature/NutritionCalculationTest.php` e confirmar imutabilidade, consulta histórica, novas execuções independentes e atomicidade integral
 
 **Checkpoint**: Criação e consulta estão completas; resultados antigos não dependem das fontes atuais e não aceitam mutação.
 

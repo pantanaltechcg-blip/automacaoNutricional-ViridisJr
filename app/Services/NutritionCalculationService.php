@@ -147,6 +147,11 @@ class NutritionCalculationService
         });
     }
 
+    public function retrieve(NutritionCalculation $calculation): NutritionCalculation
+    {
+        return $this->loadAggregate($calculation);
+    }
+
     /**
      * @param  Collection<int, RecipeIngredient>  $ingredients
      * @param  Collection<int, Nutrient>  $nutrients

@@ -2,13 +2,19 @@
 
 namespace Tests\Feature;
 
+use App\Models\Food;
+use App\Models\FoodNutrient;
+use App\Models\Nutrient;
 use App\Models\NutritionCalculation;
 use App\Models\NutritionCalculationContribution;
 use App\Models\NutritionCalculationIngredient;
 use App\Models\NutritionCalculationNutrient;
 use App\Models\NutritionCalculationNutrientState;
+use App\Models\Recipe;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class NutritionCalculationPersistenceTest extends TestCase
@@ -164,6 +170,154 @@ class NutritionCalculationPersistenceTest extends TestCase
         $this->assertArrayNotHasKey('value_numerator', (new NutritionCalculationContribution)->getCasts());
     }
 
+    public function test_historical_get_remains_identical_after_source_changes_and_a_new_execution_uses_current_data(): void
+    {
+        $nutrient = $this->createNutrient('Nutriente histórico', 'g');
+        $originalFood = $this->createFood('HISTORY-ORIGINAL');
+        $replacementFood = $this->createFood('HISTORY-REPLACEMENT');
+        $originalRelation = $this->createFoodNutrient($originalFood, $nutrient, 'EXACT', '10.00');
+        $this->createFoodNutrient($replacementFood, $nutrient, 'EXACT', '20.00');
+        $initialNutrientName = $nutrient->name;
+        $recipe = Recipe::factory()->create([
+            'name' => 'Receita histórica A',
+            'yield_value' => '100',
+            'yield_unit' => 'g',
+        ]);
+        $ingredient = $recipe->ingredients()->create([
+            'food_id' => $originalFood->id,
+            'quantity' => '100',
+            'unit' => 'g',
+            'position' => 1,
+        ]);
+
+        $firstResponse = $this->postJson("/api/recipes/{$recipe->id}/nutrition-calculations")
+            ->assertSuccessful()
+            ->json('data');
+        $firstCalculationId = $firstResponse['id'];
+        $firstNutrient = $this->nutrientPayloadFor($firstResponse['nutrients'], $nutrient->id);
+
+        $this->assertSame(['value' => '100', 'unit' => 'g'], $firstResponse['yield']);
+        $this->assertSame('TACO', $firstResponse['ingredients'][0]['food']['source']);
+        $this->assertSame($originalFood->source_code, $firstResponse['ingredients'][0]['food']['source_code']);
+        $this->assertSame($initialNutrientName, $firstNutrient['nutrient']['name']);
+        $this->assertSame('g', $firstNutrient['nutrient']['unit']);
+        $this->assertSame('10.00', $firstNutrient['contributions'][0]['source_amount_per_100g']);
+        $this->assertSame(['numerator' => '10', 'denominator' => '1'], $firstNutrient['reference']['value']);
+
+        $recipe->update([
+            'name' => 'Receita histórica B',
+            'yield_value' => '200',
+            'yield_unit' => 'ml',
+        ]);
+        $ingredient->update([
+            'food_id' => $replacementFood->id,
+            'quantity' => '50',
+            'position' => 2,
+        ]);
+        $originalFood->update([
+            'source' => 'FONTE-ALTERADA',
+            'source_code' => 'CODIGO-ALTERADO',
+        ]);
+        $nutrient->update([
+            'name' => 'Nutriente histórico alterado',
+            'unit' => 'mg',
+        ]);
+        $originalRelation->update([
+            'amount_value' => null,
+            'status' => 'TRACE',
+        ]);
+
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+        $oldAfterChanges = $this->getJson("/api/nutrition-calculations/{$firstCalculationId}")
+            ->assertSuccessful()
+            ->json('data');
+        $historicalQueries = DB::getQueryLog();
+        DB::disableQueryLog();
+
+        $this->assertSame($firstResponse, $oldAfterChanges);
+
+        foreach ($historicalQueries as $query) {
+            $sql = strtolower($query['query']);
+
+            foreach (['recipes', 'recipe_ingredients', 'foods', 'nutrients', 'food_nutrients'] as $sourceTable) {
+                $this->assertStringNotContainsString('from "'.$sourceTable.'"', $sql);
+                $this->assertStringNotContainsString('join "'.$sourceTable.'"', $sql);
+            }
+        }
+
+        $secondResponse = $this->postJson("/api/recipes/{$recipe->id}/nutrition-calculations")
+            ->assertSuccessful()
+            ->json('data');
+        $secondCalculationId = $secondResponse['id'];
+        $secondNutrient = $this->nutrientPayloadFor($secondResponse['nutrients'], $nutrient->id);
+
+        $this->assertNotSame($firstCalculationId, $secondCalculationId);
+        $this->assertSame('nutrition-calculation-v1', $firstResponse['rules_version']);
+        $this->assertSame('nutrition-calculation-v1', $secondResponse['rules_version']);
+        $this->assertSame(['value' => '200', 'unit' => 'ml'], $secondResponse['yield']);
+        $this->assertSame(2, $secondResponse['ingredients'][0]['position']);
+        $this->assertSame('50', $secondResponse['ingredients'][0]['quantity']);
+        $this->assertSame($replacementFood->id, $secondResponse['ingredients'][0]['food']['id']);
+        $this->assertSame('Nutriente histórico alterado', $secondNutrient['nutrient']['name']);
+        $this->assertSame('mg', $secondNutrient['nutrient']['unit']);
+        $this->assertSame('20.00', $secondNutrient['contributions'][0]['source_amount_per_100g']);
+        $this->assertSame(['numerator' => '5', 'denominator' => '1'], $secondNutrient['reference']['value']);
+
+        $this->getJson("/api/nutrition-calculations/{$firstCalculationId}")
+            ->assertSuccessful()
+            ->assertExactJson(['data' => $firstResponse]);
+        $this->getJson("/api/nutrition-calculations/{$secondCalculationId}")
+            ->assertSuccessful()
+            ->assertExactJson(['data' => $secondResponse]);
+    }
+
+    #[DataProvider('historicalTableMutationProvider')]
+    public function test_postgresql_rejects_mutation_of_every_historical_table(
+        string $table,
+        string $operation,
+    ): void {
+        $ids = $this->createHistoricalAggregateWithAQualitativeState();
+        $id = $ids[$table];
+
+        try {
+            DB::transaction(function () use ($table, $operation, $id): void {
+                $sql = $operation === 'UPDATE'
+                    ? "UPDATE {$table} SET id = id WHERE id = ?"
+                    : "DELETE FROM {$table} WHERE id = ?";
+
+                DB::statement($sql, [$id]);
+            });
+            $this->fail("{$operation} deveria ser bloqueado em {$table}.");
+        } catch (QueryException $exception) {
+            $this->assertStringContainsStringIgnoringCase('immutable', $exception->getMessage());
+        }
+
+        $this->assertDatabaseHas($table, ['id' => $id]);
+    }
+
+    /**
+     * @return array<string, array{string, string}>
+     */
+    public static function historicalTableMutationProvider(): array
+    {
+        $tables = [
+            'nutrition_calculations',
+            'nutrition_calculation_ingredients',
+            'nutrition_calculation_nutrients',
+            'nutrition_calculation_contributions',
+            'nutrition_calculation_nutrient_states',
+        ];
+        $cases = [];
+
+        foreach ($tables as $table) {
+            $cases["UPDATE {$table}"] = [$table, 'UPDATE'];
+            $cases["DELETE {$table}"] = [$table, 'DELETE'];
+        }
+
+        return $cases;
+    }
+
     /**
      * @return array<string, array{string, ?int, ?int, string}>
      */
@@ -241,5 +395,95 @@ class NutritionCalculationPersistenceTest extends TestCase
                 $constraint->conname => $constraint->definition,
             ])
             ->all();
+    }
+
+    private function createFood(string $label): Food
+    {
+        return Food::query()->create([
+            'name' => "Alimento {$label}",
+            'category' => 'Categoria histórica',
+            'source' => 'TACO',
+            'source_code' => $label.'-'.str()->uuid()->toString(),
+        ]);
+    }
+
+    private function createNutrient(string $name, string $unit): Nutrient
+    {
+        return Nutrient::query()->create([
+            'name' => $name.' '.str()->uuid()->toString(),
+            'unit' => $unit,
+        ]);
+    }
+
+    private function createFoodNutrient(
+        Food $food,
+        Nutrient $nutrient,
+        string $status,
+        ?string $amountValue = null,
+    ): FoodNutrient {
+        return FoodNutrient::query()->create([
+            'food_id' => $food->id,
+            'nutrient_id' => $nutrient->id,
+            'amount_value' => $amountValue,
+            'status' => $status,
+        ]);
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function createHistoricalAggregateWithAQualitativeState(): array
+    {
+        $nutrient = $this->createNutrient('Estado histórico', 'g');
+        $food = $this->createFood('IMMUTABLE');
+        $this->createFoodNutrient($food, $nutrient, 'TRACE');
+        $recipe = Recipe::factory()->create([
+            'yield_value' => '100',
+            'yield_unit' => 'g',
+        ]);
+        $recipe->ingredients()->create([
+            'food_id' => $food->id,
+            'quantity' => '10',
+            'unit' => 'g',
+            'position' => 1,
+        ]);
+        $calculationId = $this->postJson("/api/recipes/{$recipe->id}/nutrition-calculations")
+            ->assertSuccessful()
+            ->json('data.id');
+        $ingredientId = (int) DB::table('nutrition_calculation_ingredients')
+            ->where('nutrition_calculation_id', $calculationId)
+            ->value('id');
+        $nutrientId = (int) DB::table('nutrition_calculation_nutrients')
+            ->where('nutrition_calculation_id', $calculationId)
+            ->where('nutrient_id', $nutrient->id)
+            ->value('id');
+
+        return [
+            'nutrition_calculations' => (int) $calculationId,
+            'nutrition_calculation_ingredients' => $ingredientId,
+            'nutrition_calculation_nutrients' => $nutrientId,
+            'nutrition_calculation_contributions' => (int) DB::table('nutrition_calculation_contributions')
+                ->where('nutrition_calculation_ingredient_id', $ingredientId)
+                ->where('nutrition_calculation_nutrient_id', $nutrientId)
+                ->value('id'),
+            'nutrition_calculation_nutrient_states' => (int) DB::table('nutrition_calculation_nutrient_states')
+                ->where('nutrition_calculation_nutrient_id', $nutrientId)
+                ->value('id'),
+        ];
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $nutrients
+     * @return array<string, mixed>
+     */
+    private function nutrientPayloadFor(array $nutrients, int $nutrientId): array
+    {
+        $payload = collect($nutrients)->first(
+            fn (array $item): bool => $item['nutrient']['id'] === $nutrientId,
+        );
+
+        $this->assertNotNull($payload);
+
+        return $payload;
     }
 }
