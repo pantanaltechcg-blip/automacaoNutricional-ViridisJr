@@ -7,12 +7,15 @@ namespace Tests\Feature;
 use App\Models\Food;
 use App\Models\FoodNutrient;
 use App\Models\Nutrient;
+use App\Models\NutritionCalculationNutrient;
 use App\Models\Recipe;
 use App\Services\NutritionCalculationService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\DataProvider;
+use RuntimeException;
 use Tests\TestCase;
 
 class NutritionCalculationTest extends TestCase
@@ -340,6 +343,247 @@ class NutritionCalculationTest extends TestCase
         $this->assertSame([], $consolidation['qualitative_states']);
     }
 
+    public function test_post_persists_the_complete_snapshot_and_normalizes_complete_and_incomplete_totals_for_100g(): void
+    {
+        $energy = $this->createNutrient('Energia da fonte', 'kcal');
+        $carbohydrate = $this->createNutrient('Carboidrato', 'g');
+        $unavailable = $this->createNutrient('Componente indisponível', 'mg');
+        $firstFood = $this->createFood('SNAPSHOT-FIRST');
+        $secondFood = $this->createFood('SNAPSHOT-SECOND');
+        $thirdFood = $this->createFood('SNAPSHOT-THIRD');
+        $energyRelations = [
+            $this->createFoodNutrient($firstFood, $energy, 'EXACT', '100.00'),
+            $this->createFoodNutrient($secondFood, $energy, 'EXACT', '200.00'),
+            $this->createFoodNutrient($thirdFood, $energy, 'EXACT', '0.00'),
+        ];
+        $carbohydrateExact = $this->createFoodNutrient($firstFood, $carbohydrate, 'EXACT', '12.50');
+        $carbohydrateTrace = $this->createFoodNutrient($secondFood, $carbohydrate, 'TRACE');
+        $unavailableAbsent = $this->createFoodNutrient($firstFood, $unavailable, 'ABSENT');
+        $unavailableReevaluation = $this->createFoodNutrient($thirdFood, $unavailable, 'REEVALUATION');
+        $recipe = $this->createRecipe([
+            ['food_id' => $firstFood->id, 'quantity' => '100', 'unit' => 'g', 'position' => 1],
+            ['food_id' => $secondFood->id, 'quantity' => '50', 'unit' => 'g', 'position' => 2],
+            ['food_id' => $thirdFood->id, 'quantity' => '25', 'unit' => 'g', 'position' => 3],
+        ], '300', 'g');
+        $ingredients = $recipe->ingredients()->get();
+        $sourceModels = [
+            $recipe,
+            ...$ingredients,
+            $firstFood,
+            $secondFood,
+            $thirdFood,
+            $energy,
+            $carbohydrate,
+            $unavailable,
+            ...$energyRelations,
+            $carbohydrateExact,
+            $carbohydrateTrace,
+            $unavailableAbsent,
+            $unavailableReevaluation,
+        ];
+        $sourceSnapshots = collect($sourceModels)
+            ->map(fn (Model $model): array => $model->getRawOriginal())
+            ->all();
+
+        $response = $this->postJson("/api/recipes/{$recipe->id}/nutrition-calculations");
+
+        $response->assertSuccessful();
+        $data = $response->json('data');
+
+        $this->assertIsArray($data);
+        $this->assertSame($recipe->id, $data['recipe_id']);
+        $this->assertSame('nutrition-calculation-v1', $data['rules_version']);
+        $this->assertSame(['value' => '300', 'unit' => 'g'], $data['yield']);
+        $this->assertSame([
+            [
+                'recipe_ingredient_id' => $ingredients[0]->id,
+                'position' => 1,
+                'quantity' => '100',
+                'unit' => 'g',
+                'food' => [
+                    'id' => $firstFood->id,
+                    'source' => 'TACO',
+                    'source_code' => $firstFood->source_code,
+                ],
+            ],
+            [
+                'recipe_ingredient_id' => $ingredients[1]->id,
+                'position' => 2,
+                'quantity' => '50',
+                'unit' => 'g',
+                'food' => [
+                    'id' => $secondFood->id,
+                    'source' => 'TACO',
+                    'source_code' => $secondFood->source_code,
+                ],
+            ],
+            [
+                'recipe_ingredient_id' => $ingredients[2]->id,
+                'position' => 3,
+                'quantity' => '25',
+                'unit' => 'g',
+                'food' => [
+                    'id' => $thirdFood->id,
+                    'source' => 'TACO',
+                    'source_code' => $thirdFood->source_code,
+                ],
+            ],
+        ], $data['ingredients']);
+        $this->assertCount(Nutrient::query()->count(), $data['nutrients']);
+
+        $energyPayload = $this->nutrientPayloadFor($data['nutrients'], $energy->id);
+        $this->assertSame(['id' => $energy->id, 'name' => $energy->name, 'unit' => 'kcal'], $energyPayload['nutrient']);
+        $this->assertSame([
+            'value' => ['numerator' => '200', 'denominator' => '1'],
+            'complete' => true,
+            'qualitative_states' => [],
+            'has_missing_relation' => false,
+        ], $energyPayload['total']);
+        $this->assertSame([
+            'basis' => '100',
+            'unit' => 'g',
+            'value' => ['numerator' => '200', 'denominator' => '3'],
+            'complete' => true,
+            'qualitative_states' => [],
+            'has_missing_relation' => false,
+        ], $energyPayload['reference']);
+        $this->assertSame('0', $energyPayload['contributions'][2]['value']['numerator']);
+        $this->assertSame('1', $energyPayload['contributions'][2]['value']['denominator']);
+
+        $carbohydratePayload = $this->nutrientPayloadFor($data['nutrients'], $carbohydrate->id);
+        $this->assertSame([
+            'value' => ['numerator' => '25', 'denominator' => '2'],
+            'complete' => false,
+            'qualitative_states' => ['TRACE'],
+            'has_missing_relation' => true,
+        ], $carbohydratePayload['total']);
+        $this->assertSame([
+            'basis' => '100',
+            'unit' => 'g',
+            'value' => ['numerator' => '25', 'denominator' => '6'],
+            'complete' => false,
+            'qualitative_states' => ['TRACE'],
+            'has_missing_relation' => true,
+        ], $carbohydratePayload['reference']);
+        $this->assertSame($carbohydrateExact->id, $carbohydratePayload['contributions'][0]['food_nutrient_id']);
+        $this->assertSame('12.50', $carbohydratePayload['contributions'][0]['source_amount_per_100g']);
+        $this->assertSame('TRACE', $carbohydratePayload['contributions'][1]['status']);
+        $this->assertTrue($carbohydratePayload['contributions'][2]['missing_relation']);
+
+        $unavailablePayload = $this->nutrientPayloadFor($data['nutrients'], $unavailable->id);
+        $this->assertSame([
+            'value' => null,
+            'complete' => false,
+            'qualitative_states' => ['ABSENT', 'REEVALUATION'],
+            'has_missing_relation' => true,
+        ], $unavailablePayload['total']);
+        $this->assertSame([
+            'basis' => '100',
+            'unit' => 'g',
+            'value' => null,
+            'complete' => false,
+            'qualitative_states' => ['ABSENT', 'REEVALUATION'],
+            'has_missing_relation' => true,
+        ], $unavailablePayload['reference']);
+
+        $this->assertDatabaseHas('nutrition_calculations', [
+            'id' => $data['id'],
+            'recipe_id' => $recipe->id,
+            'yield_value' => '300',
+            'yield_unit' => 'g',
+            'rules_version' => 'nutrition-calculation-v1',
+        ]);
+        $this->assertDatabaseCount('nutrition_calculation_ingredients', 3);
+        $this->assertDatabaseCount('nutrition_calculation_nutrients', Nutrient::query()->count());
+        $this->assertDatabaseCount(
+            'nutrition_calculation_contributions',
+            $ingredients->count() * Nutrient::query()->count(),
+        );
+
+        foreach ($sourceModels as $index => $model) {
+            $this->assertEquals($sourceSnapshots[$index], $model->fresh()->getRawOriginal());
+        }
+    }
+
+    public function test_post_uses_the_persisted_ml_yield_and_preserves_a_repeating_reference_exactly(): void
+    {
+        $nutrient = $this->createNutrient('Referência periódica');
+        $food = $this->createFood('REFERENCE-ML');
+        $this->createFoodNutrient($food, $nutrient, 'EXACT', '1.00');
+        $recipe = $this->createRecipe([
+            ['food_id' => $food->id, 'quantity' => '1', 'unit' => 'g', 'position' => 1],
+        ], '3', 'ml');
+
+        $response = $this->postJson("/api/recipes/{$recipe->id}/nutrition-calculations");
+
+        $response->assertSuccessful();
+        $payload = $this->nutrientPayloadFor($response->json('data.nutrients'), $nutrient->id);
+
+        $this->assertSame(['value' => '3', 'unit' => 'ml'], $response->json('data.yield'));
+        $this->assertSame(['numerator' => '1', 'denominator' => '100'], $payload['total']['value']);
+        $this->assertSame('100', $payload['reference']['basis']);
+        $this->assertSame('ml', $payload['reference']['unit']);
+        $this->assertSame(['numerator' => '1', 'denominator' => '3'], $payload['reference']['value']);
+        $this->assertTrue($payload['reference']['complete']);
+    }
+
+    public function test_each_post_creates_a_new_preserved_execution_without_a_functional_payload(): void
+    {
+        $nutrient = $this->createNutrient('Nova execução');
+        $food = $this->createFood('NEW-EXECUTION');
+        $this->createFoodNutrient($food, $nutrient, 'EXACT', '5.00');
+        $recipe = $this->createRecipe([
+            ['food_id' => $food->id, 'quantity' => '10', 'unit' => 'g', 'position' => 1],
+        ]);
+        $initialCount = DB::table('nutrition_calculations')->count();
+
+        $first = $this->postJson("/api/recipes/{$recipe->id}/nutrition-calculations")->assertSuccessful();
+        $second = $this->postJson("/api/recipes/{$recipe->id}/nutrition-calculations")->assertSuccessful();
+
+        $this->assertNotSame($first->json('data.id'), $second->json('data.id'));
+        $this->assertSame('nutrition-calculation-v1', $first->json('data.rules_version'));
+        $this->assertSame('nutrition-calculation-v1', $second->json('data.rules_version'));
+        $this->assertSame($initialCount + 2, DB::table('nutrition_calculations')->count());
+    }
+
+    public function test_post_rolls_back_the_entire_aggregate_when_a_child_fails_during_persistence(): void
+    {
+        $nutrient = $this->createNutrient('Rollback integral');
+        $food = $this->createFood('ROLLBACK');
+        $this->createFoodNutrient($food, $nutrient, 'EXACT', '10.00');
+        $recipe = $this->createRecipe([
+            ['food_id' => $food->id, 'quantity' => '10', 'unit' => 'g', 'position' => 1],
+        ]);
+        $tables = [
+            'nutrition_calculations',
+            'nutrition_calculation_ingredients',
+            'nutrition_calculation_nutrients',
+            'nutrition_calculation_contributions',
+            'nutrition_calculation_nutrient_states',
+        ];
+        $countsBefore = collect($tables)->mapWithKeys(
+            fn (string $table): array => [$table => DB::table($table)->count()],
+        );
+        $eventName = 'eloquent.creating: '.NutritionCalculationNutrient::class;
+        Event::listen($eventName, static function (): never {
+            throw new RuntimeException('Falha de persistência provocada pelo teste.');
+        });
+        $this->withoutExceptionHandling();
+
+        try {
+            $this->postJson("/api/recipes/{$recipe->id}/nutrition-calculations");
+            $this->fail('A falha provocada durante a persistência não foi propagada.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame('Falha de persistência provocada pelo teste.', $exception->getMessage());
+        } finally {
+            Event::forget($eventName);
+        }
+
+        foreach ($countsBefore as $table => $count) {
+            $this->assertSame($count, DB::table($table)->count(), $table);
+        }
+    }
+
     private function createFood(string $label): Food
     {
         $sourceCode = $label.'-'.str()->uuid()->toString();
@@ -377,12 +621,15 @@ class NutritionCalculationTest extends TestCase
     /**
      * @param  list<array{food_id: int, quantity: string, unit: string, position: int}>  $ingredients
      */
-    private function createRecipe(array $ingredients): Recipe
-    {
+    private function createRecipe(
+        array $ingredients,
+        string $yieldValue = '1000',
+        string $yieldUnit = 'g',
+    ): Recipe {
         $recipe = Recipe::factory()->create([
             'name' => 'Receita para cálculo de contribuições',
-            'yield_value' => '1000',
-            'yield_unit' => 'g',
+            'yield_value' => $yieldValue,
+            'yield_unit' => $yieldUnit,
         ]);
         $recipe->ingredients()->createMany($ingredients);
 
@@ -485,5 +732,20 @@ class NutritionCalculationTest extends TestCase
         $this->assertNotNull($consolidation);
 
         return $consolidation;
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $nutrients
+     * @return array<string, mixed>
+     */
+    private function nutrientPayloadFor(array $nutrients, int $nutrientId): array
+    {
+        $payload = collect($nutrients)->first(
+            fn (array $item): bool => $item['nutrient']['id'] === $nutrientId,
+        );
+
+        $this->assertNotNull($payload);
+
+        return $payload;
     }
 }

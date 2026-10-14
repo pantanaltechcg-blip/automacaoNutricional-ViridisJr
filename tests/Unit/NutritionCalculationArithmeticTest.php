@@ -72,6 +72,13 @@ class NutritionCalculationArithmeticTest extends TestCase
     }
 
     #[Test]
+    public function it_normalizes_a_ratio_by_the_persisted_yield_without_rounding(): void
+    {
+        $this->assertRatio('25', '6', $this->arithmetic->normalizeRatio('25', '2', '300'));
+        $this->assertRatio('1', '3', $this->arithmetic->normalizeRatio('1', '100', '3'));
+    }
+
+    #[Test]
     public function it_represents_numeric_zero_canonically_as_zero_over_one(): void
     {
         $this->assertRatio('0', '1', $this->arithmetic->multiplyAndDivide('125.5001', '0.00', '100'));
@@ -80,7 +87,7 @@ class NutritionCalculationArithmeticTest extends TestCase
     #[Test]
     public function its_public_decimal_inputs_are_strings_and_reject_floats(): void
     {
-        foreach (['fromDecimal', 'multiply', 'divide', 'add', 'multiplyAndDivide'] as $methodName) {
+        foreach (['fromDecimal', 'multiply', 'divide', 'add', 'multiplyAndDivide', 'normalizeRatio'] as $methodName) {
             $method = new ReflectionMethod(NutritionCalculationArithmetic::class, $methodName);
 
             foreach ($method->getParameters() as $parameter) {

@@ -43,6 +43,16 @@ class NutritionCalculationArithmetic
         return $this->multiply($left, $right)->dividedBy($this->fromDecimal($divisor));
     }
 
+    public function normalizeRatio(
+        string $numerator,
+        string $denominator,
+        string $yieldValue,
+    ): BigRational {
+        return $this->fromRatio($numerator, $denominator)
+            ->multipliedBy($this->fromDecimal('100'))
+            ->dividedBy($this->fromDecimal($yieldValue));
+    }
+
     /**
      * @return array{numerator: string, denominator: string}
      */

@@ -116,23 +116,23 @@
 
 ### Tests for User Story 3
 
-- [ ] T022 [US3] Estender `tests/Feature/NutritionCalculationTest.php` com testes inicialmente falhos para `total_or_subtotal × 100 ÷ yield_value`, referência 100 g/100 ml, rendimento diferente da soma dos ingredientes, ausência de conversão g↔ml/densidade, referência nula sem `EXACT` e referência numérica incompleta preservando exatamente estados e ausência do subtotal
+- [X] T022 [US3] Estender `tests/Feature/NutritionCalculationTest.php` com testes inicialmente falhos para `total_or_subtotal × 100 ÷ yield_value`, referência 100 g/100 ml, rendimento diferente da soma dos ingredientes, ausência de conversão g↔ml/densidade, referência nula sem `EXACT` e referência numérica incompleta preservando exatamente estados e ausência do subtotal
 
-- [ ] T023 [US3] Adicionar em `tests/Feature/NutritionCalculationTest.php` testes inicialmente falhos do contrato `POST /api/recipes/{recipe}/nutrition-calculations`: sem payload funcional, cada chamada cria novo ID, `rules_version = nutrition-calculation-v1`, snapshot mínimo completo, contribuições/resultados como razões de strings, ordenação determinística e rollback sem execução parcial em qualquer falha
+- [X] T023 [US3] Adicionar em `tests/Feature/NutritionCalculationTest.php` testes inicialmente falhos do contrato `POST /api/recipes/{recipe}/nutrition-calculations`: sem payload funcional, cada chamada cria novo ID, `rules_version = nutrition-calculation-v1`, snapshot mínimo completo, contribuições/resultados como razões de strings, ordenação determinística e rollback sem execução parcial em qualquer falha
 
 ### Implementation for User Story 3
 
-- [ ] T024 [US3] Implementar em `app/Services/NutritionCalculationArithmetic.php` a normalização racional `total_or_subtotal × 100 ÷ yield_value`, produzindo referência quando existir valor numérico e nenhuma referência numérica sem `EXACT`, sem conversão g↔ml, densidade, rendimento inferido ou arredondamento
+- [X] T024 [US3] Implementar em `app/Services/NutritionCalculationArithmetic.php` a normalização racional `total_or_subtotal × 100 ÷ yield_value`, produzindo referência quando existir valor numérico e nenhuma referência numérica sem `EXACT`, sem conversão g↔ml, densidade, rendimento inferido ou arredondamento
 
-- [ ] T025 [US3] Implementar em `app/Services/NutritionCalculationService.php` a criação integral de uma execução dentro de única transação PostgreSQL `REPEATABLE READ`: ler Recipe/ingredientes/Base em snapshot coerente, calcular, consolidar, normalizar e persistir raiz, snapshots, matriz de contribuições e estados com `rules_version = nutrition-calculation-v1`; qualquer falha deve executar rollback integral e nova solicitação nunca deve substituir execução anterior
+- [X] T025 [US3] Implementar em `app/Services/NutritionCalculationService.php` a criação integral de uma execução dentro de única transação PostgreSQL `REPEATABLE READ`: ler Recipe/ingredientes/Base em snapshot coerente, calcular, consolidar, normalizar e persistir raiz, snapshots, matriz de contribuições e estados com `rules_version = nutrition-calculation-v1`; qualquer falha deve executar rollback integral e nova solicitação nunca deve substituir execução anterior
 
-- [ ] T026 [P] [US3] Criar `app/Http/Resources/NutritionCalculationResource.php` para serializar somente o agregado preservado conforme `specs/003-nutrition-calculation/contracts/nutrition-calculations.md`, usando strings para decimais/razões, ordenação determinística e dimensões separadas de valor, estados, ausência e completude, sem cálculo no Resource
+- [X] T026 [P] [US3] Criar `app/Http/Resources/NutritionCalculationResource.php` para serializar somente o agregado preservado conforme `specs/003-nutrition-calculation/contracts/nutrition-calculations.md`, usando strings para decimais/razões, ordenação determinística e dimensões separadas de valor, estados, ausência e completude, sem cálculo no Resource
 
-- [ ] T027 [US3] Criar `app/Http/Controllers/NutritionCalculationController.php` com ação de criação que apenas recebe a Recipe resolvida, delega ao `NutritionCalculationService` e retorna `NutritionCalculationResource`, sem cálculo ou regra de domínio no Controller
+- [X] T027 [US3] Criar `app/Http/Controllers/NutritionCalculationController.php` com ação de criação que apenas recebe a Recipe resolvida, delega ao `NutritionCalculationService` e retorna `NutritionCalculationResource`, sem cálculo ou regra de domínio no Controller
 
-- [ ] T028 [US3] Registrar somente a rota de criação `POST /api/recipes/{recipe}/nutrition-calculations` em `routes/api.php`, sem PUT, PATCH, DELETE, listagem, filtro, paginação ou endpoint de “resultado atual”
+- [X] T028 [US3] Registrar somente a rota de criação `POST /api/recipes/{recipe}/nutrition-calculations` em `routes/api.php`, sem PUT, PATCH, DELETE, listagem, filtro, paginação ou endpoint de “resultado atual”
 
-- [ ] T029 [US3] Executar `php artisan test --compact tests/Unit/NutritionCalculationArithmeticTest.php tests/Feature/NutritionCalculationTest.php` e confirmar a criação atômica, referências 100 g/100 ml e contrato POST antes de iniciar consulta histórica
+- [X] T029 [US3] Executar `php artisan test --compact tests/Unit/NutritionCalculationArithmeticTest.php tests/Feature/NutritionCalculationTest.php` e confirmar a criação atômica, referências 100 g/100 ml e contrato POST antes de iniciar consulta histórica
 
 **Checkpoint**: O sistema cria uma execução completa, nova e reproduzível; nenhuma operação histórica de consulta foi adicionada ainda.
 
