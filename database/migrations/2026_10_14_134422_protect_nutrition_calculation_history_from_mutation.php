@@ -20,7 +20,7 @@ return new class extends Migration
     public function up(): void
     {
         DB::statement(<<<'SQL'
-            CREATE FUNCTION prevent_nutrition_calculation_history_mutation()
+            CREATE OR REPLACE FUNCTION prevent_nutrition_calculation_history_mutation()
             RETURNS TRIGGER AS $$
             BEGIN
                 RAISE EXCEPTION 'Nutrition calculation history is immutable.';

@@ -1,16 +1,15 @@
-<!-- 
+<!--
 Sync Impact Report
-- Version change: 0.0.0 -> 1.0.0
-- Added Sections: 
-  - Core Principles (Princípio de Não Invenção, Stack Definida, Arquitetura, Dados Nutricionais, Motor de Cálculo, Regras Regulatórias)
-  - Domínios do Backend
-  - Receitas e Rendimento
-  - Geração do Rótulo
-  - Banco de Dados e Testes
-  - Desenvolvimento e Controle de Versão
+- Version change: 1.0.0 -> 2.0.0
+- Modified Sections:
+  - Desenvolvimento Orientado a Specifications (Spec Kit) e Controle de Versão
   - Governance
+- Added Sections:
+  - Autoridade Administrativa e Integridade Técnica
 - Removed Sections: N/A
-- Follow-up TODOs: N/A
+- Follow-up TODOs:
+  - Alinhar a Specification e os artefatos da Feature 004 à governança 2.0.0 antes do Plan.
+  - Manter documentados e isolados os bloqueios nutricionais e regulatórios ainda não validados.
 -->
 
 # NutriLabel Constitution
@@ -48,11 +47,64 @@ Cálculo nutricional e representação visual são estritamente desacoplados. O 
 ## Banco de Dados e Testes
 PostgreSQL é o banco de dados definido para o projeto. Alterações estruturais no banco devem ser realizadas e versionadas por meio de Laravel Migrations. A modelagem deve preservar os relacionamentos entre receitas, ingredientes, alimentos e dados nutricionais, bem como a origem dos dados relevantes para os cálculos. Nenhuma credencial deve ser persistida em repositório. O motor de cálculo nutricional e as regras de rotulagem exigem cobertura por testes automatizados, utilizando a planilha de cálculo da Viridis Jr. como referência técnica base (mas sem sobrescrever as regras regulatórias puras).
 
+## Autoridade Administrativa e Integridade Técnica
+
+O diretor responsável pelo NutriLabel possui autoridade administrativa para aprovar
+decisões do projeto, alterar escopo e prioridades e autorizar a passagem entre Specify,
+Clarify, Plan, Tasks, Analyze, Implement, validação e entrega. Cada manifestação MUST ser
+registrada com data, versão, alcance e origem rastreável. A manifestação executiva de
+2026-11-10 registra que a Viridis delegou verbalmente essa autoridade ao diretor; esse
+registro não simula assinatura, ata, documento ou validação técnica de terceiro.
+
+Aprovação ou ratificação externa da Viridis não é pré-requisito administrativo para o
+diretor autorizar Plan, Tasks ou Implement. Essa autonomia administrativa não constitui,
+por si só, equivalência nutricional, aprovação de fator energético, autorização de
+conversão, confirmação de unidade, fonte quantitativa ou conformidade normativa. Toda
+regra sem fundamento técnico suficiente MUST permanecer documentada como pendente,
+indisponível ou bloqueada, conforme o caso.
+
+Pendências nutricionais e regulatórias não bloqueiam automaticamente a infraestrutura
+nem comportamentos independentes e seguros. O desenvolvimento pode prosseguir quando a
+Specification define de modo testável o isolamento da pendência e garante que:
+
+- dado desconhecido, qualitativo, incompatível ou ausente nunca seja convertido em zero
+  ou em valor fictício;
+- cálculo dependente de correspondência, fator, conversão, fonte ou aplicabilidade não
+  validada permaneça indisponível;
+- resultado parcial ou incompleto preserve suas causas e nunca seja classificado como
+  completo, validado ou apto à rotulagem;
+- valores originais, fontes, versões, decisões e resultados históricos permaneçam
+  rastreáveis e imutáveis;
+- testes automatizados comprovem tanto os caminhos autorizados quanto os bloqueios
+  seguros.
+
 ## Desenvolvimento Orientado a Specifications (Spec Kit) e Controle de Versão
-Todas as alterações seguem o Spec-Driven Development: Constitution -> Specify -> Clarify -> Plan -> Tasks -> Analyze -> Implement -> Validação. Nenhum requisito ausente ou não aprovado deve ser desenvolvido. O versionamento via Git segue a esteira de `main` <- `develop` <- `feature branches`, exigindo revisão antes da integração de funcionalidades.
+Todas as alterações seguem o Spec-Driven Development: Constitution -> Specify -> Clarify
+-> Plan -> Tasks -> Analyze -> Implement -> Validação. O diretor pode autorizar a passagem
+entre etapas quando os critérios documentais e técnicos aplicáveis estiverem testáveis.
+Nenhum requisito ausente deve ser inventado, e nenhuma regra técnica bloqueada pode ser
+implementada como se estivesse validada. Partes independentes e seguras podem avançar
+quando a Specification define explicitamente o comportamento de indisponibilidade,
+incompletude e rastreabilidade. O versionamento via Git segue a esteira de `main` <-
+`develop` <- `feature branches`, exigindo revisão antes da integração de funcionalidades.
 
 ## Governance
-Esta Constitution governa as regras técnicas irrefutáveis do projeto NutriLabel. A precedência hierárquica é: Constitution -> Specification -> Plan -> Tasks -> Implementação.
-Toda alteração que impacte fundamentos aqui presentes requer aprovação da equipe e alteração prévia e formal neste documento. Nenhuma expansão de escopo é permitida.
+Esta Constitution governa as regras técnicas e administrativas do projeto NutriLabel. A
+precedência hierárquica é: Constitution -> Specification -> Plan -> Tasks ->
+Implementação.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-05 | **Last Amended**: 2026-10-05
+O diretor do projeto é a autoridade responsável por aprovar emendas constitucionais,
+mudanças de escopo, prioridades, critérios de implementação, passagem entre etapas e
+preparação da entrega. A autorização MUST identificar o conteúdo aprovado, sua versão,
+data, alcance, origem e eventuais ressalvas. Aprovação administrativa não substitui a
+evidência técnica ou normativa que um cálculo ou uma declaração regulatória exige.
+
+Emendas a esta Constitution MUST ser realizadas antes da aplicação da nova governança,
+incluir relatório de impacto e atualizar a versão segundo SemVer: MAJOR para remoção ou
+redefinição incompatível de governança, MINOR para novo princípio ou expansão material
+compatível e PATCH para esclarecimento sem alteração semântica. Toda revisão de
+Specification, Plan, Tasks ou implementação MUST verificar conformidade com a versão
+vigente e registrar desvios ou bloqueios. Nenhuma expansão de escopo pode ocorrer sem
+manifestação rastreável do diretor.
+
+**Version**: 2.0.0 | **Ratified**: 2026-10-05 | **Last Amended**: 2026-11-10

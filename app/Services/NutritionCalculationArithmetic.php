@@ -43,6 +43,36 @@ class NutritionCalculationArithmetic
         return $this->multiply($left, $right)->dividedBy($this->fromDecimal($divisor));
     }
 
+    public function multiplyRatioByDecimal(
+        string $numerator,
+        string $denominator,
+        string $multiplier,
+    ): BigRational {
+        return $this->fromRatio($numerator, $denominator)
+            ->multipliedBy($this->fromDecimal($multiplier));
+    }
+
+    public function multiplyRatios(
+        string $leftNumerator,
+        string $leftDenominator,
+        string $rightNumerator,
+        string $rightDenominator,
+    ): BigRational {
+        return $this->fromRatio($leftNumerator, $leftDenominator)
+            ->multipliedBy($this->fromRatio($rightNumerator, $rightDenominator));
+    }
+
+    public function percentage(
+        string $numerator,
+        string $denominator,
+        string $dailyValueNumerator,
+        string $dailyValueDenominator,
+    ): BigRational {
+        return $this->fromRatio($numerator, $denominator)
+            ->multipliedBy(100)
+            ->dividedBy($this->fromRatio($dailyValueNumerator, $dailyValueDenominator));
+    }
+
     public function normalizeRatio(
         string $numerator,
         string $denominator,
