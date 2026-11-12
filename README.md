@@ -13,14 +13,28 @@ Backend em Laravel + PostgreSQL para base nutricional TACO, receitas e cálculo 
 
 ### Como rodar
 
+Requisitos: Docker Desktop (macOS/Windows) ou Docker Engine com Docker Compose.
+
 ```bash
 composer install
 cp .env.example .env          # Windows: Copy-Item .env.example .env
 php artisan key:generate
-docker compose up -d          # PostgreSQL (defina DB_PASSWORD no .env)
-php artisan migrate
-php artisan nutrition:import-taco
-php artisan serve             # http://localhost:8000
+./vendor/bin/sail up -d
+./vendor/bin/sail artisan migrate
+./vendor/bin/sail artisan nutrition:import-taco
+```
+
+A API fica em `http://localhost:8000`. O Sail executa PHP 8.4 e PostgreSQL 17
+em containers. Para executar comandos da aplicação, prefixe-os com
+`./vendor/bin/sail`: por exemplo, `./vendor/bin/sail artisan test` ou
+`./vendor/bin/sail composer install`. Para compilar os assets, use
+`./vendor/bin/sail npm install --ignore-scripts` e
+`./vendor/bin/sail npm run build`.
+
+Para parar os containers sem remover os dados persistidos:
+
+```bash
+./vendor/bin/sail stop
 ```
 
 ### Convenções da API
