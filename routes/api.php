@@ -2,12 +2,17 @@
 
 use App\Http\Controllers\DeclaredNutritionCalculationController;
 use App\Http\Controllers\FoodController;
+use App\Http\Controllers\ManualFoodRegistrationController;
 use App\Http\Controllers\NutritionCalculationController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\ServingDailyValueCalculationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/foods', [FoodController::class, 'search']);
+Route::post('/manual-foods', [ManualFoodRegistrationController::class, 'store']);
+Route::get('/manual-foods/{food}', [ManualFoodRegistrationController::class, 'show'])->whereNumber('food');
+Route::put('/manual-foods/{food}', [ManualFoodRegistrationController::class, 'update'])->whereNumber('food');
+Route::patch('/manual-foods/{food}/status', [ManualFoodRegistrationController::class, 'updateStatus'])->whereNumber('food');
 Route::post('/recipes', [RecipeController::class, 'store']);
 Route::get('/recipes/{recipe}', [RecipeController::class, 'show']);
 Route::put('/recipes/{recipe}', [RecipeController::class, 'update']);

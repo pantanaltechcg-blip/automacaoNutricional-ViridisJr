@@ -30,6 +30,7 @@ class NutritionBaseService
     {
         return Food::query()
             ->with('foodNutrients.nutrient')
+            ->whereDoesntHave('manualRegistration', fn ($registrationQuery) => $registrationQuery->where('is_active', false))
             ->whereRaw('unaccent(name) ILIKE unaccent(?)', ["%{$query}%"])
             ->get()
             ->map(function (Food $food): array {
