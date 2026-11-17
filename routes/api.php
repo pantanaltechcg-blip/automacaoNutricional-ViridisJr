@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DeclaredNutritionCalculationController;
 use App\Http\Controllers\FoodController;
 use App\Http\Controllers\NutritionCalculationController;
 use App\Http\Controllers\RecipeController;
@@ -14,3 +15,5 @@ Route::post('/recipes/{recipe}/nutrition-calculations', [NutritionCalculationCon
 Route::get('/nutrition-calculations/{calculation}', [NutritionCalculationController::class, 'show']);
 Route::post('/nutrition-calculations/{nutritionCalculation}/serving-daily-value-calculations', [ServingDailyValueCalculationController::class, 'store']);
 Route::get('/serving-daily-value-calculations/{servingDailyValueCalculation}', [ServingDailyValueCalculationController::class, 'show']);
+Route::post('/serving-daily-value-calculations/{servingDailyValueCalculation}/declared-nutrition-calculations', [DeclaredNutritionCalculationController::class, 'store']);
+Route::get('/declared-nutrition-calculations/{declaredNutritionCalculation}', [DeclaredNutritionCalculationController::class, 'show']);

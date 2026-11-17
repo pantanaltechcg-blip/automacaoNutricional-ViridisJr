@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services;
 
 use Brick\Math\BigRational;
+use Brick\Math\RoundingMode;
+use InvalidArgumentException;
 
 class NutritionCalculationArithmetic
 {
@@ -92,5 +94,27 @@ class NutritionCalculationArithmetic
             'numerator' => (string) $value->getNumerator(),
             'denominator' => (string) $value->getDenominator(),
         ];
+    }
+
+    public function compare(BigRational $left, BigRational $right): int
+    {
+        return $left->compareTo($right);
+    }
+
+    public function roundToStepHalfUp(BigRational $value, BigRational $step): BigRational
+    {
+        if ($step->getSign() <= 0) {
+            throw new InvalidArgumentException('O incremento de arredondamento deve ser positivo.');
+        }
+
+        return $value->dividedBy($step)
+            ->toScale(0, RoundingMode::HalfUp)
+            ->toBigRational()
+            ->multipliedBy($step);
+    }
+
+    public function formatDecimal(BigRational $value, int $decimalPlaces): string
+    {
+        return $value->toScale($decimalPlaces, RoundingMode::Unnecessary)->toString();
     }
 }
