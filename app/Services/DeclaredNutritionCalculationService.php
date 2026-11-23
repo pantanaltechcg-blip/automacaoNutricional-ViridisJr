@@ -205,35 +205,56 @@ class DeclaredNutritionCalculationService
         $causes = [];
 
         foreach ($source->regulatoryResults as $result) {
+            $isFormulationBacked = $result->map_code === 'MAP-004'
+                && $result->value_source_type === 'ADDED_SUGARS_FORMULATION';
+
             /** @var ServingDailyValueNutrient|null $svNutrient */
             $svNutrient = $result->serving_daily_value_nutrient_id !== null
                 ? $svNutrientsById->get((int) $result->serving_daily_value_nutrient_id)
                 : null;
             $calcNutrient = $svNutrient?->sourceNutrient;
 
-            $states = $this->orderedQualitativeStates($svNutrient);
-            $sourceHasMissingRelation = (bool) ($svNutrient?->has_missing_relation ?? $calcNutrient?->has_missing_relation ?? false);
-            $sourceIsComplete = $svNutrient !== null
-                && $calcNutrient !== null
-                && (bool) $svNutrient->is_complete
-                && (bool) $calcNutrient->is_complete
-                && ! $sourceHasMissingRelation;
+            $states = $isFormulationBacked ? [] : $this->orderedQualitativeStates($svNutrient);
+            $sourceHasMissingRelation = $isFormulationBacked
+                ? false
+                : (bool) ($svNutrient?->has_missing_relation ?? $calcNutrient?->has_missing_relation ?? false);
+            $sourceIsComplete = $isFormulationBacked
+                ? ((bool) $source->added_sugars_is_regulatory_eligible && (bool) $result->is_complete)
+                : ($svNutrient !== null
+                    && $calcNutrient !== null
+                    && (bool) $svNutrient->is_complete
+                    && (bool) $calcNutrient->is_complete
+                    && ! $sourceHasMissingRelation);
 
             $mapAuthorized = $this->gates->sourceMappingAuthorized($source, $result);
             $conversionAuthorized = $this->gates->sourceConversionAuthorized($source, $result);
 
-            [$ref100SourceRatio, $ref100RegRatio] = $this->resolveReference100Ratios(
-                $calcNutrient?->reference_numerator !== null ? $this->nullableString($calcNutrient->reference_numerator) : null,
-                $calcNutrient?->reference_denominator !== null ? $this->nullableString($calcNutrient->reference_denominator) : null,
-                $result,
-                $mapAuthorized,
-                $conversionAuthorized,
-            );
+            if ($isFormulationBacked) {
+                $ref100SourceRatio = $this->canonicalRatio(
+                    $result->source_reference_numerator !== null ? $this->nullableString($result->source_reference_numerator) : null,
+                    $result->source_reference_denominator !== null ? $this->nullableString($result->source_reference_denominator) : null,
+                );
+                $ref100RegRatio = ($mapAuthorized && $conversionAuthorized) ? $ref100SourceRatio : null;
+                $portionSourceRatio = $this->canonicalRatio(
+                    $result->value_numerator !== null ? $this->nullableString($result->value_numerator) : null,
+                    $result->value_denominator !== null ? $this->nullableString($result->value_denominator) : null,
+                );
+                $svNutrientMissing = ! ((bool) $source->added_sugars_is_regulatory_eligible && $ref100SourceRatio !== null);
+            } else {
+                [$ref100SourceRatio, $ref100RegRatio] = $this->resolveReference100Ratios(
+                    $calcNutrient?->reference_numerator !== null ? $this->nullableString($calcNutrient->reference_numerator) : null,
+                    $calcNutrient?->reference_denominator !== null ? $this->nullableString($calcNutrient->reference_denominator) : null,
+                    $result,
+                    $mapAuthorized,
+                    $conversionAuthorized,
+                );
+                $portionSourceRatio = $this->canonicalRatio(
+                    $svNutrient?->portion_numerator !== null ? $this->nullableString($svNutrient->portion_numerator) : null,
+                    $svNutrient?->portion_denominator !== null ? $this->nullableString($svNutrient->portion_denominator) : null,
+                );
+                $svNutrientMissing = $svNutrient === null || $calcNutrient === null;
+            }
 
-            $portionSourceRatio = $this->canonicalRatio(
-                $svNutrient?->portion_numerator !== null ? $this->nullableString($svNutrient->portion_numerator) : null,
-                $svNutrient?->portion_denominator !== null ? $this->nullableString($svNutrient->portion_denominator) : null,
-            );
             $portionRegRatio = ($mapAuthorized && $conversionAuthorized)
                 ? $this->canonicalRatio(
                     $result->value_numerator !== null ? $this->nullableString($result->value_numerator) : null,
@@ -251,7 +272,7 @@ class DeclaredNutritionCalculationService
                 qualitativeStates: $states,
                 sourceHasMissingRelation: $sourceHasMissingRelation,
                 sourceIsComplete: $sourceIsComplete,
-                svNutrientMissing: $svNutrient === null || $calcNutrient === null,
+                svNutrientMissing: $svNutrientMissing,
                 regulatoryRatio: $ref100RegRatio,
                 nsqRule: $nsqByKey->get("{$result->map_code}:REFERENCE_100"),
                 roundingRule: $roundingByKey->get("{$result->map_code}:REFERENCE_100"),
@@ -267,7 +288,7 @@ class DeclaredNutritionCalculationService
                 qualitativeStates: $states,
                 sourceHasMissingRelation: $sourceHasMissingRelation,
                 sourceIsComplete: $sourceIsComplete,
-                svNutrientMissing: $svNutrient === null || $calcNutrient === null,
+                svNutrientMissing: $svNutrientMissing,
                 regulatoryRatio: $portionRegRatio,
                 nsqRule: $nsqByKey->get("{$result->map_code}:PORTION"),
                 roundingRule: $roundingByKey->get("{$result->map_code}:PORTION"),

@@ -145,8 +145,10 @@ class ServingRegulatoryGateService
             && ($applicability->status !== 'NOT_APPLICABLE' || $this->nonEmpty($applicability->justification));
     }
 
-    public function dailyValueAuthorized(RegulatoryDailyValue $dailyValue): bool
-    {
+    public function dailyValueAuthorized(
+        RegulatoryDailyValue $dailyValue,
+        bool $allowFormulationBackedMap = false,
+    ): bool {
         $dailyValue->loadMissing(['profile', 'mapping.profile', 'mapping.nutrient']);
         $profile = $dailyValue->profile;
         $mapping = $dailyValue->mapping;
@@ -155,7 +157,7 @@ class ServingRegulatoryGateService
             && $mapping instanceof RegulatoryNutrientMapping
             && (int) $mapping->profile_id === (int) $profile->getKey()
             && $this->profileAuthorized($profile)
-            && $this->mappingAuthorized($mapping)
+            && ($allowFormulationBackedMap || $this->mappingAuthorized($mapping))
             && $dailyValue->technical_status === 'AUTHORIZED'
             && $dailyValue->mapping_id !== null
             && $dailyValue->vdr_numerator !== null

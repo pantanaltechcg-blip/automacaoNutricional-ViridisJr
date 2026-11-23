@@ -45,6 +45,18 @@ class ServingDailyValueCalculationResource extends JsonResource
                 'consulted_on' => (string) $this->resource->regulatory_profile_consulted_on,
                 'evidence' => $this->evidence($this->resource, 'regulatory_profile_evidence_', 'regulatory_profile_validated_'),
             ],
+            'added_sugars_evaluation' => $this->resource->added_sugars_evaluation_id !== null ? [
+                'id' => (int) $this->resource->added_sugars_evaluation_id,
+                'formulation_version_number' => (int) $this->resource->added_sugars_formulation_version_number,
+                'validation_status' => $this->resource->added_sugars_validation_status,
+                'is_regulatory_eligible' => (bool) $this->resource->added_sugars_is_regulatory_eligible,
+                'is_confirmed_zero' => (bool) $this->resource->added_sugars_is_confirmed_zero,
+                'reference' => [
+                    'basis' => '100',
+                    'unit' => $this->resource->added_sugars_reference_unit,
+                    'value' => $this->ratio($this->resource->added_sugars_reference_numerator, $this->resource->added_sugars_reference_denominator),
+                ],
+            ] : null,
             'nutrients' => $this->resource->nutrients->map(fn ($nutrient): array => [
                 'nutrient' => ['id' => (int) $nutrient->nutrient_id, 'name' => $nutrient->nutrient_name, 'unit' => $nutrient->nutrient_unit],
                 'source_total' => $this->nutrientValue($nutrient, 'source_'),
@@ -64,6 +76,8 @@ class ServingDailyValueCalculationResource extends JsonResource
                     'evidence' => $this->evidence($result, 'conversion_evidence_', 'conversion_validated_'),
                 ],
                 'value' => $this->ratio($result->value_numerator, $result->value_denominator),
+                'value_source_type' => $result->value_source_type ?? 'NUTRITION_CALCULATION',
+                'source_reference_100' => $this->ratio($result->source_reference_numerator, $result->source_reference_denominator),
                 'unit' => $result->regulatory_unit,
                 'complete' => (bool) $result->is_complete,
                 'availability' => $result->availability,

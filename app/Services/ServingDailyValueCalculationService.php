@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\AddedSugarsEvaluation;
 use App\Models\NutritionCalculation;
 use App\Models\PortionAuthorization;
 use App\Models\RegulatoryEnergyApplicability;
@@ -12,6 +13,7 @@ use App\Models\ServingDailyValueCalculation;
 use Brick\Math\BigRational;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use UnexpectedValueException;
 
 class ServingDailyValueCalculationService
@@ -49,9 +51,28 @@ class ServingDailyValueCalculationService
                 ])
                 ->findOrFail($input['regulatory_profile_id']);
 
+            $addedSugarsEvaluation = null;
+            if (isset($input['added_sugars_evaluation_id']) && $input['added_sugars_evaluation_id'] !== null) {
+                $addedSugarsEvaluation = AddedSugarsEvaluation::query()
+                    ->with(['causes' => fn ($q) => $q->orderBy('id')])
+                    ->findOrFail((int) $input['added_sugars_evaluation_id']);
+
+                if ((int) $addedSugarsEvaluation->nutrition_calculation_id !== (int) $source->getKey()) {
+                    throw ValidationException::withMessages([
+                        'added_sugars_evaluation_id' => 'A avaliação de açúcares adicionados informada pertence a outra execução nutricional.',
+                    ]);
+                }
+            }
+
             $this->gates->assertPortionAuthorized($source, $authorization, $input['portion']);
             $nutrientRows = $this->nutrientRows($source, $input['portion']['value']);
-            $regulatory = $this->regulatoryRows($profile, $nutrientRows);
+            $regulatory = $this->regulatoryRows(
+                $profile,
+                $nutrientRows,
+                $source,
+                $input['portion']['value'],
+                $addedSugarsEvaluation,
+            );
             $applicabilities = RegulatoryEnergyApplicability::query()
                 ->where('nutrition_calculation_id', $source->getKey())
                 ->where('profile_id', $profile->getKey())
@@ -99,6 +120,14 @@ class ServingDailyValueCalculationService
                 'energy_unit' => $energy['ratio'] === null ? null : 'kcal',
                 'energy_is_complete' => $energy['complete'],
                 'energy_availability' => $energy['availability'],
+                'added_sugars_evaluation_id' => $addedSugarsEvaluation?->getKey(),
+                'added_sugars_formulation_version_number' => $addedSugarsEvaluation?->formulation_version_number,
+                'added_sugars_validation_status' => $addedSugarsEvaluation?->validation_status,
+                'added_sugars_is_regulatory_eligible' => $addedSugarsEvaluation?->is_regulatory_eligible,
+                'added_sugars_is_confirmed_zero' => $addedSugarsEvaluation?->is_confirmed_zero,
+                'added_sugars_reference_numerator' => $addedSugarsEvaluation?->reference_numerator,
+                'added_sugars_reference_denominator' => $addedSugarsEvaluation?->reference_denominator,
+                'added_sugars_reference_unit' => $addedSugarsEvaluation?->reference_unit,
                 'rules_version' => ServingDailyValueCalculation::RULES_VERSION,
             ]);
 
@@ -207,8 +236,13 @@ class ServingDailyValueCalculationService
      * @param  list<array<string, mixed>>  $nutrientRows
      * @return array{rows: list<array<string, mixed>>, causes: list<array<string, mixed>>, authorized: array<string, bool>}
      */
-    private function regulatoryRows(RegulatoryProfile $profile, array $nutrientRows): array
-    {
+    private function regulatoryRows(
+        RegulatoryProfile $profile,
+        array $nutrientRows,
+        NutritionCalculation $source,
+        string $portionValue,
+        ?AddedSugarsEvaluation $addedSugarsEvaluation = null,
+    ): array {
         $nutrients = collect($nutrientRows)->keyBy('nutrient_id');
         $rows = [];
         $causes = [];
@@ -216,6 +250,79 @@ class ServingDailyValueCalculationService
         $profileAuthorized = $this->gates->profileAuthorized($profile);
 
         foreach ($profile->mappings as $mapping) {
+            if ($mapping->map_code === 'MAP-004' && $addedSugarsEvaluation instanceof AddedSugarsEvaluation) {
+                $formulationEligible = $profileAuthorized
+                    && (bool) $addedSugarsEvaluation->is_regulatory_eligible
+                    && $mapping->regulatory_unit === 'g'
+                    && $addedSugarsEvaluation->total_numerator !== null
+                    && $addedSugarsEvaluation->total_denominator !== null
+                    && $addedSugarsEvaluation->reference_numerator !== null
+                    && $addedSugarsEvaluation->reference_denominator !== null;
+
+                $authorizedMappings[$mapping->map_code] = $formulationEligible;
+                $ratio = null;
+
+                if ($formulationEligible) {
+                    $yield = $this->rawString($source, 'yield_value');
+                    $ratio = $this->arithmetic->ratio(
+                        $this->arithmetic->multiplyRatioByDecimal(
+                            (string) $addedSugarsEvaluation->total_numerator,
+                            (string) $addedSugarsEvaluation->total_denominator,
+                            $portionValue,
+                        )->dividedBy($this->arithmetic->fromDecimal($yield)),
+                    );
+                } else {
+                    if (! $profileAuthorized) {
+                        $causes[] = $this->cause('REGULATORY_VALUE', $mapping->map_code, 'REGULATORY_BLOCK', 'MAP_NOT_TECHNICALLY_AUTHORIZED', $mapping->source_reference);
+                    }
+
+                    foreach ($addedSugarsEvaluation->causes as $evalCause) {
+                        $causes[] = $this->cause(
+                            'REGULATORY_VALUE',
+                            $mapping->map_code,
+                            'REGULATORY_BLOCK',
+                            $evalCause->cause_code,
+                            $evalCause->detail,
+                        );
+                    }
+
+                    if ($profileAuthorized && $addedSugarsEvaluation->causes->isEmpty()) {
+                        $causes[] = $this->cause('REGULATORY_VALUE', $mapping->map_code, 'REGULATORY_BLOCK', 'ADDED_SUGARS_EVALUATION_NOT_ELIGIBLE', $mapping->source_reference);
+                    }
+                }
+
+                $rows[] = [
+                    'map_code' => $mapping->map_code,
+                    'component_name' => $mapping->component_name,
+                    'technical_status' => $mapping->technical_status,
+                    'nutrient_id' => $mapping->nutrient_id,
+                    'nutrient_name' => null,
+                    'source_unit' => 'g',
+                    'regulatory_unit' => $mapping->regulatory_unit,
+                    'map_source_reference' => $mapping->source_reference,
+                    ...$this->evidenceSnapshot($mapping, 'evidence_', 'map_evidence_'),
+                    'map_validated_by' => $mapping->validated_by,
+                    'map_validated_on' => $mapping->validated_on,
+                    'conversion_status' => 'NOT_REQUIRED',
+                    'conversion_source_unit' => null,
+                    'conversion_target_unit' => null,
+                    'conversion_numerator' => null,
+                    'conversion_denominator' => null,
+                    ...$this->evidenceSnapshot($mapping, 'conversion_evidence_', 'conversion_evidence_'),
+                    'conversion_validated_by' => $mapping->conversion_validated_by,
+                    'conversion_validated_on' => $mapping->conversion_validated_on,
+                    'value_source_type' => 'ADDED_SUGARS_FORMULATION',
+                    'source_reference_numerator' => $formulationEligible ? (string) $addedSugarsEvaluation->reference_numerator : null,
+                    'source_reference_denominator' => $formulationEligible ? (string) $addedSugarsEvaluation->reference_denominator : null,
+                    'value_numerator' => $ratio['numerator'] ?? null,
+                    'value_denominator' => $ratio['denominator'] ?? null,
+                    'is_complete' => $formulationEligible && $ratio !== null,
+                    'availability' => $formulationEligible && $ratio !== null ? 'AVAILABLE' : 'UNAVAILABLE',
+                ];
+
+                continue;
+            }
+
             $nutrient = $mapping->nutrient_id === null ? null : $nutrients->get((int) $mapping->nutrient_id);
             $mappingAuthorized = $profileAuthorized && $this->gates->mappingAuthorized($mapping);
             $authorizedMappings[$mapping->map_code] = $mappingAuthorized;
@@ -426,11 +533,16 @@ class ServingDailyValueCalculationService
             $availability = 'UNAVAILABLE';
             $complete = false;
 
+            $allowFormulationBacked = $mapCode === 'MAP-004'
+                && is_array($result)
+                && ($result['value_source_type'] ?? 'NUTRITION_CALCULATION') === 'ADDED_SUGARS_FORMULATION'
+                && ($authorizedMappings[$mapCode] ?? false);
+
             if ($this->gates->noNormativeDailyValueAuthorized($dailyValue)) {
                 $availability = 'NO_NORMATIVE_VDR';
                 $causes[] = $this->cause('DAILY_VALUE', $dailyValue->vdr_code, 'NO_NORMATIVE_VDR', 'NO_NORMATIVE_VDR', $dailyValue->source_reference);
             } elseif ($profileAuthorized
-                && $this->gates->dailyValueAuthorized($dailyValue)
+                && $this->gates->dailyValueAuthorized($dailyValue, $allowFormulationBacked)
                 && $mapCode !== null
                 && ($authorizedMappings[$mapCode] ?? false)
                 && is_array($result)
