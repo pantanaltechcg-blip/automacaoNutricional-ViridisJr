@@ -34,6 +34,21 @@ export function init() {
     const generateBtn = document.getElementById('generate-table-btn');
 
     let draft = loadRecipeDraft();
+    const initialRecipeRaw = root.dataset.initialRecipe;
+    if (initialRecipeRaw && initialRecipeRaw !== 'null') {
+        try {
+            const initial = JSON.parse(initialRecipeRaw);
+            if (initial && initial.recipeId) {
+                draft = {
+                    ...draft,
+                    ...initial,
+                };
+                persistDraft();
+            }
+        } catch {
+            // mantém rascunho existente
+        }
+    }
     let searchTimer = null;
     let searchAbort = null;
 
@@ -213,9 +228,22 @@ export function init() {
                 left.className = 'text-rn-ink';
                 left.textContent = food.name;
 
-                const right = document.createElement('span');
-                right.className = 'text-xs font-medium text-rn-muted shrink-0';
-                right.textContent = food.source;
+                const right = document.createElement('div');
+                right.className = 'flex items-center gap-2 shrink-0';
+
+                const sourceBadge = document.createElement('span');
+                sourceBadge.className = 'text-xs font-medium text-rn-muted';
+                sourceBadge.textContent = food.source;
+                right.appendChild(sourceBadge);
+
+                if (String(food.source).toUpperCase() !== 'TACO') {
+                    const editLink = document.createElement('a');
+                    editLink.href = `/ingredientes/${encodeURIComponent(food.id)}`;
+                    editLink.className = 'text-xs font-medium text-rn-primary hover:underline';
+                    editLink.textContent = 'Editar';
+                    editLink.addEventListener('click', (ev) => ev.stopPropagation());
+                    right.appendChild(editLink);
+                }
 
                 btn.append(left, right);
                 btn.addEventListener('click', () => {

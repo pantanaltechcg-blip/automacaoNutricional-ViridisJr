@@ -56,6 +56,14 @@ export function init() {
                 li.appendChild(cause);
             }
 
+            if (s.stage === 'CALC_003' && s.state === 'DONE' && s.resourceId) {
+                const link = document.createElement('a');
+                link.href = `/calculos/${encodeURIComponent(s.resourceId)}`;
+                link.className = 'text-rn-primary font-medium hover:underline self-start';
+                link.textContent = `Ver detalhes do cálculo #${s.resourceId}`;
+                li.appendChild(link);
+            }
+
             stagesList.appendChild(li);
         });
     }

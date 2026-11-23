@@ -13,6 +13,7 @@
 <div id="recipe-app"
      data-ingredient-create-url="{{ route('ingredients.create') }}"
      data-table-url-template="/receitas/__ID__/tabela"
+     data-initial-recipe='@json($initialRecipe ?? null)'
      class="flex flex-col gap-6">
 
     <div id="recipe-feedback" class="hidden rounded-xl border px-4 py-3 text-sm" role="alert"></div>
