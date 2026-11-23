@@ -1,18 +1,13 @@
 {
-  "version": "0.16.3",
+  "version": "1.4.1",
   "integration_state_schema": 1,
   "installed_integrations": [
-    "agy",
-    "opencode"
+    "agy"
   ],
   "integration_settings": {
     "agy": {
       "script": "ps",
       "invoke_separator": "-"
-    },
-    "opencode": {
-      "script": "ps",
-      "invoke_separator": "."
     }
   },
   "integration": "agy",
