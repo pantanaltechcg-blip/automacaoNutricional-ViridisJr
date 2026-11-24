@@ -1,0 +1,132 @@
+# Feature Specification: Added Sugars Formulation Obtaining and Validation
+
+**Feature Branch**: `007-added-sugars-formulation`
+
+**Created**: 2026-11-23
+
+**Status**: Clarified — Ready for `/speckit-plan` under Constitution 2.0.0
+
+**Input**: User description: "a spec 007 vai ser sobre o topico 1" — Obtenção e validação de açúcares adicionados por formulação (`specs/backlog/added-sugars-formulation-validation.md`)
+
+## Clarifications
+
+### Session 2026-11-23
+
+- Q: A v1 da Spec 007 deve suportar tanto ingredientes simples quanto ingredientes compostos/industrializados (com teor de açúcares adicionados declarado pelo fabricante), ou deve começar restrita a ingredientes simples? → A: Suportar ingredientes simples e ingredientes compostos/industrializados com declaração de fabricante (informados por 100 g ou por quantidade direta na formulação), distinguindo explicitamente o tipo do ingrediente e a origem/ficha do fabricante.
+- Q: Como deve funcionar o gate de liberação do valor de açúcares adicionados para uso regulatório? → A: Modo estrito *deny-by-default* alinhado às Features 004 e 005: exige validação/autorização técnica verificável da classificação normativa e das evidências (com `TEST_FIXTURE` restrito exclusivamente ao ambiente de testes); dados não validados, formulários não revisados, dados ausentes ou conflitos ficam registrados para rastreabilidade, mas permanecem bloqueados para uso regulatório.
+- Q: Como o resultado da avaliação de açúcares adicionados deve se conectar às execuções das Features 004 (porção/`%VD`) e 005 (valores declarados)? → A: Como artefato/avaliação independente vinculada à receita/formulação (calculando lote e base 100 g/100 ml), consumida explicitamente e de forma opcional em novas execuções da Feature 004 (e, por consequência, na Feature 005), preservando 100% de retrocompatibilidade e imutabilidade das execuções históricas.
+- Q: Como a formulação e a avaliação de açúcares adicionados devem se vincular à receita e à execução nutricional (Feature 003) para garantir consistência de ingredientes e rendimento? → A: Formulação versionada vinculada à receita (`Recipe`) e cada avaliação vinculada a uma execução nutricional imutável da Feature 003 (`NutritionCalculation`), herdando exatamente seus ingredientes, quantidades e rendimento preservados e exigindo cobertura integral dos ingredientes daquela execução.
+- Q: Quando parte dos ingredientes da formulação possui açúcares adicionados validados, mas um ou mais ingredientes estão ausentes, pendentes de validação técnica ou em conflito de evidências, como a avaliação deve calcular o total do lote e o valor por 100 g/100 ml? → A: Manter o total da formulação e o valor por `100 g/100 ml` estritamente `null` (e não elegível para rotulagem) sempre que qualquer ingrediente estiver ausente, pendente de validação técnica ou em conflito, preservando individualmente a contribuição de cada ingrediente validado e todas as causas impeditivas.
+- Q: Como a validação técnica (autorização ou rejeição) de uma versão da formulação de açúcares adicionados deve ser registrada sem violar a imutabilidade das versões e dos snapshots históricos? → A: Registro de validação técnica separado e imutável (*append-only*) vinculado à versão específica da formulação, preservando histórico cronológico de decisões (pendente, autorizada, rejeitada, revogada) com responsável, data, norma e evidência, exigindo nova avaliação após autorização sem alterar snapshots anteriores.
+- Q: Ao referenciar opcionalmente uma avaliação de açúcares adicionados em uma nova execução da Feature 004 (e propagá-la para a Feature 005), como o sistema deve tratar incompatibilidade de origem ou avaliação ainda bloqueada/incompleta? → A: Rejeitar a criação na Feature 004 se a avaliação de açúcares adicionados pertencer a outra execução nutricional (`NutritionCalculation`); se pertencer à mesma execução, consumir o valor em `MAP-004` (liberando `%VD` somente se `VDR-004` também estiver tecnicamente autorizado) quando elegível, ou manter `MAP-004` bloqueado (`null`) preservando as causas herdadas quando a avaliação estiver bloqueada/incompleta.
+
+## Clarification Status
+
+- **CQ-001 — Escopo de tipos de ingrediente (resolvida)**: A v1 abrange tanto ingredientes simples quanto ingredientes compostos ou industrializados com declaração de fabricante (por 100 g do ingrediente ou por quantidade direta na formulação), distinguindo explicitamente o tipo do ingrediente e sua proveniência documental, mantendo bloqueio seguro sempre que o fabricante omitir o dado ou informar apenas açúcares totais.
+- **CQ-002 — Governança de validação e liberação regulatória (resolvida)**: O módulo opera em modo estrito *deny-by-default* alinhado às Features 004 e 005, exigindo validação/autorização técnica verificável da classificação normativa e das evidências para liberar uso regulatório (`TEST_FIXTURE` restrito exclusivamente ao ambiente de teste). Evidências operacionais (como formulários) ou declarações sem validação técnica concluída são preservadas, mas permanecem bloqueadas para uso regulatório.
+- **CQ-003 — Integração com porção, `%VD` e valores declarados (resolvida)**: A avaliação de açúcares adicionados é persistida como artefato/execução independente vinculada à receita/formulação (preservando contribuições por ingrediente, total do lote e base de referência `100 g`/`100 ml`) e pode ser referenciada explicitamente de forma opcional em novas execuções da Feature 004 (e propagada para a Feature 005), sem alterar contratos existentes nem execuções históricas das Features 003–005.
+- **CQ-004 — Vínculo entre formulação, receita e execução nutricional da Feature 003 (resolvida)**: A formulação de açúcares adicionados é versionada no nível da receita, enquanto cada avaliação histórica de açúcares adicionados é vinculada a uma única execução nutricional imutável da Feature 003 daquela mesma receita, utilizando exclusivamente os ingredientes, quantidades e rendimento preservados nessa execução e exigindo correspondência integral dos ingredientes da execução de origem.
+- **CQ-005 — Agregação diante de ingredientes ausentes, pendentes ou conflitantes (resolvida)**: A avaliação pode ser persistida mesmo com pendências para fins de auditoria, preservando a contribuição exata de cada ingrediente individualmente validado e todas as causas impeditivas; porém o total da formulação e o valor normalizado por `100 g/100 ml` permanecem estritamente `null` (sem subtotal parcial agregado) e o resultado é marcado como não elegível para rotulagem até que todos os ingredientes da execução estejam completos e tecnicamente validados.
+- **CQ-006 — Registro imutável de validações técnicas (resolvida)**: Validações técnicas (autorização, rejeição ou revogação) são persistidas como registros imutáveis *append-only* separados vinculados à versão específica da formulação, preservando responsável, data, norma, evidência e escopo; mudanças no estado de validação exigem nova avaliação e nunca alteram snapshots históricos já emitidos.
+- **CQ-007 — Fronteira de integração com Feature 004 (`MAP-004`/`VDR-004`) e Feature 005 (resolvida)**: Ao referenciar opcionalmente uma avaliação de açúcares adicionados na Feature 004, o sistema rejeita a criação se ela pertencer a outra execução nutricional (`NutritionCalculation`); quando pertencer à mesma execução, propaga o valor exato por porção e base `100 g`/`100 ml` para `MAP-004` (liberando `%VD` somente se `VDR-004` também estiver tecnicamente autorizado) se a avaliação for elegível, ou mantém `MAP-004` e `%VD` bloqueados (`null`) com as causas herdadas se a avaliação estiver bloqueada/incompleta, propagando o mesmo snapshot para a Feature 005.
+
+## User Scenarios & Testing *(mandatory)*
+
+### User Story 1 - Registrar e avaliar açúcares adicionados a partir da formulação do produto (Priority: P1)
+
+Como responsável técnico ou nutricionista do NutriLabel, quero registrar a composição de açúcares adicionados dos ingredientes de uma formulação — indicando sua origem, classificação regulatória (inclusão ou exclusão normativa), quantidade/teor e evidência documental — para obter o valor exato de açúcares adicionados da formulação (total do lote, base de referência de 100 g/100 ml e porção), sem alterar a Base Nutricional TACO.
+
+**Why this priority**: A Base Nutricional TACO atual não possui dado de açúcares adicionados (`MAP-004`). Sem um fluxo próprio e governado baseado na formulação do produto, o componente obrigatório de açúcares adicionados permanece permanentemente indisponível e impede a completude regulatória.
+
+**Independent Test**: Pode ser testada registrando uma formulação com ingredientes que possuam classificação regulatória e teor/quantidade de açúcares adicionados respaldados por evidência válida, verificando que o sistema calcula de forma exata a contribuição por ingrediente, o total da formulação e os valores normalizados pelo rendimento (100 g/100 ml e porção aplicável) sem modificar a TACO nem execuções históricas anteriores.
+
+**Acceptance Scenarios**:
+
+1. **Given** uma formulação vinculada a uma receita com rendimento definido e ingredientes classificados com fontes e evidências válidas de açúcares adicionados, **When** a avaliação de açúcares adicionados é executada, **Then** o sistema calcula exatamente a contribuição de cada ingrediente elegível, consolida o total da formulação e produz o valor normalizado na base de referência (`100 g` ou `100 ml`, conforme a unidade do rendimento) sem arredondamento prematuro nem conversão silenciosa entre massa e volume.
+2. **Given** um ingrediente comprovadamente enquadrado em exclusão normativa de açúcares adicionados (com justificativa e evidência registradas), **When** a formulação é avaliada, **Then** o ingrediente é registrado explicitamente como excluído/não contributivo por regra normativa, distinto de dado ausente, não informado ou zero inferido.
+3. **Given** uma formulação contendo ingrediente sem informação de açúcares adicionados, com dado incompleto ou com evidências conflitantes, **When** a avaliação é executada, **Then** o sistema nunca converte o dado ausente ou conflitante em zero, preserva as causas explícitas de incompletude/conflito e impede que o resultado seja classificado como completo ou apto à rotulagem.
+
+---
+
+### User Story 2 - Governar validação técnica, evidências e tratamento de ingredientes compostos ou industrializados (Priority: P2)
+
+Como responsável pela conformidade nutricional e regulatória, quero que as informações de açúcares adicionados (inclusive dados declarados por fabricantes ou oriundos de formulários de coleta) passem por governança de proveniência, versão e validação técnica verificável, distinguindo evidência operacional de aprovação técnica nutricional.
+
+**Why this priority**: Informações declaradas em formulários de clientes ou rótulos de fabricantes não constituem automaticamente aprovação regulatória. A governança evita que dados não validados, desatualizados ou conflitantes liberem indevidamente valores regulatórios.
+
+**Independent Test**: Pode ser testada submetendo informações de açúcares adicionados oriundas de formulário ou fabricante em diferentes estados de validação e verificando que somente fontes/classificações que atendam aos critérios de validação definidos liberam o valor regulatório, enquanto itens pendentes, rejeitados ou sem evidência permanecem bloqueados com causa explícita.
+
+**Acceptance Scenarios**:
+
+1. **Given** um ingrediente cuja informação de açúcares adicionados provém de formulário de coleta operacional ou declaração de fabricante sem validação técnica concluída, **When** a avaliação regulatória é solicitada, **Then** a evidência é preservada para rastreabilidade, mas o dado não é tratado como automaticamente aprovado para uso regulatório.
+2. **Given** ingredientes da formulação com declaração de açúcares adicionados, **When** suas declarações são registradas, **Then** o sistema exige identificação da fonte, unidade compatível, referência documental/evidência, responsável e data, rejeitando unidades incompatíveis ou valores negativos.
+3. **Given** uma tentativa de usar o resultado de açúcares adicionados em contexto regulatório enquanto houver pendência de validação técnica ou conflito entre evidências, **When** o sistema avalia a elegibilidade regulatória, **Then** o resultado permanece bloqueado/indisponível para rotulagem com registro explícito de todas as causas impeditivas.
+
+---
+
+### User Story 3 - Versionar formulações e preservar integralmente snapshots históricos (Priority: P3)
+
+Como auditor ou responsável técnico, quero que cada revisão nas informações de açúcares adicionados da formulação gere uma nova versão imutável e que os resultados históricos já apurados permaneçam inalterados e reproduzíveis, permitindo integração rastreável com execuções futuras de porção, `%VD` e valores declarados.
+
+**Why this priority**: Alterações na formulação, troca de fornecedor ou atualização de laudo/rótulo de fabricante jamais podem alterar retroativamente cálculos nutricionais, porções ou declarações históricas já emitidas.
+
+**Independent Test**: Pode ser testada criando uma avaliação de açúcares adicionados para uma formulação, atualizando posteriormente o teor ou a evidência de um ingrediente na formulação e verificando que a avaliação histórica anterior permanece idêntica enquanto uma nova avaliação reflete a nova versão da formulação.
+
+**Acceptance Scenarios**:
+
+1. **Given** uma avaliação histórica de açúcares adicionados já persistida, **When** a formulação, os ingredientes, as evidências de fabricante ou os estados de validação são atualizados posteriormente, **Then** uma nova versão é registrada e a avaliação histórica anterior permanece integralmente inalterada e reproduzível.
+2. **Given** uma avaliação de açúcares adicionados completa e tecnicamente autorizada para uma versão específica da formulação, **When** uma nova apuração regulatória por porção, `%VD` ou valores declarados é executada, **Then** o valor validado é consumido de forma rastreável com identificação da versão e da evidência utilizadas, sem criar fator energético adicional nem alterar cálculos históricos anteriores.
+
+---
+
+### Edge Cases
+
+- O que acontece quando um ingrediente é açúcar puro ou fonte direta de açúcar adicionado (ex.: sacarose, mel, xarope) versus um ingrediente naturalmente doce excluído pela norma (ex.: fruta *in natura* íntegra)? O sistema deve distinguir explicitamente inclusão e exclusão normativa mediante classificação fundamentada, nunca inferindo automaticamente apenas pelo nome do alimento.
+- O que acontece quando um ingrediente composto/industrializado informa apenas açúcares totais, sem discriminar açúcares adicionados? O sistema deve tratar açúcares adicionados como ausentes/indisponíveis (nunca assumir igualdade com açúcares totais nem converter para zero).
+- O que acontece quando duas fontes para o mesmo ingrediente na formulação apresentam valores divergentes de açúcares adicionados (ex.: formulário do cliente vs. ficha técnica do fabricante)? O sistema deve sinalizar conflito explícito e impedir o uso regulatório até resolução formal e versionada.
+- O que acontece quando o rendimento final da receita é alterado após uma avaliação de açúcares adicionados já ter sido emitida? A avaliação anterior permanece preservada com o rendimento original, e o novo rendimento exige nova execução vinculada à nova versão.
+- O que acontece quando todos os ingredientes da formulação são comprovadamente isentos de açúcares adicionados segundo a norma? O resultado pode produzir zero numérico exato completo (`0`) somente quando todos os ingredientes tiverem classificação e evidência completas e validadas, distinguindo esse zero completo de ausência de dados.
+- O que acontece quando a formulação possui unidade de rendimento incompatível com a base dimensional dos dados informados (massa vs. volume)? O sistema deve rejeitar ou bloquear a operação sem inferir densidade ou realizar conversão implícita.
+- O que acontece quando uma nova execução da Feature 004 referencia uma avaliação de açúcares adicionados gerada para outra execução nutricional (`NutritionCalculation`)? O sistema deve rejeitar a requisição por incompatibilidade estrutural de origem.
+
+## Requirements *(mandatory)*
+
+### Functional Requirements
+
+- **FR-001**: O sistema MUST permitir registrar e versionar formulações de açúcares adicionados vinculadas a uma receita existente e executar avaliações vinculadas a uma única execução nutricional imutável da Feature 003 dessa mesma receita (exigindo correspondência integral com os ingredientes preservados nessa execução), mantendo a Base Nutricional TACO original integralmente intacta e sem criar nutrientes artificiais na TACO.
+- **FR-002**: O sistema MUST suportar a classificação regulatória explícita de cada ingrediente da formulação quanto à incidência de açúcares adicionados (incluindo inclusão normativa, exclusão normativa justificada, ausência de dado e conflito de evidências), proibindo inferência automática a partir do nome do ingrediente, da categoria do alimento, de carboidratos ou de açúcares totais.
+- **FR-003**: O sistema MUST exigir proveniência e evidência rastreáveis para cada informação de açúcares adicionados registrada (incluindo identificação da fonte, referência documental/evidência, unidade, versão normativa aplicável, responsável e data), tratando dados coletados em formulários operacionais como evidência de entrada e nunca como aprovação técnica automática.
+- **FR-004**: O sistema MUST suportar tanto ingredientes simples quanto ingredientes compostos ou industrializados na formulação, distinguindo explicitamente o tipo do ingrediente e aceitando teor de açúcares adicionados por 100 g do ingrediente ou por quantidade direta na formulação mediante declaração/ficha de fabricante ou evidência documental compatível, exigindo unidades compatíveis e rejeitando valores negativos ou inconsistentes.
+- **FR-005**: O sistema MUST calcular a contribuição de açúcares adicionados por ingrediente, o total da formulação e o valor normalizado pelo rendimento (base de referência de `100 g` ou `100 ml`, conforme a unidade do rendimento preservado na execução nutricional da Feature 003) utilizando exclusivamente as quantidades de ingredientes e o rendimento imutáveis da execução nutricional vinculada, com aritmética exata, sem arredondamento intermediário e sem conversão implícita entre massa e volume.
+- **FR-006**: O sistema MUST preservar explicitamente incompletude, dados ausentes, estados não numéricos e conflitos entre fontes, garantindo que nenhum dado ausente, não validado ou conflitante seja convertido silenciosamente em zero numérico; quando qualquer ingrediente da execução estiver ausente, pendente de validação técnica ou em conflito, o sistema MUST preservar individualmente as contribuições dos ingredientes já validados e todas as causas impeditivas, mantendo o total da formulação e o valor por `100 g/100 ml` estritamente `null` (sem subtotal parcial agregado) e marcando o resultado como não elegível para rotulagem.
+- **FR-007**: O sistema MUST operar em modo estrito *deny-by-default* (alinhado às Features 004 e 005), exigindo validação e autorização técnica verificáveis da classificação normativa e das evidências de todos os ingredientes aplicáveis para liberar o uso regulatório do resultado de açúcares adicionados (com `TEST_FIXTURE` restrito exclusivamente ao ambiente de teste), mantendo dados não validados, formulários não revisados, dados ausentes ou conflitos registrados para rastreabilidade, porém bloqueados para uso regulatório.
+- **FR-008**: O sistema MUST versionar imutavelmente cada alteração na formulação de açúcares adicionados, nas classificações de ingredientes ou nas evidências, e MUST registrar decisões de validação técnica (autorização, rejeição ou revogação) como registros imutáveis *append-only* vinculados à versão específica da formulação (com responsável, data, norma e evidência), garantindo que avaliações históricas já persistidas permaneçam inalteradas e exigindo nova avaliação após mudança de estado.
+- **FR-009**: O sistema MUST persistir a avaliação de açúcares adicionados como artefato/execução independente vinculada à receita/formulação e à execução nutricional da Feature 003 (com contribuições por ingrediente, total do lote e base de referência `100 g`/`100 ml`) e permitir que novas execuções da Feature 004 referenciem explicitamente e de forma opcional essa avaliação: se a avaliação pertencer a outra execução nutricional, o sistema MUST rejeitar a criação; se pertencer à mesma execução nutricional, o sistema MUST consumir o valor em `MAP-004` (calculando por porção e liberando `%VD` somente quando `VDR-004` também estiver tecnicamente autorizado, propagando o snapshot para a Feature 005) quando a avaliação for elegível, ou manter `MAP-004` e `%VD` bloqueados (`null`) com as causas herdadas quando a avaliação estiver bloqueada/incompleta, preservando integralmente a retrocompatibilidade e a imutabilidade das execuções históricas das Features 003, 004 e 005.
+- **FR-010**: O sistema MUST garantir que a obtenção de açúcares adicionados não crie fator energético adicional, não duplique contribuições energéticas já contempladas em carboidratos e não aprove automaticamente o VDR correspondente nem regras de rotulagem frontal ou layout visual.
+- **FR-011**: O sistema MUST distinguir explicitamente zero numérico completo (quando todos os ingredientes da formulação têm exclusão normativa validada ou teor zero validado de açúcares adicionados) de resultado indisponível (`null`), bloqueado por validação pendente ou bloqueado por conflito de evidências.
+- **FR-012**: Esta feature MUST NOT incluir renderização visual da tabela nutricional, rotulagem nutricional frontal (lupa), exportação de arquivos (PDF/PNG), autenticação de usuários ou alteração retroativa de alimentos da TACO e alimentos manuais cadastrados na Feature 006.
+
+### Key Entities *(include if feature involves data)*
+
+- **Formulação de Açúcares Adicionados (Versionada)**: Registro versionado e imutável vinculado a uma receita/formulação específica, contendo referência normativa aplicável, responsável, data, estado de validação e conjunto de declarações de ingredientes daquela versão.
+- **Item de Açúcares Adicionados por Ingrediente**: Associação entre um ingrediente da formulação e sua classificação regulatória de açúcares adicionados (inclusão, exclusão normativa, ausente ou conflitante), teor/quantidade exata informada, unidade e vínculo com a evidência documental.
+- **Fonte e Evidência de Açúcares Adicionados**: Registro de proveniência da informação nutricional de açúcares adicionados (ex.: ficha técnica de fabricante, laudo laboratorial, formulário operacional coletado, referência normativa), incluindo referência documental, versão, responsável, data e estado de validação técnica.
+- **Registro de Validação Técnica (Append-Only)**: Registro imutável de decisão técnica (autorizada, rejeitada ou revogada) vinculado a uma versão específica da formulação de açúcares adicionados, contendo responsável técnico, data, norma/versão conferida, escopo, evidência documental e tipo de evidência (com `TEST_FIXTURE` restrito ao ambiente de teste).
+- **Avaliação Histórica de Açúcares Adicionados**: Snapshot imutável vinculado a uma versão específica da formulação de açúcares adicionados e a uma única execução nutricional imutável da Feature 003 da mesma receita, preservando os ingredientes, quantidades e rendimento herdados da execução nutricional, o estado de validação vigente no momento da avaliação, contribuições exatas por ingrediente, total da formulação, valor normalizado por `100 g`/`100 ml`, estado de completude, elegibilidade regulatória e todas as causas de bloqueio, incompletude ou conflito.
+
+## Success Criteria *(mandatory)*
+
+### Measurable Outcomes
+
+- **SC-001**: 100% das avaliações de formulações com todos os ingredientes classificados, evidenciados e tecnicamente validados produzem valores exatos de açúcares adicionados (por ingrediente, total e base de referência `100 g`/`100 ml`) reproduzíveis deterministicamente e sem arredondamento prematuro.
+- **SC-002**: 100% dos cenários contendo ingrediente sem dado de açúcares adicionados, evidência não validada, unidade incompatível ou conflito entre fontes impedem a conversão silenciosa para zero e impedem a classificação do resultado como completo ou apto à rotulagem, registrando todas as causas impeditivas.
+- **SC-003**: 100% dos dados originais da base TACO e 100% das execuções históricas previamente persistidas (cálculos nutricionais, porções/%VD, valores declarados e avaliações anteriores de açúcares adicionados) permanecem integralmente inalterados após qualquer criação ou atualização de formulação.
+- **SC-004**: Responsáveis técnicos conseguem registrar, consultar e auditar a origem, a classificação regulatória (inclusão/exclusão) e o estado de validação de cada ingrediente de uma formulação em um fluxo único, identificando imediatamente quais ingredientes bloqueiam a completude de açúcares adicionados.
+- **SC-005**: 100% das formulações cujos ingredientes sejam comprovadamente isentos de açúcares adicionados resultam em zero numérico completo claramente diferenciado de resultados ausentes, parciais ou bloqueados.
+
+## Assumptions
+
+- As Features 001 a 006 encontram-se integradas na base de desenvolvimento (`develop`), fornecendo receitas com ingredientes e rendimento (`002`), execuções nutricionais imutáveis (`003`), estrutura de porção, `MAP-004` e `VDR` com gates regulatórios (`004`), valores declarados e arredondamento (`005`) e cadastro manual governado de alimentos simples (`006`).
+- A base normativa de referência permanece sendo a legislação oficial vigente (RDC nº 429/2020, art. 3º, I, e art. 5º, IV; IN nº 75/2020 e retificações publicadas), sujeita às mesmas exigências de rastreabilidade e validação técnica estabelecidas na Constitution 2.0.0.
+- O formulário operacional coletado pela Viridis Jr. pode ser registrado como evidência de entrada, mas não substitui validação técnica nutricional ou aprovação normativa.
+- Controle de autenticação e perfis de acesso continuam fora do escopo desta feature até a especificação dedicada do módulo de autenticação previsto na Constitution, assumindo que a identificação do responsável pela operação é informada e registrada no fluxo.
