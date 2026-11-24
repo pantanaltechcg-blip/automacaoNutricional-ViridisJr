@@ -1,5 +1,13 @@
 import { requestJson } from '../api.js';
 
+const QUALITATIVE_STATE_LABELS = {
+    EXACT: 'Valor numérico',
+    TRACE: 'Traço',
+    NA: 'Não aplicável',
+    ABSENT: 'Ausente',
+    REEVALUATION: 'Em reavaliação',
+};
+
 export async function init() {
     const root = document.getElementById('calculation-app');
     if (!root) {
@@ -50,8 +58,10 @@ export async function init() {
 
             const statesTd = document.createElement('td');
             statesTd.className = 'py-2 text-rn-muted';
-            const states = item.total?.qualitative_states || [];
-            const missing = item.total?.has_missing_relation ? 'RELAÇÃO_AUSENTE' : null;
+            const states = (item.total?.qualitative_states || []).map(
+                (state) => QUALITATIVE_STATE_LABELS[state] ?? state,
+            );
+            const missing = item.total?.has_missing_relation ? 'Relação ausente' : null;
             const list = missing ? [...states, missing] : states;
             statesTd.textContent = list.length > 0 ? list.join(', ') : '—';
 

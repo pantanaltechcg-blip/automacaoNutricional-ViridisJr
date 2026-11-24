@@ -116,11 +116,11 @@
                                         data-nutrient-status="{{ $item['field'] }}"
                                         class="w-full rounded-lg bg-rn-input border border-rn-border px-2.5 py-1.5 text-xs text-rn-ink">
                                     <option value="">Não informar</option>
-                                    <option value="EXACT">EXACT (valor numérico)</option>
-                                    <option value="TRACE">TRACE (traço)</option>
-                                    <option value="NA">NA (não aplicável)</option>
-                                    <option value="ABSENT">ABSENT (ausente)</option>
-                                    <option value="REEVALUATION">REEVALUATION</option>
+                                    <option value="EXACT">Valor numérico</option>
+                                    <option value="TRACE">Traço</option>
+                                    <option value="NA">Não aplicável</option>
+                                    <option value="ABSENT">Ausente</option>
+                                    <option value="REEVALUATION">Em reavaliação</option>
                                 </select>
 
                                 <input type="text"
