@@ -29,6 +29,7 @@ class StoreServingDailyValueCalculationRequest extends FormRequest
             'portion.household_measure' => ['nullable', 'string'],
             'portion_authorization_id' => ['required', 'integer', 'exists:portion_authorizations,id'],
             'regulatory_profile_id' => ['required', 'integer', 'exists:regulatory_profiles,id'],
+            'added_sugars_evaluation_id' => ['nullable', 'integer', 'exists:added_sugars_evaluations,id'],
         ];
     }
 }

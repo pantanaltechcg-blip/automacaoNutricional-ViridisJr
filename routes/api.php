@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AddedSugarsEvaluationController;
+use App\Http\Controllers\AddedSugarsFormulationController;
 use App\Http\Controllers\DeclaredNutritionCalculationController;
 use App\Http\Controllers\FoodController;
 use App\Http\Controllers\ManualFoodRegistrationController;
@@ -22,3 +24,8 @@ Route::post('/nutrition-calculations/{nutritionCalculation}/serving-daily-value-
 Route::get('/serving-daily-value-calculations/{servingDailyValueCalculation}', [ServingDailyValueCalculationController::class, 'show']);
 Route::post('/serving-daily-value-calculations/{servingDailyValueCalculation}/declared-nutrition-calculations', [DeclaredNutritionCalculationController::class, 'store']);
 Route::get('/declared-nutrition-calculations/{declaredNutritionCalculation}', [DeclaredNutritionCalculationController::class, 'show']);
+Route::post('/recipes/{recipe}/added-sugars-formulations', [AddedSugarsFormulationController::class, 'store']);
+Route::get('/recipes/{recipe}/added-sugars-formulations', [AddedSugarsFormulationController::class, 'show']);
+Route::post('/added-sugars-formulation-versions/{version}/validations', [AddedSugarsFormulationController::class, 'storeValidation']);
+Route::post('/nutrition-calculations/{nutritionCalculation}/added-sugars-evaluations', [AddedSugarsEvaluationController::class, 'store']);
+Route::get('/added-sugars-evaluations/{addedSugarsEvaluation}', [AddedSugarsEvaluationController::class, 'show']);

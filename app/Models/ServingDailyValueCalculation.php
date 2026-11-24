@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ServingDailyValueCalculation extends Model
@@ -38,5 +39,10 @@ class ServingDailyValueCalculation extends Model
     public function causes(): HasMany
     {
         return $this->hasMany(ServingDailyValueResultCause::class);
+    }
+
+    public function addedSugarsEvaluation(): BelongsTo
+    {
+        return $this->belongsTo(AddedSugarsEvaluation::class);
     }
 }

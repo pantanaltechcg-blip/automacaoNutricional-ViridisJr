@@ -472,7 +472,23 @@ class DeclaredValuesRegulatoryGateService
         ServingDailyValueCalculation $source,
         ServingDailyValueRegulatoryResult $result,
     ): bool {
-        if ($source->regulatory_profile_status !== 'AUTHORIZED' || $result->technical_status !== 'AUTHORIZED') {
+        if ($source->regulatory_profile_status !== 'AUTHORIZED') {
+            return false;
+        }
+
+        if (
+            $result->map_code === 'MAP-004'
+            && $result->value_source_type === 'ADDED_SUGARS_FORMULATION'
+        ) {
+            return (bool) $source->added_sugars_is_regulatory_eligible
+                && $result->is_complete
+                && $result->value_numerator !== null
+                && $result->value_denominator !== null
+                && $result->source_reference_numerator !== null
+                && $result->source_reference_denominator !== null;
+        }
+
+        if ($result->technical_status !== 'AUTHORIZED') {
             return false;
         }
 
