@@ -24,10 +24,11 @@ class RecipeScreenTest extends TestCase
         $response->assertSee('Medida caseira');
         $response->assertSee('Ingredientes e quantidades');
         $response->assertSee('Buscar ingrediente');
-        $response->assertSee('Não encontrou? Cadastrar ingrediente manualmente');
+        $response->assertSee('Ingrediente não está no banco de dados?');
+        $response->assertSee('Cadastre manualmente em uma tela separada.');
         $response->assertSee('Total informativo dos ingredientes');
         $response->assertSee('+ Cadastrar novo ingrediente');
         $response->assertSee('Gerar tabela nutricional');
-        $response->assertSee('kcal indisponível');
+        $response->assertDontSee('kcal');
     }
 }

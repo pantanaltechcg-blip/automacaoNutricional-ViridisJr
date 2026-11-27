@@ -1,6 +1,6 @@
-# UI Contracts — Feature 007
+# UI Contracts — Feature 008
 
-Contratos de **apresentação**. Nenhum contrato da API é criado ou alterado; os contratos de `/api` são os das Features 001–006.
+Contratos de **apresentação**. Nenhum contrato da API é criado ou alterado; os contratos de `/api` são os das Features 001–007.
 
 ## 1. Rotas web (novas, somente GET)
 

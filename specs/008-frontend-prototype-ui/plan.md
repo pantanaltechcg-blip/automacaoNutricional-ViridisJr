@@ -1,12 +1,12 @@
       # Implementation Plan: Frontend do Protótipo RótuloNutri
 
-**Branch**: `007-frontend-prototype-ui` | **Date**: 2026-11-22 | **Spec**: [spec.md](./spec.md)
+**Feature**: `008-frontend-prototype-ui` | **Branch**: `frontend-` | **Date**: 2026-11-22 | **Spec**: [spec.md](./spec.md)
 
-**Input**: Feature specification from `/specs/007-frontend-prototype-ui/spec.md` (aprovada pelo diretor em 2026-11-22; CQ-001 a CQ-008 e decisões complementares incorporadas)
+**Input**: Feature specification from `/specs/008-frontend-prototype-ui/spec.md` (aprovada pelo diretor em 2026-11-22; CQ-001 a CQ-008 e decisões complementares incorporadas)
 
 ## Summary
 
-Entregar as 4 telas do protótipo (`docs/referencias/pagina-01..04.png`) como páginas **Laravel Blade** servidas por **rotas web de apresentação** e **controllers de apresentação**, estilizadas com **Tailwind CSS 4** já instalado e com interações em **JavaScript Vanilla** empacotado pelo **Vite** já configurado. A interface consome somente os endpoints `/api` existentes (Features 001–006) e **não altera nenhum arquivo de backend nem a Feature 005**.
+Entregar as 4 telas do protótipo (`docs/referencias/pagina-01..04.png`) como páginas **Laravel Blade** servidas por **rotas web de apresentação** e **controllers de apresentação**, estilizadas com **Tailwind CSS 4** já instalado e com interações em **JavaScript Vanilla** empacotado pelo **Vite** já configurado. A interface consome somente os endpoints `/api` existentes (Features 001–007) e **não altera nenhum arquivo de backend nem qualquer artefato dessas features**.
 
 Abordagem técnica:
 
@@ -22,7 +22,7 @@ Abordagem técnica:
 
 **Primary Dependencies**: já instaladas — `laravel/framework`, `vite ^8`, `laravel-vite-plugin ^3.1`, `tailwindcss ^4`, `@tailwindcss/vite ^4`. **Nenhuma nova dependência** (Composer ou npm).
 
-**Storage**: PostgreSQL existente, **somente leitura** pela Feature 007 (tabelas `nutrients` e `declared_nutrition_calculations` apenas via Eloquent). Nenhuma migration. Estado de edição no navegador (`sessionStorage`), nunca no backend.
+**Storage**: PostgreSQL existente, **somente leitura** pela Feature 008 (tabelas `nutrients` e `declared_nutrition_calculations` apenas via Eloquent). Nenhuma migration. Estado de edição no navegador (`sessionStorage`), nunca no backend.
 
 **Testing**: PHPUnit 12 (`php artisan test --compact`) para rotas Blade, service de mapeamento e não regressão; `node --test` (runner nativo do Node 24, sem dependência) para módulos JS puros (`decimal`, `payloads`, `pipeline`, `errors`) em `tests/Js/`.
 
@@ -32,7 +32,7 @@ Abordagem técnica:
 
 **Performance Goals**: busca com debounce (300 ms) e cancelamento de requisição obsoleta (`AbortController`); páginas sem bloqueio perceptível.
 
-**Constraints**: sem SPA, sem frameworks externos, sem nova API, sem alteração de Models/Migrations/Controllers/Services/Requests/Resources existentes, `routes/api.php`, contratos ou Feature 005; nenhuma regra de cálculo/validação/arredondamento/conversão no cliente.
+**Constraints**: sem SPA, sem frameworks externos, sem nova API, sem alteração de Models/Migrations/Controllers/Services/Requests/Resources existentes, `routes/api.php`, contratos ou Features 001–007; nenhuma regra de cálculo/validação/arredondamento/conversão no cliente.
 
 **Scale/Scope**: 4 telas, 5 rotas web (GET), 1 service de apresentação, ~8 módulos JS, ~6 componentes Blade.
 
@@ -64,7 +64,7 @@ Fonte tipográfica, paleta, roteamento entre telas, persistência de rascunho, e
 ### Documentation (this feature)
 
 ```text
-specs/007-frontend-prototype-ui/
+specs/008-frontend-prototype-ui/
 ├── spec.md                      # aprovada
 ├── plan.md                      # este arquivo
 ├── research.md                  # Phase 0

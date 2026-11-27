@@ -1,6 +1,6 @@
-# Data Model — Feature 007
+# Data Model — Feature 008
 
-A Feature 007 **não cria nem altera tabelas, models ou migrations**. Este documento descreve (1) as leituras permitidas no backend e (2) o estado transitório no cliente.
+A Feature 008 **não cria nem altera tabelas, models ou migrations**. Este documento descreve (1) as leituras permitidas no backend e (2) o estado transitório no cliente.
 
 ## 1. Leituras somente leitura no backend
 

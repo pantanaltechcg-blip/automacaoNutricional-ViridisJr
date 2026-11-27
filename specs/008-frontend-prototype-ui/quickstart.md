@@ -1,4 +1,4 @@
-# Quickstart — Validação da Feature 007
+# Quickstart — Validação da Feature 008
 
 Guia de validação (não contém código de implementação). Referências: [spec.md](./spec.md), [contracts/ui-contracts.md](./contracts/ui-contracts.md), [data-model.md](./data-model.md).
 
@@ -9,11 +9,13 @@ Guia de validação (não contém código de implementação). Referências: [sp
 ## 1. Testes automatizados
 ```bash
 php artisan test --compact tests/Feature/Frontend
-node --test tests/Js
-php artisan test --compact          # não regressão das Features 001–006
+node --test --test-isolation=none tests/Js/*.test.mjs
+php artisan test --compact          # não regressão das Features 001–007
 vendor/bin/pint --dirty --format agent
 ```
-Esperado: tudo verde; nenhum arquivo de backend existente alterado (`git diff --stat` limitado a `routes/web.php`, novos controllers/service, views, JS, CSS, testes e `specs/007-*`).
+Esperado: tudo verde; nenhum arquivo de backend existente alterado (`git diff --stat` limitado a `routes/web.php`, novos controllers/service, views, JS, CSS, testes e `specs/008-frontend-prototype-ui/**`).
+
+No Windows, `node --test tests/Js` pode falhar ao criar subprocessos com `spawn EPERM`. `--test-isolation=none` mantém o runner oficial do Node e executa os mesmos testes sem essa criação de processos.
 
 ## 2. Validação manual (backend atual)
 1. Abrir `/receitas/nova`: layout igual a `docs/referencias/pagina-01.png`.

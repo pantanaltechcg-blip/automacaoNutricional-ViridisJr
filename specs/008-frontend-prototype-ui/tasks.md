@@ -1,6 +1,6 @@
 ﻿# Tasks: Frontend do Protótipo RótuloNutri
 
-**Input**: Design documents from `/specs/007-frontend-prototype-ui/`
+**Input**: Design documents from `/specs/008-frontend-prototype-ui/`
 **Prerequisites**: [plan.md](./plan.md), [spec.md](./spec.md), [research.md](./research.md), [data-model.md](./data-model.md), [contracts/ui-contracts.md](./contracts/ui-contracts.md), [quickstart.md](./quickstart.md)
 **Tests**: INCLUÍDOS (NFR-008; Constituição exige testes dos caminhos autorizados e dos bloqueios). Escrever cada teste antes da implementação correspondente e vê-lo falhar.
 **Organization**: por user story (spec.md §4): US1 Receita (P1), US2 Tabela/bloqueios (P1), US3 Cadastro de ingrediente (P2), US4 Rótulo (P3).
@@ -10,8 +10,8 @@
 - **[Story]**: US1–US4 (apenas nas fases de user story)
 
 ## Regras permanentes (valem para todas as tarefas)
-- **PROIBIDO alterar**: `app/Models/*`, `app/Services/*` existentes, `app/Http/Controllers/*` existentes, `app/Http/Requests/*`, `app/Http/Resources/*`, `database/**`, `routes/api.php`, `specs/001–006/**`, qualquer artefato da Feature 005.
-- **Permitido**: novos controllers/service de apresentação, `routes/web.php` (apenas acréscimo; rota `/` intacta), views Blade, `resources/css/app.css` (apenas acréscimo em `@theme`), `resources/js/**`, `tests/**`, `specs/007-*`.
+- **PROIBIDO alterar**: `app/Models/*`, `app/Services/*` existentes, `app/Http/Controllers/*` existentes, `app/Http/Requests/*`, `app/Http/Resources/*`, `database/**`, `routes/api.php`, `specs/001–007/**`.
+- **Permitido**: novos controllers/service de apresentação, `routes/web.php` (apenas acréscimo; rota `/` intacta), views Blade, `resources/css/app.css` (apenas acréscimo em `@theme`), `resources/js/**`, `tests/**`, `specs/008-frontend-prototype-ui/**`.
 - Sem novas dependências (Composer/npm). Sem IDs regulatórios criados/fixados/mockados. Nenhum cálculo, arredondamento ou conversão no cliente. Vazio ≠ 0.
 - Criar PHP com `php artisan make:*` e `--no-interaction`; ao final rodar `vendor/bin/pint --dirty --format agent`.
 
@@ -19,7 +19,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T001 Verificar baseline: `git status`, rodar `php artisan test --compact` e registrar que a suíte das Features 001–006 passa antes de qualquer alteração (referência para NFR-011).
+- [X] T001 Verificar baseline: `git status` e suíte pré-frontend documentados no PR #8 da Feature 006 (222 testes, 27.591 asserções; commit-base `85825fc`, pai do primeiro commit frontend `96a383b`), antes de qualquer alteração (referência para NFR-011).
 - [X] T002 [P] Amostrar as cores do protótipo em `docs/referencias/pagina-01.png`…`pagina-04.png` e definir os tokens (sidebar escura, verde primário, verde-claro de destaque, fundo esverdeado, campos, borda, vermelho do ×) em `@theme` de `resources/css/app.css` (acréscimo apenas; `welcome` inalterada; fonte Instrument Sans mantida, D-01/D-02).
 - [X] T003 [P] Criar a estrutura de diretórios vazia: `resources/views/layouts/`, `resources/views/components/rotulonutri/`, `resources/views/rotulonutri/`, `resources/js/rotulonutri/pages/`, `tests/Feature/Frontend/`, `tests/Js/`.
 
@@ -57,7 +57,7 @@
 
 ### Testes
 - [X] T017 [P] [US1] Teste JS `tests/Js/payloads.test.mjs`: `buildRecipePayload(draft)` ⇒ `yield_unit` `g`/`ml` conforme tipo; `quantity` string com ponto; `unit:"g"`; `position` 1..n; **sem** porção, medida caseira nem total informativo; ingrediente com quantidade vazia/≤0 não é enviado como 0 (retorna erro local de presença).
-- [X] T018 [P] [US1] Teste Feature `tests/Feature/Frontend/RecipeScreenTest.php`: Tela 1 contém "Cadastro de Receita", "Informações da receita", "Nome da receita", "Tipo do produto", "Sólido ou semissólido", "Líquido", "Peso final (g)", "Porção (g)", "Medida caseira", "Buscar ingrediente", "Não encontrou? Cadastrar ingrediente manualmente", "Total informativo dos ingredientes", "+ Cadastrar novo ingrediente", "Gerar tabela nutricional"; "auto kcal" sem número.
+- [X] T018 [P] [US1] Teste Feature `tests/Feature/Frontend/RecipeScreenTest.php`: no HTML inicial da Tela 1, validar a caixa estática "Ingrediente não está no banco de dados?" + "Cadastre manualmente em uma tela separada." e a ação "+ Cadastrar novo ingrediente"; a ação dinâmica de cadastro permanece implementada após os resultados da busca; a carga inicial não apresenta valor de kcal.
 
 ### Implementação
 - [X] T019 [US1] Implementar `resources/js/rotulonutri/payloads.js` (`buildRecipePayload`) conforme T017 e contracts §3.
@@ -136,11 +136,11 @@
 - [X] T046 [P] Revisão de acessibilidade (NFR-004): rótulos associados, foco visível, navegação por teclado, `aria-disabled`/descrição nos itens indisponíveis, estados não dependentes só de cor.
 - [X] T047 [P] Responsividade mínima funcional sem perda de dados (NFR-003) em `resources/css/app.css`/views, sem criar novo design.
 - [X] T048 [P] Revisão de segurança (NFR-006): escape Blade, uso de `textContent` no DOM, ausência de rotas web de escrita, sem credenciais no cliente.
-- [ ] T049 Revisão visual lado a lado das 4 telas contra `docs/referencias/pagina-01..04.png` (NFR-001); registrar desvios (fonte; acréscimos exigidos pelo backend) para aprovação.
-- [ ] T050 Rodar `npm run build`, `node --test tests/Js`, `php artisan test --compact tests/Feature/Frontend` e `php artisan test --compact` completo (NFR-011).
-- [ ] T051 Executar `vendor/bin/pint --dirty --format agent` e corrigir.
+- [X] T049 Revisão visual lado a lado das 4 telas contra `docs/referencias/pagina-01..04.png` (NFR-001); registrar desvios (fonte; acréscimos exigidos pelo backend) para aprovação. Comparação concluída: os campos adicionais de rastreabilidade e estados não suportados da Tela 4 são exigidos pela Feature 006; o shell global também aparece na Tela 4 embora não esteja na referência visual. Os bloqueios honestos da 004/005 e controles da Tela 3 permanecem conforme especificado; nenhum desvio exige mudança funcional.
+- [X] T050 Rodar `npm run build`, `node --test --test-isolation=none tests/Js/*.test.mjs`, `php artisan test --compact tests/Feature/Frontend` e `php artisan test --compact` completo (NFR-011). Verificação final: build aprovado (com aviso não bloqueante da dependência opcional `fontaine`); 18 testes JS e 13 testes Frontend aprovados; suíte completa `vendor/bin/phpunit --no-coverage` aprovada em banco PostgreSQL isolado recém-migrado e importado (270 testes, 28.286 asserções, 2 deprecações PHPUnit). No banco `testing` preexistente, quatro verificações de contagem falharam por registros persistentes de execuções anteriores; nenhum dado foi removido. O teste do mapper foi isolado em tabela temporária para não colidir com os 66 Nutrients importados.
+- [X] T051 Executar `vendor/bin/pint --dirty --format agent` e corrigir (sem arquivos PHP fora do padrão).
 - [X] T052 Verificar por `git diff --stat` e `git status` que **nenhum** arquivo proibido foi alterado (SC-007/FR-028) e que `package.json`/`composer.json` não mudaram.
-- [ ] T053 Executar a validação manual de [quickstart.md](./quickstart.md) e registrar o resultado.
+- [X] T053 Executar a validação manual de [quickstart.md](./quickstart.md) e registrar o resultado. Roteiro concluído no ambiente isolado: cadastro inválido com `source = TACO` rejeitado; cadastro `TEST_FIXTURE` aceito e localizado pela busca; receita salva e reaberta; etapas 003/004/005 e bloqueio regulatório conferidos; falha de conexão exibiu a mensagem e a ação “Tentar novamente”; telas comparadas às referências; rota inexistente e ações indisponíveis conferidas. Dados e banco descartáveis não foram usados fora de testing.
 
 ---
 

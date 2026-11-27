@@ -1,20 +1,21 @@
 # Feature Specification: Frontend do Protótipo RótuloNutri
 
-**Feature Branch**: `007-frontend-prototype-ui`
+**Feature ID**: `008-frontend-prototype-ui`
+**Feature Branch**: `frontend-` (branch atual do repositório)
 **Created**: 2026-11-22
-**Updated**: 2026-11-22 (CQ-001 a CQ-008 resolvidas pelo diretor)
-**Status**: Specify concluído e clarificado — aguardando aprovação do diretor para Plan (nenhum Plan, Tasks ou Implement iniciado)
+**Updated**: 2026-11-26 (ID único da feature, status de implementação e compatibilidade com Features 001–007)
+**Status**: Specify, Clarify, Plan e Tasks concluídos; implementação em andamento, com validações finais pendentes.
 **Constitution**: 2.0.0
 **Referência visual obrigatória**: `docs/referencias/Rotulagem Nutricional – Protótipo.pdf` (4 páginas, exportadas em `docs/referencias/pagina-01.png` a `pagina-04.png`)
-**Input**: "Especificar o frontend do protótipo aprovado do RótuloNutri, cruzando-o com o backend Laravel existente (Features 001–006), sem alterar backend, sem alterar a Feature 005 e sem inventar funcionalidades."
+**Input**: "Especificar o frontend do protótipo aprovado do RótuloNutri, cruzando-o com o backend Laravel existente (Features 001–007), sem alterar backend ou funcionalidades existentes e sem inventar funcionalidades."
 
-> **Numeração**: 001–005 e 006 (`006-manual-food-registration`) já existem. A pasta vazia `006-frontend-prototype-ui` foi removida e `.specify/feature.json` aponta para `specs/007-frontend-prototype-ui`.
+> **Numeração**: `007-added-sugars-formulation` já existe. Para evitar conflito de identificadores, esta feature usa `008-frontend-prototype-ui`. O diretório de especificação é `specs/008-frontend-prototype-ui/`.
 
 ## 0. Diretriz principal (decisão do diretor)
 
-A Feature 007 implementa **exclusivamente a interface frontend** do protótipo dentro da aplicação Laravel existente. **O frontend se adapta integralmente ao backend atual.** É proibido alterar, complementar, contornar ou modificar o backend para a interface funcionar.
+A Feature 008 implementa **exclusivamente a interface frontend** do protótipo dentro da aplicação Laravel existente. **O frontend se adapta integralmente ao backend atual.** É proibido alterar, complementar, contornar ou modificar o backend para a interface funcionar.
 
-**Não alterar**: Models, Migrations, Controllers existentes, Services existentes, rotas da API existentes, contratos de requisição/resposta, regras de validação, cálculo nutricional, regras regulatórias, Features 001–006 e, sob nenhuma circunstância, a Feature 005.
+**Não alterar**: Models, Migrations, Controllers existentes, Services existentes, rotas da API existentes, contratos de requisição/resposta, regras de validação, cálculo nutricional, regras regulatórias ou artefatos das Features 001–007.
 
 **Não criar**: endpoints de API, tabelas, campos, identificadores, nutrientes, regras de negócio ou funcionalidades inexistentes.
 
@@ -71,11 +72,11 @@ flowchart LR
     P -->|Baixar PDF| F["Arquivo PDF"]
 ```
 
-**Fluxo efetivamente alcançável com o backend atual** (ver 2.3 e CQ-002): Receita → salvar receita → Feature 003 → **interrupção na Feature 004** com mensagem da etapa bloqueada → Tela 2 em estado "bloqueado" (tabela sem valores). A Tela 3 só é alcançável após uma execução válida da Feature 005, hoje inexistente.
+**Fluxo efetivamente alcançável com o backend atual** (ver 2.3 e CQ-002): Receita → salvar receita → Feature 003 → **interrupção na Feature 004** com mensagem da etapa bloqueada → Tela 2 em estado "bloqueado" (tabela sem valores). A Tela 3 só é alcançável quando houver uma execução válida da Feature 005 disponível; este protótipo não cria nem simula tal execução.
 
 ## 2. Cruzamento com o backend (estado real)
 
-### 2.1 Capacidades existentes (Features 001–006)
+### 2.1 Capacidades existentes (Features 001–007)
 
 | Endpoint | Função | Observações relevantes |
 |---|---|---|
@@ -163,7 +164,7 @@ Legenda: **S** suportado · **P** parcial/condicionado · **I** indisponível (s
 6. `is_label_ready` e `label_readiness_causes` são apresentados exatamente como retornados pela Feature 005; se `false`, informar que o resultado não está apto à rotulagem e listar as causas.
 7. Funcionalidades sem suporte permanecem visivelmente indisponíveis, sem simulação.
 8. Erros 422 nos respectivos campos com as mensagens da API; erros de rede/5xx com mensagem compreensível e nova tentativa.
-9. Preservar contratos, arquivos e responsabilidades das Features 001–006.
+9. Preservar contratos, arquivos e responsabilidades das Features 001–007.
 10. Fidelidade visual às quatro páginas do protótipo, sem novas telas ou funcionalidades.
 11. Nenhum arquivo de backend, migration ou da Feature 005 é alterado.
 
@@ -172,11 +173,11 @@ Legenda: **S** suportado · **P** parcial/condicionado · **I** indisponível (s
 1. **Mapeamento de nutrientes (FR-022, FR-031)**: controller de apresentação, consulta somente leitura à tabela `nutrients`, relação por nome e unidade; sem `nutrient_id` fixo, sem criar/modificar registros, sem presumir nutrientes inexistentes; correspondência ausente ou ambígua = campo indisponível, sem escolha arbitrária.
 2. **Porção e medida caseira (FR-029)**: somente estado local; sem campos, colunas ou persistência no backend; enviados à Feature 004 apenas quando todos os requisitos dessa integração estiverem disponíveis; sem simulação enquanto bloqueada.
 3. **Resultados da Feature 003 (FR-030)**: não preenchem células da tabela quando exigirem conversão ou cálculo no cliente; a interface mostra apenas andamento das etapas, estados da API e mensagens de erro; células permanecem "—" ou informativas; sem frações convertidas, cálculos, arredondamentos, estimativas ou valores fictícios.
-4. **Preservação do backend**: nada nas Features 001–006 é alterado (migrations, tabelas, Models, regras, endpoints, contratos, cálculos). A Feature 007 se adapta ao backend atual.
+4. **Preservação do backend**: nada nas Features 001–007 é alterado (migrations, tabelas, Models, regras, endpoints, contratos, cálculos). A Feature 008 se adapta ao backend atual.
 
-Revisão de compatibilidade das decisões: a leitura de `nutrients` (Feature 001, somente leitura) e o uso de nome+unidade são compatíveis com a base importada (`nutrients.csv` possui `Energia` em `kcal` e `kJ`, distinguíveis pela unidade); nenhuma incompatibilidade nova com as Features 001–006 foi encontrada. A ambiguidade potencial (mais de um registro com o mesmo nome e unidade) é tratada por FR-031.
+Revisão de compatibilidade das decisões: a leitura de `nutrients` (Feature 001, somente leitura) e o uso de nome+unidade são compatíveis com a base importada (`nutrients.csv` possui `Energia` em `kcal` e `kJ`, distinguíveis pela unidade); nenhuma incompatibilidade nova com as Features 001–007 foi encontrada. A ambiguidade potencial (mais de um registro com o mesmo nome e unidade) é tratada por FR-031.
 
-### Verificação de compatibilidade (Features 001–006 e Constituição 2.0.0)
+### Verificação de compatibilidade (Features 001–007 e Constituição 2.0.0)
 
 | Verificação | Resultado |
 |---|---|
@@ -235,7 +236,7 @@ Como usuário, quero acionar "Gerar tabela nutricional" e ver claramente até on
 7. **Given** "Cancelar", **Then** nada é persistido e a receita é preservada.
 
 ### User Story 4 — Montagem do rótulo e PDF (Priority: P3, indisponível)
-Somente a estrutura visual da Tela 3 é especificada. Ela só é alcançável após execução 005 válida (hoje inexistente). "Baixar PDF" permanece desabilitado e explicado; tamanho, formato e nome do arquivo são visuais; lista de ingredientes e linha "Lote · Validade · Peso líquido · Contato" permanecem como placeholders do protótipo; "Aplicar ao rótulo" não gera nem persiste nada.
+Somente a estrutura visual da Tela 3 é especificada. Ela só é alcançável após execução 005 válida, quando disponível. "Baixar PDF" permanece desabilitado e explicado; tamanho, formato e nome do arquivo são visuais; lista de ingredientes e linha "Lote · Validade · Peso líquido · Contato" permanecem como placeholders do protótipo; "Aplicar ao rótulo" não gera nem persiste nada.
 
 ### Edge Cases
 - Busca vazia: nenhuma requisição; sem resultados: apenas a ação de cadastro manual.
@@ -293,7 +294,7 @@ Somente a estrutura visual da Tela 3 é especificada. Ela só é alcançável ap
 - **FR-025**: O frontend MUST NOT calcular energia, macronutrientes, %VD, arredondamentos, conversões de unidade nem aplicar regras regulatórias.
 - **FR-026**: O frontend MUST NOT duplicar regras de validação do servidor (limites, formatos, enums) como fonte de verdade; restrições locais limitam-se a normalização de transporte, presença mínima e comportamento dos controles (FR-007).
 - **FR-027**: O frontend MUST NOT enviar campos que o servidor resolve (fatores, VDR, status técnico, evidência regulatória, regras de arredondamento) nem criar, fixar, inferir ou mockar `portion_authorization_id`, `regulatory_profile_id` ou `regulatory_declaration_profile_id`.
-- **FR-028**: Nenhum arquivo de Models, Migrations, Controllers/Services/Requests/Resources existentes, `routes/api.php`, contratos ou da Feature 005 MUST ser alterado por esta feature.
+- **FR-028**: Nenhum arquivo de Models, Migrations, Controllers/Services/Requests/Resources existentes, `routes/api.php`, contratos ou artefato das Features 001–007 MUST ser alterado por esta feature.
 
 ### Non-Functional Requirements
 
@@ -307,7 +308,7 @@ Somente a estrutura visual da Tela 3 é especificada. Ela só é alcançável ap
 - **NFR-008 (Testabilidade)**: Testes de feature para rotas Blade e de integração com a API existente (estados 422, bloqueio da cadeia, ausência de zero fictício); estratégia de testes de JS definida no Plan sem novas dependências sem aprovação.
 - **NFR-009 (Rastreabilidade)**: Cada requisito mapeia a uma página do protótipo e a um endpoint ou lacuna (2.2).
 - **NFR-010 (Idioma)**: Português do Brasil conforme o protótipo.
-- **NFR-011 (Não regressão)**: A suíte existente das Features 001–006 continua passando sem modificações.
+- **NFR-011 (Não regressão)**: A suíte existente das Features 001–007 continua passando sem modificações.
 
 ### Key Entities
 - **Receita em edição (cliente)**: nome, tipo/unidade, rendimento, porção, medida caseira (locais), ingredientes (`food_id`, quantidade, posição).
@@ -327,7 +328,7 @@ Alterar backend ou Feature 005; criar autenticação, endpoints, tabelas, campos
 - **SC-004**: Em qualquer execução 005 retornada, 100% das células correspondem à resposta; 0 ocorrências de `null`/estado qualitativo exibido como zero.
 - **SC-005**: Cadastro manual válido via `POST /api/manual-foods` aparece na busca seguinte; erros 422 aparecem nos campos.
 - **SC-006**: Todas as lacunas GAP-01 a GAP-09 aparecem como indisponíveis/bloqueadas e explicadas, sem simulação.
-- **SC-007**: O diff da implementação não toca em backend, migrations, `routes/api.php`, contratos nem na Feature 005, e a suíte das Features 001–006 permanece verde.
+- **SC-007**: O diff da implementação não toca em backend, migrations, `routes/api.php`, contratos nem nas Features 001–007, e a suíte anterior à Feature 008 permanece verde.
 
 ## 7. Assumptions
 

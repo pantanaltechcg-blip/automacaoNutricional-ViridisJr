@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Frontend;
 
+use App\Models\Nutrient;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
@@ -13,6 +14,8 @@ class IngredientScreenTest extends TestCase
 
     public function test_ingredient_screen_renders_required_fields_qualitative_statuses_and_unsupported_options(): void
     {
+        Nutrient::query()->create(['name' => 'Energia', 'unit' => 'kcal']);
+
         $response = $this->get('/ingredientes/novo');
 
         $response->assertStatus(200);

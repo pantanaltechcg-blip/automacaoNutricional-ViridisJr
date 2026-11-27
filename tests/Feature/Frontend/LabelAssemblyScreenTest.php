@@ -9,7 +9,6 @@ use App\Models\NutritionCalculation;
 use App\Models\Recipe;
 use App\Models\ServingDailyValueCalculation;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class LabelAssemblyScreenTest extends TestCase
@@ -35,22 +34,12 @@ class LabelAssemblyScreenTest extends TestCase
             'yield_unit' => 'g',
         ]);
 
-        $profileId = DB::table('regulatory_profiles')->insertGetId([
-            'code' => 'PROF-TEST',
-            'version' => '1.0',
-            'title' => 'Perfil Teste',
-            'normative_source' => 'RDC 429/2020',
-            'normative_version' => '2020',
-            'technical_status' => 'BLOCKED',
-            'created_at' => now(),
-        ]);
-
         $calc004 = ServingDailyValueCalculation::query()->create([
             'nutrition_calculation_id' => $calc003->id,
             'source_recipe_id' => $recipe->id,
-            'source_rules_version' => 'nutrition-calculation-v1',
-            'yield_value' => '400',
-            'yield_unit' => 'g',
+            'source_rules_version' => NutritionCalculation::RULES_VERSION,
+            'source_yield_value' => '400',
+            'source_yield_unit' => 'g',
             'portion_value' => '50',
             'portion_unit' => 'g',
             'household_measure_mode' => 'PROVIDED',
@@ -59,63 +48,56 @@ class LabelAssemblyScreenTest extends TestCase
             'portion_reference_version' => '1.0',
             'portion_reference_source' => 'TEST',
             'portion_reference_technical_status' => 'AUTHORIZED',
-            'portion_reference_validated_on' => '2026-11-11',
             'portion_evidence_reference' => 'EV-1',
             'portion_evidence_source' => 'TEST',
             'portion_evidence_version' => '1.0',
             'portion_evidence_scope' => 'test',
             'portion_evidence_kind' => 'TEST_FIXTURE',
-            'portion_evidence_validated_by' => 'tester',
-            'portion_evidence_validated_on' => '2026-11-11',
-            'regulatory_profile_id' => $profileId,
+            'portion_validated_by' => 'tester',
+            'portion_validated_on' => '2026-11-11',
             'regulatory_profile_code' => 'PROF-TEST',
             'regulatory_profile_version' => '1.0',
-            'regulatory_normative_source' => 'RDC 429/2020',
-            'regulatory_normative_version' => '2020',
-            'regulatory_profile_technical_status' => 'BLOCKED',
-        ]);
-
-        $declProfileId = DB::table('regulatory_declaration_profiles')->insertGetId([
-            'code' => 'DECL-TEST',
-            'version' => '1.0',
-            'title' => 'Decl Teste',
-            'regulatory_profile_code' => 'PROF-TEST',
-            'regulatory_profile_version' => '1.0',
-            'normative_source' => 'RDC 429/2020',
-            'normative_version' => '2020',
-            'consulted_on' => '2026-11-12',
-            'technical_status' => 'BLOCKED',
-            'created_at' => now(),
+            'regulatory_profile_title' => 'Perfil Teste',
+            'regulatory_profile_status' => 'BLOCKED',
+            'regulatory_profile_normative_source' => 'RDC 429/2020',
+            'regulatory_profile_normative_version' => '2020',
+            'regulatory_profile_consulted_on' => '2026-11-12',
         ]);
 
         $declared = DeclaredNutritionCalculation::query()->create([
             'serving_daily_value_calculation_id' => $calc004->id,
-            'nutrition_calculation_id' => $calc003->id,
+            'source_nutrition_calculation_id' => $calc003->id,
             'source_recipe_id' => $recipe->id,
-            'source_003_rules_version' => 'nutrition-calculation-v1',
-            'source_004_rules_version' => 'serving-daily-values-v1',
-            'yield_value' => '400',
-            'yield_unit' => 'g',
+            'source_003_rules_version' => NutritionCalculation::RULES_VERSION,
+            'source_004_rules_version' => ServingDailyValueCalculation::RULES_VERSION,
+            'source_yield_value' => '400',
+            'source_yield_unit' => 'g',
             'portion_value' => '50',
             'portion_unit' => 'g',
             'household_measure_mode' => 'PROVIDED',
             'household_measure' => '1 fatia',
             'portion_reference_technical_status' => 'AUTHORIZED',
+            'portion_evidence_reference' => 'EV-1',
+            'portion_evidence_source' => 'TEST',
+            'portion_evidence_version' => '1.0',
+            'portion_evidence_scope' => 'test',
+            'portion_evidence_kind' => 'TEST_FIXTURE',
+            'portion_validated_by' => 'tester',
+            'portion_validated_on' => '2026-11-11',
             'regulatory_profile_code' => 'PROF-TEST',
             'regulatory_profile_version' => '1.0',
-            'regulatory_profile_technical_status' => 'BLOCKED',
-            'regulatory_declaration_profile_id' => $declProfileId,
+            'regulatory_profile_status' => 'BLOCKED',
+            'regulatory_profile_normative_source' => 'RDC 429/2020',
+            'regulatory_profile_normative_version' => '2020',
             'declaration_profile_code' => 'DECL-TEST',
             'declaration_profile_version' => '1.0',
             'declaration_profile_title' => 'Decl Teste',
-            'declaration_profile_technical_status' => 'BLOCKED',
-            'normative_source' => 'RDC 429/2020',
-            'normative_version' => '2020',
-            'declaration_consulted_on' => '2026-11-12',
-            'recalculation_policy_code' => 'REC-001',
-            'recalculation_order_mode' => 'DECLARE_COMPONENTS_THEN_ENERGY_AND_VD',
-            'recalculation_policy_technical_status' => 'BLOCKED',
-            'recalculation_requires_complete_energy_inputs' => true,
+            'declaration_profile_status' => 'BLOCKED',
+            'declaration_profile_normative_source' => 'RDC 429/2020',
+            'declaration_profile_normative_version' => '2020',
+            'declaration_profile_consulted_on' => '2026-11-12',
+            'reference_100_energy_availability' => 'UNAVAILABLE',
+            'portion_energy_availability' => 'UNAVAILABLE',
             'is_label_ready' => false,
         ]);
 
@@ -123,7 +105,7 @@ class LabelAssemblyScreenTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Montagem do Rótulo');
-        $response->assertSee('Produto Teste');
+        $response->assertSee('[Nome do produto]');
         $response->assertSee('Arquivo para impressão');
         $response->assertSee('Tamanho do rótulo');
         $response->assertSee('Formato');

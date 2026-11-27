@@ -1,4 +1,4 @@
-# Research — Feature 007 (Frontend do Protótipo)
+# Research — Feature 008 (Frontend do Protótipo)
 
 ## D-01 Tipografia
 - **Decision**: manter a fonte já configurada no projeto (`Instrument Sans` via `@fonts`/Bunny em `vite.config.js` e `@theme`).
