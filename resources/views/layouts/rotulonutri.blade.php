@@ -22,21 +22,10 @@
                 Receitas
             </a>
 
-            <span role="link"
-                  aria-disabled="true"
-                  title="Funcionalidade indisponível no sistema atual"
-                  class="px-3.5 py-2.5 rounded-lg text-white/60 cursor-not-allowed flex items-center justify-between">
-                <span>Rótulos</span>
-                <span class="text-[11px] uppercase tracking-wide text-white/50">Indisponível</span>
-            </span>
-
-            <span role="link"
-                  aria-disabled="true"
-                  title="Funcionalidade indisponível no sistema atual"
-                  class="px-3.5 py-2.5 rounded-lg text-white/60 cursor-not-allowed flex items-center justify-between">
-                <span>Configurações</span>
-                <span class="text-[11px] uppercase tracking-wide text-white/50">Indisponível</span>
-            </span>
+            <a href="{{ route('labels.index') }}"
+               class="px-3.5 py-2.5 rounded-lg transition-colors {{ request()->routeIs('labels.*') ? 'bg-rn-sidebar-active text-white' : 'text-white/80 hover:bg-white/10' }}">
+                Rótulos
+            </a>
         </nav>
     </aside>
 

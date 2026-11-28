@@ -13,7 +13,7 @@ class ShellTest extends TestCase
         $this->get('/')->assertStatus(200);
     }
 
-    public function test_recipe_screen_renders_prototype_shell_and_unavailable_nav_items(): void
+    public function test_recipe_screen_renders_prototype_shell_with_labels_navigation_and_disabled_later_steps(): void
     {
         $response = $this->get('/receitas/nova');
 
@@ -22,7 +22,8 @@ class ShellTest extends TestCase
         $response->assertSee('Nutri', false);
         $response->assertSee('Receitas');
         $response->assertSee('Rótulos');
-        $response->assertSee('Configurações');
+        $response->assertSee('href="'.route('labels.index').'"', false);
+        $response->assertDontSee('Configurações');
         $response->assertSee('Tabela nutricional');
         $response->assertSee('Rótulo em PDF');
         $response->assertSee('aria-disabled="true"', false);
